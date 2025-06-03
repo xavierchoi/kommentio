@@ -3,7 +3,7 @@
 **오픈소스 댓글 시스템 - 광고 없는 Disqus 대체제**
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
+![Version](https://img.shields.io/badge/version-0.1.1-orange.svg)
 ![Bundle Size](https://img.shields.io/badge/bundle%20size-19.85KB-brightgreen.svg)
 ![Gzipped](https://img.shields.io/badge/gzipped-6.57KB-brightgreen.svg)
 

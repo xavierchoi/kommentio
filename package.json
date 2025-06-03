@@ -1,7 +1,7 @@
 {
   "name": "kommentio",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Open-source embeddable comment widget - Ad-free alternative to Disqus",
   "scripts": {

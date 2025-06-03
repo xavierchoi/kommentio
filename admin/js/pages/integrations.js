@@ -506,31 +506,58 @@ class IntegrationsPage {
 
   // API 키 관련 메서드
   openApiKeyModal() {
-    const modalContent = Utils.createElement('div', 'space-y-4');
-    modalContent.innerHTML = `
-      <div>
-        <label class="input-label">API 키 이름</label>
-        <input type="text" class="input" id="apiKeyName" placeholder="예: Production API Key">
-      </div>
-      
-      <div>
-        <label class="input-label">권한</label>
-        <div class="space-y-2">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" id="permRead" checked>
-            <span>읽기 (Read)</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="checkbox" id="permWrite">
-            <span>쓰기 (Write)</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="checkbox" id="permAdmin">
-            <span>관리자 (Admin)</span>
-          </label>
-        </div>
-      </div>
-    `;
+    const modalContent = Utils.createElement('div');
+    
+    // API 키 이름 섹션
+    const nameSection = Utils.createElement('div', 'form-section');
+    const nameLabel = Utils.createElement('label', 'input-label', 'API 키 이름');
+    const nameInput = Utils.createElement('input', 'input');
+    nameInput.type = 'text';
+    nameInput.id = 'apiKeyName';
+    nameInput.placeholder = '예: Production API Key';
+    
+    nameSection.appendChild(nameLabel);
+    nameSection.appendChild(nameInput);
+    
+    // 권한 섹션
+    const permSection = Utils.createElement('div', 'form-section');
+    const permLabel = Utils.createElement('div', 'input-label', '권한 설정');
+    const permGroup = Utils.createElement('div', 'checkbox-group');
+    const permGroupTitle = Utils.createElement('div', 'checkbox-group-title', '이 API 키로 허용할 작업을 선택하세요');
+    
+    // 체크박스들
+    const readLabel = Utils.createElement('label');
+    const readCheckbox = Utils.createElement('input');
+    readCheckbox.type = 'checkbox';
+    readCheckbox.id = 'permRead';
+    readCheckbox.checked = true;
+    readLabel.appendChild(readCheckbox);
+    readLabel.appendChild(document.createTextNode('읽기 권한 (Read) - 댓글 조회'));
+    
+    const writeLabel = Utils.createElement('label');
+    const writeCheckbox = Utils.createElement('input');
+    writeCheckbox.type = 'checkbox';
+    writeCheckbox.id = 'permWrite';
+    writeLabel.appendChild(writeCheckbox);
+    writeLabel.appendChild(document.createTextNode('쓰기 권한 (Write) - 댓글 작성, 수정'));
+    
+    const adminLabel = Utils.createElement('label');
+    const adminCheckbox = Utils.createElement('input');
+    adminCheckbox.type = 'checkbox';
+    adminCheckbox.id = 'permAdmin';
+    adminLabel.appendChild(adminCheckbox);
+    adminLabel.appendChild(document.createTextNode('관리자 권한 (Admin) - 모든 작업'));
+    
+    permGroup.appendChild(permGroupTitle);
+    permGroup.appendChild(readLabel);
+    permGroup.appendChild(writeLabel);
+    permGroup.appendChild(adminLabel);
+    
+    permSection.appendChild(permLabel);
+    permSection.appendChild(permGroup);
+    
+    modalContent.appendChild(nameSection);
+    modalContent.appendChild(permSection);
 
     const modal = Components.createModal('새 API 키 생성', modalContent, [
       {

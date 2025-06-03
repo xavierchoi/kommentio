@@ -5,7 +5,7 @@
 
 class Kommentio {
   constructor(options = {}) {
-    this.version = '1.0.0';
+    this.version = '0.1.1';
     this.options = {
       siteId: null,
       theme: 'light', // 'light' | 'dark' | 'auto'

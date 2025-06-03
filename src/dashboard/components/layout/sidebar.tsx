@@ -92,7 +92,7 @@ export default function Sidebar() {
       {/* 하단 정보 */}
       <div className="absolute bottom-0 w-64 p-4 border-t border-gray-200 bg-gray-50">
         <div className="text-xs text-gray-500 text-center">
-          <div>Kommentio v1.0</div>
+          <div>Kommentio v0.1.1</div>
           <div className="mt-1">오픈소스 댓글 시스템</div>
         </div>
       </div>
