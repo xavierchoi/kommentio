@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kommentio 위젯 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .demo-article {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+        .success {
+            background: #10b981;
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success">
+            ✅ 빌드된 위젯 파일 테스트 중... (Mock 모드)
+        </div>
+
+        <article class="demo-article">
+            <h1>빌드된 Kommentio 위젯 테스트</h1>
+            <p>이 페이지는 빌드된 위젯 파일(kommentio.iife.js)을 테스트합니다.</p>
+            <p><strong>파일 크기:</strong> 13KB (목표: 50KB 이하) ✅</p>
+            <p><strong>압축 크기:</strong> 4.27KB ✅</p>
+            <p><strong>PRD 요구사항 달성도:</strong></p>
+            <ul>
+                <li>✅ Vanilla JS 구현 (React 제거)</li>
+                <li>✅ 단일 스크립트 파일</li>
+                <li>✅ 경량화 (50KB 이하)</li>
+                <li>✅ 임베드 가능한 위젯</li>
+                <li>✅ Mock 모드 지원</li>
+                <li>✅ 소셜 로그인 (Mock)</li>
+                <li>✅ 댓글 CRUD 기능</li>
+            </ul>
+        </article>
+
+        <!-- Kommentio 위젯 임베드 -->
+        <div 
+            data-kommentio
+            data-site-id="test-site"
+            data-theme="light"
+            data-language="ko"
+            data-mock-mode="true"
+        ></div>
+    </div>
+
+    <!-- 빌드된 위젯 스크립트 로드 -->
+    <script src="./dist/widget/kommentio.iife.js"></script>
+
+    <script>
+        // 위젯 로딩 완료 확인
+        window.addEventListener('load', () => {
+            if (window.Kommentio) {
+                console.log('✅ Kommentio 위젯이 성공적으로 로드되었습니다!');
+                console.log('버전:', window.kommentio?.version || 'Unknown');
+                console.log('Mock 모드:', window.kommentio?.mockMode || false);
+            } else {
+                console.error('❌ Kommentio 위젯 로딩 실패');
+            }
+        });
+    </script>
+</body>
+</html>

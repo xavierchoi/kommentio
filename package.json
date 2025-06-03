@@ -1,0 +1,26 @@
+{
+  "name": "kommentio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Open-source embeddable comment widget - Ad-free alternative to Disqus",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:widget": "vite build --config vite.widget.config.js",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "serve": "vite preview --port 3000"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "@supabase/supabase-js": "^2.39.0",
+    "autoprefixer": "^10.4.18",
+    "eslint": "^9.9.1",
+    "globals": "^15.9.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "terser": "^5.40.0",
+    "vite": "^5.4.2"
+  }
+}

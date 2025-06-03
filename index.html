@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kommentio - 오픈소스 댓글 시스템</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 2rem;
+        background: #f9fafb;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      h1 {
+        color: #1f2937;
+        margin-bottom: 1rem;
+      }
+      .demo-article {
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 2rem;
+        margin-bottom: 2rem;
+      }
+      .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙 다크모드</button>
+    
+    <div class="container">
+      <article class="demo-article">
+        <h1>Kommentio 댓글 시스템 데모</h1>
+        <p>이것은 Kommentio 위젯의 데모 페이지입니다. 아래에서 댓글 시스템을 테스트해보세요.</p>
+        <p>PRD에 따르면 이 위젯은 다음과 같은 특징을 가져야 합니다:</p>
+        <ul>
+          <li>✅ 완전 무료 + 광고 없음</li>
+          <li>✅ 원클릭 설정 (노코드 친화적)</li>
+          <li>✅ 포괄적 소셜 로그인 (Google, GitHub, Facebook)</li>
+          <li>✅ AI 기반 스팸 방지 (Claude Haiku)</li>
+          <li>✅ 고성능 (Disqus 대비 5-10배 빠름)</li>
+        </ul>
+      </article>
+
+      <!-- Kommentio 위젯이 여기에 임베드됩니다 -->
+      <div 
+        data-kommentio
+        data-site-id="demo-site"
+        data-theme="light"
+        data-language="ko"
+        data-supabase-url="YOUR_SUPABASE_URL"
+        data-supabase-key="YOUR_SUPABASE_ANON_KEY"
+      ></div>
+
+      <div style="margin-top: 2rem; padding: 1rem; background: #f3f4f6; border-radius: 8px;">
+        <h3>🔧 소셜 로그인 설정 테스트</h3>
+        <p>아래 버튼들로 다양한 소셜 프로바이더 조합을 테스트해보세요:</p>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+          <button onclick="enableBasicProviders()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            기본 (Google + GitHub)
+          </button>
+          <button onclick="enableAllProviders()" style="padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            전체 활성화
+          </button>
+          <button onclick="enableKoreanProviders()" style="padding: 0.5rem 1rem; background: #fee500; color: black; border: none; border-radius: 4px; cursor: pointer;">
+            한국 특화 (Kakao + LINE)
+          </button>
+          <button onclick="enableBusinessProviders()" style="padding: 0.5rem 1rem; background: #0077b5; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            비즈니스 (LinkedIn + Apple)
+          </button>
+          <button onclick="disableAllProviders()" style="padding: 0.5rem 1rem; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            모두 비활성화
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kommentio 위젯 스크립트 -->
+    <script type="module" src="/src/kommentio.js"></script>
+
+    <script>
+      let isDark = false;
+      
+      function toggleTheme() {
+        isDark = !isDark;
+        const theme = isDark ? 'dark' : 'light';
+        const kommentioWidget = document.querySelector('[data-kommentio]');
+        
+        if (kommentioWidget) {
+          kommentioWidget.setAttribute('data-theme', theme);
+          // 위젯에 테마 변경 알림
+          if (window.kommentio) {
+            window.kommentio.options.theme = theme;
+            window.kommentio.container.setAttribute('data-theme', theme);
+          }
+        }
+        
+        // 페이지 테마 변경
+        document.body.style.background = isDark ? '#1f2937' : '#f9fafb';
+        document.body.style.color = isDark ? '#f9fafb' : '#1f2937';
+        document.querySelector('.container').style.background = isDark ? '#374151' : 'white';
+        
+        // 버튼 텍스트 변경
+        document.querySelector('.theme-toggle').textContent = isDark ? '☀️ 라이트모드' : '🌙 다크모드';
+      }
+
+      // 소셜 프로바이더 설정 함수들
+      function enableBasicProviders() {
+        if (window.kommentio) {
+          window.kommentio.updateSocialProviders({
+            google: { enabled: true, label: 'Google', color: '#4285f4', icon: '🔍' },
+            github: { enabled: true, label: 'GitHub', color: '#333', icon: '🐙' },
+            facebook: { enabled: false, label: 'Facebook', color: '#1877f2', icon: '📘' },
+            twitter: { enabled: false, label: 'X.com', color: '#000', icon: '🐦' },
+            apple: { enabled: false, label: 'Apple', color: '#000', icon: '🍎' },
+            linkedin: { enabled: false, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
+            kakao: { enabled: false, label: '카카오톡', color: '#fee500', icon: '💬' },
+            line: { enabled: false, label: 'LINE', color: '#00b900', icon: '💚' }
+          });
+        }
+      }
+
+      function enableAllProviders() {
+        if (window.kommentio) {
+          window.kommentio.updateSocialProviders({
+            google: { enabled: true, label: 'Google', color: '#4285f4', icon: '🔍' },
+            github: { enabled: true, label: 'GitHub', color: '#333', icon: '🐙' },
+            facebook: { enabled: true, label: 'Facebook', color: '#1877f2', icon: '📘' },
+            twitter: { enabled: true, label: 'X.com', color: '#000', icon: '🐦' },
+            apple: { enabled: true, label: 'Apple', color: '#000', icon: '🍎' },
+            linkedin: { enabled: true, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
+            kakao: { enabled: true, label: '카카오톡', color: '#fee500', icon: '💬' },
+            line: { enabled: true, label: 'LINE', color: '#00b900', icon: '💚' }
+          });
+        }
+      }
+
+      function enableKoreanProviders() {
+        if (window.kommentio) {
+          window.kommentio.updateSocialProviders({
+            google: { enabled: false, label: 'Google', color: '#4285f4', icon: '🔍' },
+            github: { enabled: false, label: 'GitHub', color: '#333', icon: '🐙' },
+            facebook: { enabled: false, label: 'Facebook', color: '#1877f2', icon: '📘' },
+            twitter: { enabled: false, label: 'X.com', color: '#000', icon: '🐦' },
+            apple: { enabled: false, label: 'Apple', color: '#000', icon: '🍎' },
+            linkedin: { enabled: false, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
+            kakao: { enabled: true, label: '카카오톡', color: '#fee500', icon: '💬' },
+            line: { enabled: true, label: 'LINE', color: '#00b900', icon: '💚' }
+          });
+        }
+      }
+
+      function enableBusinessProviders() {
+        if (window.kommentio) {
+          window.kommentio.updateSocialProviders({
+            google: { enabled: false, label: 'Google', color: '#4285f4', icon: '🔍' },
+            github: { enabled: false, label: 'GitHub', color: '#333', icon: '🐙' },
+            facebook: { enabled: false, label: 'Facebook', color: '#1877f2', icon: '📘' },
+            twitter: { enabled: false, label: 'X.com', color: '#000', icon: '🐦' },
+            apple: { enabled: true, label: 'Apple', color: '#000', icon: '🍎' },
+            linkedin: { enabled: true, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
+            kakao: { enabled: false, label: '카카오톡', color: '#fee500', icon: '💬' },
+            line: { enabled: false, label: 'LINE', color: '#00b900', icon: '💚' }
+          });
+        }
+      }
+
+      function disableAllProviders() {
+        if (window.kommentio) {
+          window.kommentio.updateSocialProviders({
+            google: { enabled: false, label: 'Google', color: '#4285f4', icon: '🔍' },
+            github: { enabled: false, label: 'GitHub', color: '#333', icon: '🐙' },
+            facebook: { enabled: false, label: 'Facebook', color: '#1877f2', icon: '📘' },
+            twitter: { enabled: false, label: 'X.com', color: '#000', icon: '🐦' },
+            apple: { enabled: false, label: 'Apple', color: '#000', icon: '🍎' },
+            linkedin: { enabled: false, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
+            kakao: { enabled: false, label: '카카오톡', color: '#fee500', icon: '💬' },
+            line: { enabled: false, label: 'LINE', color: '#00b900', icon: '💚' }
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
