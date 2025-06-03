@@ -1,0 +1,134 @@
+name: 🔧 Setup Help
+description: Get help with Kommentio installation and configuration
+title: "[Setup]: "
+labels: ["help wanted", "setup"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help setting up Kommentio? We're here to help! 🤝
+        
+        Please provide details about your setup and what you're trying to achieve.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-submission Checklist
+      description: Please check the following before asking for help
+      options:
+        - label: I have read the README and documentation
+          required: true
+        - label: I have checked existing issues for similar setup questions
+          required: true
+
+  - type: dropdown
+    id: setup-type
+    attributes:
+      label: Setup Type
+      description: What type of setup are you working on?
+      options:
+        - Basic HTML Installation
+        - Jekyll/Hugo Static Site
+        - WordPress Integration
+        - React/Vue/Angular SPA
+        - Supabase Configuration
+        - Social Login Setup
+        - Claude AI Integration
+        - Admin Dashboard
+        - Custom Domain/CDN
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: experience-level
+    attributes:
+      label: Technical Experience
+      description: How would you describe your technical experience?
+      options:
+        - Beginner (new to web development)
+        - Intermediate (some web development experience)
+        - Advanced (experienced developer)
+        - Expert (can help others after getting setup)
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to achieve?
+      description: Describe what you want to accomplish with Kommentio
+      placeholder: |
+        e.g., "I want to add comments to my Jekyll blog" 
+        or "I'm trying to set up social login with Google"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-setup
+    attributes:
+      label: Current Setup
+      description: Describe your current website/platform setup
+      placeholder: |
+        - Platform: (e.g., Jekyll, WordPress, Custom HTML)
+        - Hosting: (e.g., GitHub Pages, Netlify, Self-hosted)
+        - Domain: (e.g., example.com, subdomain.example.com)
+        - Any existing comment system: (e.g., Disqus, custom)
+
+  - type: textarea
+    id: steps-taken
+    attributes:
+      label: Steps Already Taken
+      description: What have you tried so far?
+      placeholder: |
+        1. Downloaded Kommentio files
+        2. Added script tag to my site
+        3. Tried to configure...
+        4. Got stuck at...
+
+  - type: textarea
+    id: error-messages
+    attributes:
+      label: Error Messages
+      description: Any error messages you're seeing?
+      placeholder: |
+        ```
+        Paste any error messages from browser console, 
+        build process, or server logs
+        ```
+
+  - type: textarea
+    id: configuration-attempt
+    attributes:
+      label: Configuration Attempt
+      description: Share your current Kommentio configuration (remove sensitive data)
+      placeholder: |
+        ```html
+        <div 
+          data-kommentio
+          data-site-id="my-blog"
+          data-theme="light"
+        ></div>
+        <script src="path/to/kommentio.js"></script>
+        ```
+
+  - type: checkboxes
+    id: mode-preference
+    attributes:
+      label: Preferred Mode
+      description: Which mode are you planning to use?
+      options:
+        - label: Mock Mode (no backend, for testing/demo)
+        - label: Supabase Mode (full production setup)
+        - label: Not sure yet
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other details that might be helpful?
+      placeholder: |
+        - Timeline/urgency
+        - Special requirements
+        - Similar tools you've used before
+        - Screenshots of current setup

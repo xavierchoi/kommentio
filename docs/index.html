@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kommentio - 오픈소스 댓글 시스템 | Live Demo</title>
+    <meta name="description" content="무료, 광고 없는 Disqus 대체제. 19KB 경량 위젯으로 빠른 로딩과 8개 소셜 로그인 지원.">
+    <meta name="keywords" content="kommentio, 댓글 시스템, disqus 대체, 오픈소스, 무료">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Kommentio - 오픈소스 댓글 시스템">
+    <meta property="og:description" content="무료, 광고 없는 Disqus 대체제. 19KB 경량 위젯으로 빠른 로딩과 8개 소셜 로그인 지원.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://xavierchoi.github.io/kommentio">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Kommentio - 오픈소스 댓글 시스템">
+    <meta name="twitter:description" content="무료, 광고 없는 Disqus 대체제">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+    
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #6b7280;
+            --background: #f9fafb;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        [data-theme="dark"] {
+            --background: #0f172a;
+            --surface: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            background: var(--background);
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text);
+        }
+
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .badge.success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--background);
+        }
+
+        .demo-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .demo-article {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-article h2 {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--background);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+        }
+
+        .control-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-panel h3 {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .control-btn.basic { background: var(--primary); color: white; }
+        .control-btn.all { background: var(--success); color: white; }
+        .control-btn.korean { background: #fee500; color: black; }
+        .control-btn.business { background: #0077b5; color: white; }
+        .control-btn.disable { background: var(--error); color: white; }
+
+        .control-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav {
+                padding: 0 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .demo-section {
+                padding: 0 1rem 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="#" class="logo">
+                💬 Kommentio
+            </a>
+            <div class="nav-links">
+                <a href="https://github.com/xavierchoi/kommentio" class="nav-link" target="_blank">GitHub</a>
+                <a href="https://github.com/xavierchoi/kommentio/blob/main/README.md" class="nav-link" target="_blank">문서</a>
+                <a href="https://github.com/xavierchoi/kommentio/discussions" class="nav-link" target="_blank">토론</a>
+                <button class="theme-toggle" onclick="toggleTheme()" title="테마 변경">
+                    🌙
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Kommentio</h1>
+            <p>무료, 광고 없는 Disqus 대체제<br>19KB 경량 위젯으로 빠른 로딩과 8개 소셜 로그인 지원</p>
+            
+            <div class="badges">
+                <span class="badge success">v0.1.1</span>
+                <span class="badge">MIT 라이선스</span>
+                <span class="badge">19KB</span>
+                <span class="badge">0% 광고</span>
+            </div>
+
+            <div class="cta-buttons">
+                <a href="https://github.com/xavierchoi/kommentio" class="btn btn-primary" target="_blank">
+                    GitHub에서 보기
+                </a>
+                <a href="#demo" class="btn btn-secondary">
+                    라이브 데모 체험
+                </a>
+            </div>
+        </section>
+
+        <section class="demo-section" id="demo">
+            <article class="demo-article">
+                <h2>🚀 Kommentio 실시간 데모</h2>
+                <p>아래에서 Kommentio 댓글 시스템을 직접 체험해보세요. Mock 모드로 동작하여 별도 설정 없이 모든 기능을 테스트할 수 있습니다.</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <span class="feature-icon">⚡</span>
+                        <div>
+                            <strong>초고속 로딩</strong><br>
+                            <small>Disqus 대비 96% 작은 크기</small>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🔐</span>
+                        <div>
+                            <strong>8개 소셜 로그인</strong><br>
+                            <small>Google, GitHub, 카카오톡 등</small>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🤖</span>
+                        <div>
+                            <strong>AI 스팸 방지</strong><br>
+                            <small>Claude Haiku 기반 필터링</small>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🔄</span>
+                        <div>
+                            <strong>실시간 업데이트</strong><br>
+                            <small>Supabase Realtime</small>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <div class="control-panel">
+                <h3>🎛️ 소셜 로그인 설정 테스트</h3>
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+                    다양한 소셜 프로바이더 조합을 실시간으로 테스트해보세요:
+                </p>
+                <div class="button-group">
+                    <button class="control-btn basic" onclick="enableBasicProviders()">
+                        기본 (Google + GitHub)
+                    </button>
+                    <button class="control-btn all" onclick="enableAllProviders()">
+                        전체 활성화 (8개)
+                    </button>
+                    <button class="control-btn korean" onclick="enableKoreanProviders()">
+                        한국 특화 (Kakao + LINE)
+                    </button>
+                    <button class="control-btn business" onclick="enableBusinessProviders()">
+                        비즈니스 (LinkedIn + Apple)
+                    </button>
+                    <button class="control-btn disable" onclick="disableAllProviders()">
+                        모두 비활성화
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kommentio 위젯 -->
+            <div 
+                data-kommentio
+                data-site-id="demo-site"
+                data-theme="light"
+                data-language="ko"
+            ></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>
+            Made with ❤️ by <a href="https://github.com/xavierchoi" style="color: var(--primary);">Xavier Choi</a> • 
+            <a href="https://github.com/xavierchoi/kommentio/blob/main/LICENSE" style="color: var(--primary);">MIT License</a>
+        </p>
+    </footer>
+
+    <!-- Kommentio 위젯 스크립트 -->
+    <script src="https://cdn.jsdelivr.net/gh/xavierchoi/kommentio@main/dist/widget/kommentio.iife.js"></script>
+
+    <script>
+        let isDark = false;
+        
+        function toggleTheme() {
+            isDark = !isDark;
+            const theme = isDark ? 'dark' : 'light';
+            
+            // HTML 데이터 속성 변경
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Kommentio 위젯 테마 변경
+            const kommentioWidget = document.querySelector('[data-kommentio]');
+            if (kommentioWidget) {
+                kommentioWidget.setAttribute('data-theme', theme);
+                if (window.kommentio) {
+                    window.kommentio.options.theme = theme;
+                    window.kommentio.container.setAttribute('data-theme', theme);
+                }
+            }
+            
+            // 테마 토글 버튼 아이콘 변경
+            document.querySelector('.theme-toggle').textContent = isDark ? '☀️' : '🌙';
+        }
+
+        // 소셜 프로바이더 설정 함수들
+        function enableBasicProviders() {
+            updateProviders({
+                google: true, github: true,
+                facebook: false, twitter: false, apple: false, 
+                linkedin: false, kakao: false, line: false
+            });
+        }
+
+        function enableAllProviders() {
+            updateProviders({
+                google: true, github: true, facebook: true, twitter: true,
+                apple: true, linkedin: true, kakao: true, line: true
+            });
+        }
+
+        function enableKoreanProviders() {
+            updateProviders({
+                google: false, github: false, facebook: false, twitter: false,
+                apple: false, linkedin: false, kakao: true, line: true
+            });
+        }
+
+        function enableBusinessProviders() {
+            updateProviders({
+                google: false, github: false, facebook: false, twitter: false,
+                apple: true, linkedin: true, kakao: false, line: false
+            });
+        }
+
+        function disableAllProviders() {
+            updateProviders({
+                google: false, github: false, facebook: false, twitter: false,
+                apple: false, linkedin: false, kakao: false, line: false
+            });
+        }
+
+        function updateProviders(config) {
+            if (window.kommentio) {
+                const providerConfig = {
+                    google: { enabled: config.google, label: 'Google', color: '#4285f4', icon: '🔍' },
+                    github: { enabled: config.github, label: 'GitHub', color: '#333', icon: '🐙' },
+                    facebook: { enabled: config.facebook, label: 'Facebook', color: '#1877f2', icon: '📘' },
+                    twitter: { enabled: config.twitter, label: 'X.com', color: '#000', icon: '🐦' },
+                    apple: { enabled: config.apple, label: 'Apple', color: '#000', icon: '🍎' },
+                    linkedin: { enabled: config.linkedin, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
+                    kakao: { enabled: config.kakao, label: '카카오톡', color: '#fee500', icon: '💬' },
+                    line: { enabled: config.line, label: 'LINE', color: '#00b900', icon: '💚' }
+                };
+                window.kommentio.updateSocialProviders(providerConfig);
+            }
+        }
+
+        // 부드러운 스크롤
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

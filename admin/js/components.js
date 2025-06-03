@@ -290,20 +290,20 @@ class Components {
     // body 스크롤 방지
     document.body.style.overflow = 'hidden';
     
-    // Shadcn 스타일 애니메이션
+    // 프리미엄 애니메이션
     modal.style.opacity = '0';
-    modal.style.transform = 'scale(0.95)';
-    modal.style.transition = 'opacity 0.2s ease-out, transform 0.2s ease-out';
+    modal.style.transform = 'scale(0.9) translateY(-20px)';
+    modal.style.transition = 'opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
     
     requestAnimationFrame(() => {
       modal.style.opacity = '1';
-      modal.style.transform = 'scale(1)';
+      modal.style.transform = 'scale(1) translateY(0)';
     });
   }
 
   static closeModal(modal) {
     modal.style.opacity = '0';
-    modal.style.transform = 'scale(0.95)';
+    modal.style.transform = 'scale(0.9) translateY(-20px)';
     
     // body 스크롤 복원
     document.body.style.overflow = '';
@@ -312,7 +312,7 @@ class Components {
       if (modal.parentNode) {
         modal.parentNode.removeChild(modal);
       }
-    }, 200);
+    }, 400);
   }
 }
 
