@@ -187,20 +187,56 @@ class UsersPage {
   }
 
   createPageHeader() {
-    const header = Utils.createElement('div', 'flex items-center justify-between mb-6');
-    
+    const header = Utils.createElement('div', 'mb-8');
     header.innerHTML = `
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900">사용자 관리</h1>
-        <p class="text-gray-600 mt-2">댓글을 작성한 사용자들을 관리하고 모니터링하세요</p>
-      </div>
-      <div class="flex gap-3">
-        <button class="btn btn-secondary" onclick="usersPage.exportUsers()">
-          <i class="fas fa-download"></i> 사용자 내보내기
-        </button>
-        <button class="btn btn-primary" onclick="usersPage.showBulkActions()">
-          <i class="fas fa-users-cog"></i> 대량 작업
-        </button>
+      <div class="flex flex-col gap-6">
+        <!-- 메인 타이틀 -->
+        <div class="flex items-center space-x-3 md:space-x-4">
+          <div class="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-xl">
+            <i class="fas fa-users text-white text-xl md:text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">사용자 관리</h1>
+            <p class="text-gray-600 mt-1 text-sm md:text-base">댓글을 작성한 사용자들을 체계적으로 관리하고 모니터링하세요</p>
+          </div>
+        </div>
+        
+        <!-- 통계 및 액션 버튼들 -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <!-- 사용자 통계 -->
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 px-3 py-2 bg-purple-50 rounded-lg border border-purple-200 w-fit">
+              <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+              <span class="text-purple-700 text-sm font-medium">총 ${this.users.length}명 등록</span>
+            </div>
+            <div class="flex items-center space-x-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200 w-fit">
+              <i class="fas fa-check-circle text-green-500"></i>
+              <span class="text-green-700 text-sm font-medium">${this.users.filter(u => u.status === 'active').length}명 활성</span>
+            </div>
+            <div class="flex items-center space-x-2 px-3 py-2 bg-blue-50 rounded-lg border border-blue-200 w-fit">
+              <i class="fas fa-shield-alt text-blue-500"></i>
+              <span class="text-blue-700 text-sm font-medium">${this.users.filter(u => u.is_trusted).length}명 신뢰</span>
+            </div>
+          </div>
+          
+          <!-- 액션 버튼들 -->
+          <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button class="w-full sm:w-auto px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center sm:justify-start space-x-2 shadow-sm min-h-[44px]" onclick="usersPage.exportUsers()">
+              <i class="fas fa-download"></i>
+              <span class="hidden sm:inline">사용자 내보내기</span>
+              <span class="sm:hidden">내보내기</span>
+            </button>
+            <button class="w-full sm:w-auto px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center sm:justify-start space-x-2 shadow-sm min-h-[44px]" onclick="usersPage.showUserAnalytics()">
+              <i class="fas fa-chart-line"></i>
+              <span class="hidden sm:inline">사용자 분석</span>
+              <span class="sm:hidden">분석</span>
+            </button>
+            <button class="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg min-h-[44px]" onclick="usersPage.showBulkActions()">
+              <i class="fas fa-users-cog"></i>
+              <span>대량 작업</span>
+            </button>
+          </div>
+        </div>
       </div>
     `;
     
@@ -208,15 +244,33 @@ class UsersPage {
   }
 
   createFiltersSection() {
-    const section = Utils.createElement('div', 'card mb-6');
-    const body = Utils.createElement('div', 'card-body');
+    const section = Utils.createElement('div', 'bg-white rounded-xl shadow-lg border border-gray-200 mb-8');
     
-    body.innerHTML = `
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- 사이트 선택 -->
+    const header = Utils.createElement('div', 'p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50');
+    header.innerHTML = `
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
+          <i class="fas fa-filter text-white text-sm"></i>
+        </div>
         <div>
-          <label class="input-label">사이트</label>
-          <select class="input" id="siteFilter">
+          <h2 class="text-xl font-bold text-gray-900">사용자 필터링</h2>
+          <p class="text-gray-600 text-sm">다양한 조건으로 사용자를 정확하게 찾아보세요</p>
+        </div>
+      </div>
+    `;
+    
+    const body = Utils.createElement('div', 'p-6');
+    body.innerHTML = `
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- 사이트 선택 -->
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+          <div class="flex items-center space-x-2 mb-3">
+            <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+              <i class="fas fa-globe text-white text-xs"></i>
+            </div>
+            <label class="block text-gray-700 font-semibold">🌐 사이트 선택</label>
+          </div>
+          <select id="siteFilter" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white min-h-[44px]">
             <option value="all">모든 사이트</option>
             ${this.sites.map(site => 
               `<option value="${site.id}" ${this.currentSite == site.id ? 'selected' : ''}>
@@ -224,64 +278,124 @@ class UsersPage {
               </option>`
             ).join('')}
           </select>
+          <p class="text-xs text-gray-500 mt-2">특정 사이트의 사용자만 표시</p>
         </div>
         
         <!-- 정렬 기준 -->
-        <div>
-          <label class="input-label">정렬 기준</label>
-          <select class="input" id="sortByFilter">
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+          <div class="flex items-center space-x-2 mb-3">
+            <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+              <i class="fas fa-sort text-white text-xs"></i>
+            </div>
+            <label class="block text-gray-700 font-semibold">📊 정렬 기준</label>
+          </div>
+          <select id="sortByFilter" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[44px]">
             <option value="last_comment" ${this.sortBy === 'last_comment' ? 'selected' : ''}>최근 활동</option>
             <option value="comments_count" ${this.sortBy === 'comments_count' ? 'selected' : ''}>댓글 수</option>
             <option value="name" ${this.sortBy === 'name' ? 'selected' : ''}>이름</option>
             <option value="first_comment" ${this.sortBy === 'first_comment' ? 'selected' : ''}>가입일</option>
           </select>
+          <p class="text-xs text-gray-500 mt-2">사용자 목록 정렬 방식</p>
         </div>
         
         <!-- 정렬 순서 -->
-        <div>
-          <label class="input-label">정렬 순서</label>
-          <select class="input" id="sortOrderFilter">
+        <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200">
+          <div class="flex items-center space-x-2 mb-3">
+            <div class="w-6 h-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+              <i class="fas fa-arrow-up-down text-white text-xs"></i>
+            </div>
+            <label class="block text-gray-700 font-semibold">🔄 정렬 순서</label>
+          </div>
+          <select id="sortOrderFilter" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white min-h-[44px]">
             <option value="desc" ${this.sortOrder === 'desc' ? 'selected' : ''}>내림차순</option>
             <option value="asc" ${this.sortOrder === 'asc' ? 'selected' : ''}>오름차순</option>
           </select>
+          <p class="text-xs text-gray-500 mt-2">오름차순 또는 내림차순</p>
         </div>
         
         <!-- 검색 -->
-        <div>
-          <label class="input-label">검색</label>
-          <input type="text" class="input" id="searchInput" placeholder="이름, 이메일..." value="${this.searchQuery}">
+        <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+          <div class="flex items-center space-x-2 mb-3">
+            <div class="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+              <i class="fas fa-search text-white text-xs"></i>
+            </div>
+            <label class="block text-gray-700 font-semibold">🔍 빠른 검색</label>
+          </div>
+          <div class="relative">
+            <input type="text" id="searchInput" placeholder="이름, 이메일로 검색..." value="${this.searchQuery}"
+                   class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white min-h-[44px]">
+            <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+              <i class="fas fa-search text-gray-400"></i>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">실시간 검색 지원</p>
+        </div>
+      </div>
+      
+      <!-- 빠른 필터 버튼들 -->
+      <div class="mt-6 pt-6 border-t border-gray-200">
+        <h3 class="text-sm font-semibold text-gray-700 mb-3">빠른 필터</h3>
+        <div class="flex flex-wrap gap-2">
+          <button class="px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors" onclick="usersPage.applyQuickFilter('active')">
+            ✅ 활성 사용자
+          </button>
+          <button class="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors" onclick="usersPage.applyQuickFilter('trusted')">
+            🛡️ 신뢰 사용자
+          </button>
+          <button class="px-3 py-2 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors" onclick="usersPage.applyQuickFilter('prolific')">
+            📝 다작 사용자
+          </button>
+          <button class="px-3 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors" onclick="usersPage.applyQuickFilter('issues')">
+            ⚠️ 문제 있는 사용자
+          </button>
         </div>
       </div>
     `;
     
+    section.appendChild(header);
     section.appendChild(body);
     
     // 이벤트 리스너 추가
-    Utils.on(Utils.$('#siteFilter'), 'change', (e) => {
-      this.currentSite = e.target.value;
-      this.currentPage = 1;
-      this.applyFiltersAndSort();
-      this.refreshUsersTable();
-    });
-    
-    Utils.on(Utils.$('#sortByFilter'), 'change', (e) => {
-      this.sortBy = e.target.value;
-      this.applyFiltersAndSort();
-      this.refreshUsersTable();
-    });
-    
-    Utils.on(Utils.$('#sortOrderFilter'), 'change', (e) => {
-      this.sortOrder = e.target.value;
-      this.applyFiltersAndSort();
-      this.refreshUsersTable();
-    });
-    
-    Utils.on(Utils.$('#searchInput'), 'input', Utils.debounce((e) => {
-      this.searchQuery = e.target.value;
-      this.currentPage = 1;
-      this.applyFiltersAndSort();
-      this.refreshUsersTable();
-    }, 300));
+    setTimeout(() => {
+      const siteFilter = Utils.$('#siteFilter');
+      const sortByFilter = Utils.$('#sortByFilter');
+      const sortOrderFilter = Utils.$('#sortOrderFilter');
+      const searchInput = Utils.$('#searchInput');
+      
+      if (siteFilter) {
+        Utils.on(siteFilter, 'change', (e) => {
+          this.currentSite = e.target.value;
+          this.currentPage = 1;
+          this.applyFiltersAndSort();
+          this.refreshUsersTable();
+        });
+      }
+      
+      if (sortByFilter) {
+        Utils.on(sortByFilter, 'change', (e) => {
+          this.sortBy = e.target.value;
+          this.applyFiltersAndSort();
+          this.refreshUsersTable();
+        });
+      }
+      
+      if (sortOrderFilter) {
+        Utils.on(sortOrderFilter, 'change', (e) => {
+          this.sortOrder = e.target.value;
+          this.applyFiltersAndSort();
+          this.refreshUsersTable();
+        });
+      }
+      
+      if (searchInput) {
+        Utils.on(searchInput, 'input', Utils.debounce((e) => {
+          this.searchQuery = e.target.value;
+          this.currentPage = 1;
+          this.applyFiltersAndSort();
+          this.refreshUsersTable();
+        }, 300));
+      }
+    }, 100);
     
     return section;
   }
@@ -669,12 +783,81 @@ class UsersPage {
     this.render();
   }
 
+  // 빠른 필터 적용
+  applyQuickFilter(filterType) {
+    let filteredUsers = [...this.users];
+
+    switch (filterType) {
+      case 'active':
+        filteredUsers = this.users.filter(user => user.status === 'active');
+        Utils.showNotification('활성 사용자만 표시합니다.', 'success');
+        break;
+      
+      case 'trusted':
+        filteredUsers = this.users.filter(user => user.is_trusted);
+        Utils.showNotification('신뢰 사용자만 표시합니다.', 'success');
+        break;
+      
+      case 'prolific':
+        filteredUsers = this.users.filter(user => user.comments_count >= 20).sort((a, b) => b.comments_count - a.comments_count);
+        Utils.showNotification('댓글을 많이 작성한 사용자를 표시합니다.', 'success');
+        break;
+      
+      case 'issues':
+        filteredUsers = this.users.filter(user => user.spam_reports > 0 || user.status === 'banned');
+        Utils.showNotification('문제가 있는 사용자를 표시합니다.', 'warning');
+        break;
+      
+      default:
+        filteredUsers = [...this.users];
+        break;
+    }
+
+    this.users = filteredUsers;
+    this.currentPage = 1;
+    this.applyPagination();
+    this.refreshUsersTable();
+  }
+
+  // 사용자 분석 모달
+  showUserAnalytics() {
+    Utils.showNotification('사용자 분석 기능은 곧 제공될 예정입니다.', 'info');
+  }
+
   showBulkActions() {
     Utils.showNotification('대량 작업 기능은 곧 제공될 예정입니다.', 'info');
   }
 
   exportUsers() {
-    Utils.showNotification('사용자 내보내기 기능은 곧 제공될 예정입니다.', 'info');
+    try {
+      const csvContent = [
+        ['사용자 ID', '이름', '이메일', '로그인 제공업체', '댓글 수', '받은 좋아요', '최근 활동', '가입일', '상태', '신뢰 사용자', '스팸 신고'],
+        ...this.users.map(user => [
+          user.id,
+          user.name,
+          user.email,
+          user.provider,
+          user.comments_count,
+          user.total_likes_received,
+          Utils.formatDateTime(user.last_comment),
+          Utils.formatDateTime(user.first_comment),
+          user.status === 'active' ? '활성' : '차단됨',
+          user.is_trusted ? '예' : '아니오',
+          user.spam_reports
+        ])
+      ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+
+      Utils.showNotification('사용자 목록이 CSV 파일로 다운로드되었습니다.', 'success');
+    } catch (error) {
+      console.error('사용자 내보내기 실패:', error);
+      Utils.showNotification('파일 내보내기에 실패했습니다.', 'error');
+    }
   }
 
   createErrorState() {

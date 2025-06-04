@@ -15,7 +15,7 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Premium Modal Design - Inspired by Modern SaaS Apps */
+/* 실제 사용 가능한 모달 - 레이아웃 우선 */
 .modal-overlay {
   position: fixed !important;
   top: 0 !important;
@@ -23,167 +23,175 @@
   right: 0 !important;
   bottom: 0 !important;
   z-index: 9999 !important;
-  background: rgba(15, 23, 42, 0.5) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 24px !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
 }
 
 .modal {
   position: relative !important;
   background: #ffffff !important;
-  border-radius: 20px !important;
-  box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
   width: 100% !important;
-  max-width: 440px !important;
-  max-height: calc(100vh - 48px) !important;
+  max-width: 500px !important;
+  min-height: 200px !important;
+  max-height: 80vh !important;
   overflow: hidden !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #e5e7eb !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
 }
 
-/* Premium Modal Header */
+/* 사용 가능한 모달 헤더 */
 .modal .modal-header {
-  padding: 36px 36px 24px 36px !important;
+  padding: 24px 24px 0 24px !important;
   border: none !important;
   background: transparent !important;
   display: flex !important;
-  align-items: flex-start !important;
+  align-items: center !important;
   justify-content: space-between !important;
-  position: relative !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .modal .modal-header h3 {
-  color: #0f172a !important;
-  font-size: 22px !important;
-  font-weight: 700 !important;
+  color: #111827 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
   margin: 0 !important;
-  line-height: 1.3 !important;
-  letter-spacing: -0.025em !important;
+  line-height: 1.4 !important;
+  flex: 1 !important;
+  padding-right: 16px !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
 }
 
 .modal .modal-header button {
-  background: rgba(148, 163, 184, 0.1) !important;
+  background: #f3f4f6 !important;
   border: none !important;
-  border-radius: 10px !important;
-  width: 36px !important;
-  height: 36px !important;
+  border-radius: 6px !important;
+  width: 32px !important;
+  height: 32px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  color: #64748b !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  color: #6b7280 !important;
+  transition: all 0.2s ease !important;
   cursor: pointer !important;
   padding: 0 !important;
+  flex-shrink: 0 !important;
 }
 
 .modal .modal-header button:hover {
-  background: rgba(148, 163, 184, 0.2) !important;
-  color: #334155 !important;
-  transform: scale(1.1) rotate(90deg) !important;
+  background: #e5e7eb !important;
+  color: #374151 !important;
 }
 
-/* Premium Modal Body */
+/* 사용 가능한 모달 바디 */
 .modal .modal-body {
-  padding: 0 36px 24px 36px !important;
+  padding: 20px 24px !important;
   background: transparent !important;
+  flex: 1 !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
 }
 
-/* Premium Modal Footer */
+/* 사용 가능한 모달 푸터 */
 .modal .modal-footer {
-  background: #fafbfc !important;
-  border-top: 1px solid #e2e8f0 !important;
-  padding: 24px 36px !important;
+  background: #f9fafb !important;
+  border-top: 1px solid #e5e7eb !important;
+  padding: 16px 24px !important;
+  margin: 0 -24px !important;
   display: flex !important;
   justify-content: flex-end !important;
-  gap: 16px !important;
-  border-radius: 0 0 20px 20px !important;
+  gap: 12px !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
 }
 
-/* Premium Form Styling */
+/* 실제 사용 가능한 폼 스타일링 */
 .modal .input-label {
   display: block !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  color: #1e293b !important;
-  margin-bottom: 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+  margin-bottom: 8px !important;
   line-height: 1.4 !important;
-  letter-spacing: -0.01em !important;
+  box-sizing: border-box !important;
 }
 
 .modal .input {
   width: 100% !important;
-  height: 48px !important;
-  padding: 14px 18px !important;
-  border: 2px solid #e2e8f0 !important;
-  border-radius: 14px !important;
-  font-size: 16px !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  height: 40px !important;
+  padding: 10px 12px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
   background: #ffffff !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+  box-sizing: border-box !important;
 }
 
 .modal .input:focus {
   outline: none !important;
   border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12), 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  transform: translateY(-1px) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 }
 
 .modal .input::placeholder {
-  color: #94a3b8 !important;
-  font-size: 15px !important;
+  color: #9ca3af !important;
+  font-size: 14px !important;
 }
 
-/* Premium Checkbox Design */
+/* 실제 사용 가능한 체크박스 디자인 */
 .modal .checkbox-group {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-  border: 2px solid #e2e8f0 !important;
-  border-radius: 16px !important;
-  padding: 20px !important;
-  margin: 16px 0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  background: #f8fafc !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  margin: 12px 0 !important;
+  box-sizing: border-box !important;
 }
 
 .modal .checkbox-group-title {
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  color: #475569 !important;
-  margin-bottom: 16px !important;
-  letter-spacing: -0.01em !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #6b7280 !important;
+  margin-bottom: 12px !important;
+  line-height: 1.4 !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
 }
 
 .modal input[type="checkbox"] {
-  width: 20px !important;
-  height: 20px !important;
-  border: 2px solid #cbd5e1 !important;
-  border-radius: 6px !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 3px !important;
   background: white !important;
   cursor: pointer !important;
   position: relative !important;
-  margin-right: 14px !important;
+  margin-right: 10px !important;
   flex-shrink: 0 !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.2s ease !important;
   appearance: none !important;
   -webkit-appearance: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
 .modal input[type="checkbox"]:hover {
-  border-color: #94a3b8 !important;
-  transform: scale(1.08) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  border-color: #9ca3af !important;
 }
 
 .modal input[type="checkbox"]:checked {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  background: #3b82f6 !important;
   border-color: #3b82f6 !important;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4) !important;
 }
 
 .modal input[type="checkbox"]:checked::after {
@@ -193,109 +201,90 @@
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
   color: white !important;
-  font-size: 12px !important;
-  font-weight: 800 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
 }
 
 .modal label {
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   cursor: pointer !important;
-  padding: 12px 0 !important;
-  font-size: 15px !important;
-  color: #334155 !important;
-  transition: all 0.2s ease !important;
-  line-height: 1.5 !important;
-  font-weight: 500 !important;
+  padding: 8px 0 !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  transition: color 0.2s ease !important;
+  line-height: 1.4 !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
+  box-sizing: border-box !important;
 }
 
 .modal label:hover {
-  color: #1e293b !important;
-  transform: translateX(2px) !important;
+  color: #111827 !important;
 }
 
-/* Premium Button Styling */
+/* 실제 사용 가능한 버튼 디자인 */
 .modal .btn {
-  height: 48px !important;
-  padding: 0 28px !important;
-  border-radius: 14px !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  border: 2px solid transparent !important;
+  height: 40px !important;
+  padding: 8px 20px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  border: 1px solid transparent !important;
   cursor: pointer !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 10px !important;
+  gap: 8px !important;
   white-space: nowrap !important;
-  min-width: 120px !important;
-  letter-spacing: -0.02em !important;
-  position: relative !important;
-  overflow: hidden !important;
+  min-width: 80px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
 }
 
 .modal .btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%) !important;
+  background: #3b82f6 !important;
   color: white !important;
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
-}
-
-.modal .btn-primary::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: -100% !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
-  transition: left 0.5s !important;
-}
-
-.modal .btn-primary:hover::before {
-  left: 100% !important;
+  border-color: #3b82f6 !important;
 }
 
 .modal .btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%) !important;
-  transform: translateY(-2px) scale(1.02) !important;
-  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5) !important;
+  background: #2563eb !important;
+  border-color: #2563eb !important;
 }
 
 .modal .btn-secondary {
   background: white !important;
-  color: #64748b !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  color: #6b7280 !important;
+  border-color: #d1d5db !important;
 }
 
 .modal .btn-secondary:hover {
-  background: #f8fafc !important;
-  border-color: #cbd5e1 !important;
-  color: #475569 !important;
-  transform: translateY(-1px) scale(1.01) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  background: #f9fafb !important;
+  border-color: #9ca3af !important;
+  color: #374151 !important;
 }
 
-/* Premium Modal Animation */
-@keyframes modalSlideIn {
+/* 간단한 모달 애니메이션 */
+@keyframes modalFadeIn {
   from {
     opacity: 0;
-    transform: scale(0.9) translateY(-20px);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1);
   }
 }
 
 .modal {
-  animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  animation: modalFadeIn 0.2s ease-out !important;
 }
 
-/* Premium Form Group Spacing */
+/* 실제 사용 가능한 폼 간격 */
 .modal .modal-body > div {
-  margin-bottom: 28px !important;
+  margin-bottom: 20px !important;
 }
 
 .modal .modal-body > div:last-child {
@@ -303,11 +292,35 @@
 }
 
 .modal .form-section {
-  margin-bottom: 28px !important;
+  margin-bottom: 20px !important;
 }
 
 .modal .form-section:last-child {
   margin-bottom: 0 !important;
+}
+
+/* 텍스트 자르기 방지 및 완전 표시 보장 */
+.modal * {
+  text-overflow: unset !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  hyphens: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* 모든 텍스트가 완전히 표시되도록 보장 */
+.modal h3,
+.modal label,
+.modal span,
+.modal p {
+  overflow: visible !important;
+  text-overflow: unset !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
+  line-height: 1.5 !important;
+  word-spacing: normal !important;
 }
 
 :root {

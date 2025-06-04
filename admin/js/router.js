@@ -19,7 +19,9 @@ class Router {
     this.pages.set('analytics', new AnalyticsPage());
     this.pages.set('users', new UsersPage());
     this.pages.set('integrations', new IntegrationsPage());
-    // 나머지 페이지들도 곧 추가 예정
+    this.pages.set('themes', new ThemesPage());
+    this.pages.set('settings', new SettingsPage());
+    this.pages.set('billing', new BillingPage());
   }
 
   setupEventListeners() {

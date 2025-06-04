@@ -18,12 +18,25 @@ class Utils {
   }
 
   // 이벤트 헬퍼
-  static on(element, event, handler) {
+  static on(element, event, selectorOrHandler, handler) {
     if (!element) {
       console.warn('Utils.on: element가 null입니다. 이벤트 리스너를 추가할 수 없습니다.');
       return;
     }
-    element.addEventListener(event, handler);
+
+    // 이벤트 델리게이션 지원
+    if (typeof selectorOrHandler === 'string' && handler) {
+      const selector = selectorOrHandler;
+      element.addEventListener(event, (e) => {
+        if (e.target.closest(selector)) {
+          handler.call(e.target.closest(selector), e);
+        }
+      });
+    } else {
+      // 일반 이벤트 리스너
+      const actualHandler = selectorOrHandler;
+      element.addEventListener(event, actualHandler);
+    }
   }
 
   static off(element, event, handler) {
@@ -135,6 +148,22 @@ class Utils {
         }
       }, 300);
     }, type === 'error' ? 5000 : 3000); // 에러는 조금 더 오래 표시
+  }
+
+  // 토스트 알림 (showNotification의 별칭)
+  static showToast(message, type = 'info') {
+    this.showNotification(message, type);
+  }
+
+  // 에러 표시
+  static showError(container, message) {
+    container.innerHTML = `
+      <div class="text-center py-8">
+        <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
+        <div class="text-red-600 text-lg font-medium mb-2">오류가 발생했습니다</div>
+        <div class="text-gray-600">${message}</div>
+      </div>
+    `;
   }
 
   // 디버깅 도우미

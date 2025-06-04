@@ -38,17 +38,75 @@ class IntegrationsPage {
   }
 
   createPageHeader() {
-    const header = Utils.createElement('div', 'flex items-center justify-between mb-6');
+    const header = Utils.createElement('div');
+    header.style.cssText = `
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      border-radius: 16px !important;
+      padding: 32px !important;
+      margin-bottom: 32px !important;
+      color: white !important;
+      position: relative !important;
+      overflow: hidden !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    `;
     
     header.innerHTML = `
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900">연동 관리</h1>
-        <p class="text-gray-600 mt-2">API 키, 웹훅, 써드파티 서비스를 관리하세요</p>
-      </div>
-      <div class="flex gap-3">
-        <button class="btn btn-primary" onclick="integrationsPage.openApiKeyModal()">
-          <i class="fas fa-plus"></i> 새 API 키
-        </button>
+      <div style="position: absolute; top: -50%; right: -10%; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 1;"></div>
+      <div style="position: absolute; bottom: -30%; left: -5%; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; z-index: 1;"></div>
+      
+      <div style="position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
+        <div style="flex: 1; min-width: 300px;">
+          <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+            <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+              <i class="fas fa-link" style="font-size: 28px; color: white;"></i>
+            </div>
+            <div>
+              <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">연동 관리</h1>
+              <p style="font-size: 18px; opacity: 0.9; margin: 8px 0 0 0; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">API 키, 웹훅, 써드파티 서비스를 관리하세요</p>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px;">
+            <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-key" style="font-size: 24px; color: #ffd700;"></i>
+                <div>
+                  <div style="font-size: 24px; font-weight: 700;">${this.apiKeys ? this.apiKeys.length : 0}</div>
+                  <div style="font-size: 14px; opacity: 0.8;">API 키</div>
+                </div>
+              </div>
+            </div>
+            <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-share-alt" style="font-size: 24px; color: #98fb98;"></i>
+                <div>
+                  <div style="font-size: 24px; font-weight: 700;">${this.webhooks ? this.webhooks.length : 0}</div>
+                  <div style="font-size: 14px; opacity: 0.8;">웹훅</div>
+                </div>
+              </div>
+            </div>
+            <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-plug" style="font-size: 24px; color: #dda0dd;"></i>
+                <div>
+                  <div style="font-size: 24px; font-weight: 700;">${this.thirdPartyIntegrations ? this.thirdPartyIntegrations.filter(i => i.status === 'connected').length : 0}</div>
+                  <div style="font-size: 14px; opacity: 0.8;">연결된 서비스</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button style="background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3); padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 8px; min-height: 44px;" onclick="integrationsPage.exportIntegrationsData()" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+            <i class="fas fa-download"></i>
+            <span>CSV 내보내기</span>
+          </button>
+          <button style="background: rgba(255,255,255,0.9); color: #667eea; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; min-height: 44px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="integrationsPage.openApiKeyModal()" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'">
+            <i class="fas fa-plus"></i>
+            <span>새 API 키</span>
+          </button>
+        </div>
       </div>
     `;
     
@@ -942,6 +1000,85 @@ class IntegrationsPage {
       service.config = null;
       this.renderCurrentTab();
       Utils.showNotification(`${service.name} 연동이 해제되었습니다.`, 'success');
+    }
+  }
+
+  // CSV 내보내기 기능
+  exportIntegrationsData() {
+    try {
+      // API 키 데이터
+      const apiKeysData = [
+        ['API 키 ID', 'API 키 이름', 'API 키', '권한', '생성일', '마지막 사용', '상태'],
+        ...this.apiKeys.map(key => [
+          key.id,
+          key.name,
+          key.key,
+          key.permissions.join(', '),
+          Utils.formatDateTime(key.created_at),
+          key.last_used ? Utils.formatDateTime(key.last_used) : '사용 안함',
+          key.status === 'active' ? '활성' : '비활성'
+        ])
+      ];
+
+      // 웹훅 데이터
+      const webhooksData = [
+        ['웹훅 ID', '웹훅 이름', 'URL', '이벤트', '생성일', '마지막 실행', '상태'],
+        ...this.webhooks.map(webhook => [
+          webhook.id,
+          webhook.name,
+          webhook.url,
+          webhook.events.join(', '),
+          Utils.formatDateTime(webhook.created_at),
+          webhook.last_triggered ? Utils.formatDateTime(webhook.last_triggered) : '실행 안함',
+          webhook.status === 'active' ? '활성' : '비활성'
+        ])
+      ];
+
+      // 써드파티 연동 데이터
+      const servicesData = [
+        ['서비스 ID', '서비스 이름', '설명', '상태', '설정 정보'],
+        ...this.thirdPartyIntegrations.map(service => [
+          service.id,
+          service.name,
+          service.description,
+          service.status === 'connected' ? '연결됨' : '연결 안됨',
+          service.config ? JSON.stringify(service.config) : 'N/A'
+        ])
+      ];
+
+      // 통합 CSV 생성
+      const allData = [
+        ['=== API 키 목록 ==='],
+        ...apiKeysData,
+        [''],
+        ['=== 웹훅 목록 ==='],
+        ...webhooksData,
+        [''],
+        ['=== 써드파티 연동 목록 ==='],
+        ...servicesData
+      ];
+
+      const csvContent = allData.map(row => 
+        row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+      ).join('\n');
+
+      // CSV 파일 다운로드
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `kommentio_integrations_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      Utils.showNotification('연동 데이터가 CSV 파일로 내보내졌습니다.', 'success');
+    } catch (error) {
+      console.error('CSV 내보내기 실패:', error);
+      Utils.showNotification('CSV 내보내기에 실패했습니다.', 'error');
     }
   }
 }

@@ -1,6 +1,16 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Before you start any session, you must read some markdown files to understand last updates and reminds:
+To know what this project's Goal: comment_system_prd.md
+To know what this project's competitors and research of their specifics: competitor_research.md
+To know current status of this project: PROJECT_STATUS.md
+To know last update log: UPDATE_LOG.md
+
+If user says '빌드를 종료합니다.", ask user to commit and push current build. If user agree with that, you must update PROJECT_STATUS.md and add update log in UPDATE_LOG.md. please name the current version of build as possible as minor number(e.g. v0.1.0 to v0.1.1). After this, ask user to commit and push this project again.
+
+During developing with user, if you learn very important thing which need to remember and remind everytime, please add the contents which contains what's your mistakes and what you learn from the mistakes in CLAUDE.md file.
+
 
 ## Project Overview
 
@@ -199,6 +209,137 @@ npm run dev  # Test mock mode
 2. Configure environment variables
 3. Test real authentication flows
 4. Verify admin dashboard integration
+
+## Critical UI/UX Implementation Lessons Learned
+
+### Modal Implementation Mistakes & Solutions
+**Background**: During admin dashboard modal development, multiple implementation failures led to important insights.
+
+**Key Mistakes Made**:
+1. **CSS Priority Issues**: Failed to use `!important` for style overrides, causing conflicts with existing styles
+2. **Positioning Problems**: Incorrect modal centering and z-index management
+3. **Detail Neglect**: Missing small but critical UI details like footer border connections
+4. **Incomplete Testing**: Not thoroughly testing visual consistency across different states
+
+**Critical Lessons**:
+1. **Pixel-Perfect Details Matter**: Small visual inconsistencies (like disconnected borders) significantly impact perceived quality
+2. **User Feedback is Essential**: Screenshots and specific visual feedback are more valuable than technical descriptions
+3. **CSS Namespacing**: Always use strong CSS specificity (`!important`, detailed selectors) to prevent style conflicts
+4. **Iterative Refinement**: Perfect UI requires multiple feedback cycles, not single implementation attempts
+5. **Visual Debugging**: Always verify final implementation matches expected visual design exactly
+
+**Implementation Pattern for Future Modals**:
+```css
+/* Always use strong specificity */
+.modal .modal-footer {
+  margin: 0 -24px !important; /* Extend borders to modal edges */
+  padding: 16px 24px !important; /* Maintain internal spacing */
+  border-top: 1px solid #e5e7eb !important; /* Consistent visual separation */
+}
+```
+
+**Remember**: UI/UX excellence requires both technical competence AND meticulous attention to visual details. Never assume implementation is complete without user validation.
+
+### CSS Framework Dependencies & Debugging Mistakes & Solutions
+**Background**: During admin dashboard UI implementation, implemented beautiful Tailwind CSS styling that appeared as plain text due to missing dependencies.
+
+**Key Mistakes Made**:
+1. **Code vs Reality Gap**: Assumed elaborate Tailwind CSS classes would render properly without verifying framework was loaded
+2. **Wrong Problem Analysis**: When user reported "plain text" styling, incorrectly analyzed code instead of checking actual rendering
+3. **Dependency Oversight**: Used Tailwind classes (`bg-gradient-to-br`, `rounded-xl`, `flex-col`) without ensuring Tailwind CSS was available
+4. **User Feedback Misinterpretation**: When user said "not decorative, just plain text", initially defended code instead of investigating actual display
+
+**Critical Lessons**:
+1. **Environment First**: Always verify CSS framework/dependencies are loaded BEFORE implementing styling
+2. **Visual Verification**: Code appearance ≠ actual rendering. Always check real browser output
+3. **Listen to User Experience**: When users describe visual issues, trust their experience over code analysis
+4. **Screenshot Requests**: When user asks to "check images not code", immediately comply - they see the real problem
+5. **Dependency Chain**: CSS framework → styling code → visual result. Break in chain = broken styling
+
+**Debugging Process for UI Issues**:
+```bash
+# 1. Check dependencies first
+- Verify CSS framework loaded (Tailwind, Bootstrap, etc.)
+- Check for console errors
+- Confirm stylesheet links work
+
+# 2. Visual verification
+- View actual rendered page
+- Compare with expected design
+- Screenshot comparison
+
+# 3. User feedback priority
+- Screenshots > code analysis
+- User experience > technical assumptions
+- Real rendering > code review
+```
+
+**Implementation Pattern for Future Styling**:
+```html
+<!-- 1. Ensure framework dependency FIRST -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- 2. THEN implement styling code -->
+<div class="bg-gradient-to-br from-blue-500 to-indigo-600">...</div>
+```
+
+**Remember**: Beautiful code is meaningless if CSS dependencies aren't loaded. Always verify the complete rendering pipeline: Dependencies → Code → Visual Output → User Experience.
+
+### Global Modal System Fix & Lessons
+**Background**: User reported modal display issues where text content appeared broken in screenshot. Investigation revealed multiple CSS conflicts and dependencies issues.
+
+**Key Mistakes Made**:
+1. **Modal Definition Conflicts**: Multiple modal implementations existed in Components.js causing inconsistent behavior
+2. **CSS Dependency Issues**: Relied on external CSS frameworks (Tailwind) that weren't always loaded
+3. **Style Override Failures**: Insufficient use of `!important` declarations for modal styling
+4. **Text Rendering Problems**: Modal content appeared as broken text due to styling conflicts
+
+**Critical Solutions Implemented**:
+1. **Complete Inline Styling**: Eliminated all CSS class dependencies by using comprehensive inline styles with `!important`
+2. **Unified Modal System**: Removed duplicate modal definitions and created single premium modal component
+3. **Font & Layout Guarantees**: Ensured all text rendering with explicit font-family, line-height, and color declarations
+4. **Global Application**: Fixed modal system applies to ALL pages automatically (comments, users, settings, etc.)
+
+**Implementation Pattern for Modals**:
+```javascript
+// Always use complete inline styling for modals
+modalElement.style.cssText = `
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #1e293b !important;
+  line-height: 1.6 !important;
+  // ... all other styles with !important
+`;
+```
+
+**Remember**: Modal systems must be completely self-contained with inline styles to guarantee consistent rendering across all environments and CSS framework states.
+
+## Design System Requirements
+
+### Responsive Design Mandate
+**CRITICAL RULE**: 모든 프론트엔드 디자인은 적응형 디자인을 활용하여 데스크톱 뷰, 태블릿 뷰, 모바일 뷰를 최적화해야 한다.
+
+**Implementation Requirements**:
+1. **Desktop First**: Design for desktop (1920px+) with full feature access
+2. **Tablet Optimization**: Adapt layouts for tablets (768px-1024px) with touch-friendly interfaces  
+3. **Mobile Responsive**: Ensure usability on mobile devices (320px-767px) with optimized navigation
+4. **Breakpoint Standards**: Use consistent breakpoints across all components
+5. **Touch Targets**: Minimum 44px touch targets for mobile interactions
+6. **Content Priority**: Show most important content first on smaller screens
+
+**Responsive Patterns to Follow**:
+```css
+/* Desktop First Approach */
+.component { /* Desktop styles */ }
+
+@media (max-width: 1024px) { /* Tablet */ }
+@media (max-width: 768px) { /* Mobile */ }
+```
+
+**Testing Requirements**:
+- Test on actual devices when possible
+- Use browser developer tools for responsive testing
+- Verify touch interactions on mobile
+- Ensure readable text sizes across all devices
+- Confirm navigation accessibility on small screens
 
 ## Future Enhancements (Phase 2)
 - Korean social login (Kakao, Line)
