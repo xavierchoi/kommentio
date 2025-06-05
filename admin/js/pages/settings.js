@@ -31,73 +31,70 @@ class SettingsPage {
   }
 
   createPageHeader() {
-    const header = Utils.createElement('div');
-    header.style.cssText = `
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-      border-radius: 16px !important;
-      padding: 32px !important;
-      margin-bottom: 32px !important;
-      color: white !important;
-      position: relative !important;
-      overflow: hidden !important;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-    `;
+    const header = Utils.createElement('div', 'bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-800 rounded-2xl p-8 mb-8 text-white relative overflow-hidden shadow-2xl');
     
     header.innerHTML = `
-      <div style="position: absolute; top: -50%; right: -10%; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 1;"></div>
-      <div style="position: absolute; bottom: -30%; left: -5%; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; z-index: 1;"></div>
+      <!-- 배경 장식 원들 -->
+      <div class="absolute -top-20 -right-8 w-48 h-48 bg-white bg-opacity-10 rounded-full"></div>
+      <div class="absolute -bottom-12 -left-4 w-32 h-32 bg-white bg-opacity-5 rounded-full"></div>
       
-      <div style="position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
-        <div style="flex: 1; min-width: 300px;">
-          <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
-            <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-              <i class="fas fa-cog" style="font-size: 28px; color: white;"></i>
+      <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <!-- 메인 콘텐츠 영역 -->
+        <div class="flex-1 min-w-0">
+          <!-- 제목 섹션 -->
+          <div class="flex items-center space-x-4 mb-6">
+            <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <i class="fas fa-cog text-white text-3xl"></i>
             </div>
             <div>
-              <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">시스템 설정</h1>
-              <p style="font-size: 18px; opacity: 0.9; margin: 8px 0 0 0; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">Kommentio 댓글 시스템의 전체적인 설정을 관리하세요</p>
+              <h1 class="text-4xl font-bold text-white drop-shadow-lg">시스템 설정</h1>
+              <p class="text-lg text-white text-opacity-90 mt-2 drop-shadow-sm">Kommentio 댓글 시스템의 전체적인 설정을 관리하세요</p>
             </div>
           </div>
           
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px;">
-            <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-shield-alt" style="font-size: 24px; color: #ffd700;"></i>
+          <!-- 상태 통계 카드들 -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white bg-opacity-15 backdrop-blur-sm p-4 rounded-xl border border-white border-opacity-20">
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-shield-alt text-yellow-300 text-2xl"></i>
                 <div>
-                  <div style="font-size: 24px; font-weight: 700;">${this.getSecurityLevel()}</div>
-                  <div style="font-size: 14px; opacity: 0.8;">보안 수준</div>
+                  <div class="text-2xl font-bold text-white">${this.getSecurityLevel()}</div>
+                  <div class="text-sm text-white text-opacity-80">보안 수준</div>
                 </div>
               </div>
             </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-clock" style="font-size: 24px; color: #98fb98;"></i>
+            <div class="bg-white bg-opacity-15 backdrop-blur-sm p-4 rounded-xl border border-white border-opacity-20">
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-clock text-green-300 text-2xl"></i>
                 <div>
-                  <div style="font-size: 24px; font-weight: 700;">99.9%</div>
-                  <div style="font-size: 14px; opacity: 0.8;">시스템 가동률</div>
+                  <div class="text-2xl font-bold text-white">99.9%</div>
+                  <div class="text-sm text-white text-opacity-80">시스템 가동률</div>
                 </div>
               </div>
             </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-sync-alt" style="font-size: 24px; color: #dda0dd;"></i>
+            <div class="bg-white bg-opacity-15 backdrop-blur-sm p-4 rounded-xl border border-white border-opacity-20">
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-sync-alt text-purple-300 text-2xl"></i>
                 <div>
-                  <div style="font-size: 24px; font-weight: 700;">자동</div>
-                  <div style="font-size: 14px; opacity: 0.8;">백업 상태</div>
+                  <div class="text-2xl font-bold text-white">자동</div>
+                  <div class="text-sm text-white text-opacity-80">백업 상태</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          <button style="background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3); padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 8px; min-height: 44px;" onclick="settingsPage.exportSettings()" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-            <i class="fas fa-download"></i>
-            <span>설정 내보내기</span>
+        <!-- 액션 버튼들 -->
+        <div class="flex flex-col sm:flex-row gap-3 lg:flex-col lg:w-auto">
+          <button class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white border-2 border-white border-opacity-30 hover:border-opacity-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300 backdrop-blur-sm flex items-center justify-center space-x-2 min-h-[44px] group" onclick="settingsPage.exportSettings()">
+            <i class="fas fa-download group-hover:animate-bounce"></i>
+            <span class="hidden sm:inline">설정 내보내기</span>
+            <span class="sm:hidden">내보내기</span>
           </button>
-          <button style="background: rgba(255,255,255,0.9); color: #667eea; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; min-height: 44px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="settingsPage.saveAllSettings()" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'">
-            <i class="fas fa-save"></i>
-            <span>모든 설정 저장</span>
+          <button class="bg-white hover:bg-gray-50 text-indigo-600 px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 min-h-[44px] shadow-lg hover:shadow-xl hover:-translate-y-0.5 group" onclick="settingsPage.saveAllSettings()">
+            <i class="fas fa-save group-hover:animate-pulse"></i>
+            <span class="hidden sm:inline">모든 설정 저장</span>
+            <span class="sm:hidden">저장</span>
           </button>
         </div>
       </div>
@@ -112,11 +109,7 @@ class SettingsPage {
   }
 
   createSettingsContainer() {
-    const container = Utils.createElement('div');
-    container.style.cssText = `
-      display: grid !important;
-      gap: 32px !important;
-    `;
+    const container = Utils.createElement('div', 'grid gap-8');
 
     // 일반 설정
     const generalSettings = this.createGeneralSettings();
@@ -138,56 +131,57 @@ class SettingsPage {
   }
 
   createGeneralSettings() {
-    const section = Utils.createElement('div');
-    section.style.cssText = `
-      background: white !important;
-      border-radius: 16px !important;
-      padding: 32px !important;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
-      border: 1px solid #e5e7eb !important;
-    `;
+    const section = Utils.createElement('div', 'bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300');
 
     section.innerHTML = `
-      <div style="margin-bottom: 24px;">
-        <h2 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0 0 8px 0; display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-sliders-h" style="color: white; font-size: 20px;"></i>
+      <!-- 섹션 헤더 -->
+      <div class="mb-6">
+        <div class="flex items-center space-x-3 mb-2">
+          <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center">
+            <i class="fas fa-sliders-h text-white text-xl"></i>
           </div>
-          일반 설정
-        </h2>
-        <p style="color: #6b7280; margin: 0;">사이트의 기본적인 설정들을 관리합니다</p>
+          <h2 class="text-2xl font-bold text-gray-900">일반 설정</h2>
+        </div>
+        <p class="text-gray-600">사이트의 기본적인 설정들을 관리합니다</p>
       </div>
       
-      <div style="display: grid; gap: 24px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-          <div>
-            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">사이트 이름</label>
-            <input type="text" id="siteName" value="Kommentio 댓글 시스템" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;">
+      <!-- 설정 폼 -->
+      <div class="space-y-6">
+        <!-- 기본 정보 그리드 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">사이트 이름</label>
+            <input type="text" id="siteName" value="Kommentio 댓글 시스템" 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-white">
           </div>
-          <div>
-            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">관리자 이메일</label>
-            <input type="email" id="adminEmail" value="admin@kommentio.com" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;">
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">관리자 이메일</label>
+            <input type="email" id="adminEmail" value="admin@kommentio.com"
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-white">
           </div>
         </div>
         
-        <div>
-          <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">사이트 설명</label>
-          <textarea id="siteDescription" rows="3" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; resize: vertical;">Kommentio는 오픈소스 댓글 시스템입니다.</textarea>
+        <!-- 사이트 설명 -->
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-gray-700">사이트 설명</label>
+          <textarea id="siteDescription" rows="3" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-white resize-vertical">Kommentio는 오픈소스 댓글 시스템입니다.</textarea>
         </div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-          <div>
-            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">기본 언어</label>
-            <select id="defaultLanguage" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;">
+        <!-- 언어 및 시간대 설정 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">기본 언어</label>
+            <select id="defaultLanguage" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-white">
               <option value="ko">한국어</option>
               <option value="en">English</option>
               <option value="ja">日本語</option>
               <option value="zh">中文</option>
             </select>
           </div>
-          <div>
-            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">시간대</label>
-            <select id="timezone" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;">
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">시간대</label>
+            <select id="timezone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-white">
               <option value="Asia/Seoul">Asia/Seoul (KST)</option>
               <option value="UTC">UTC</option>
               <option value="America/New_York">America/New_York (EST)</option>
@@ -196,20 +190,24 @@ class SettingsPage {
           </div>
         </div>
         
-        <div style="border-top: 1px solid #e5e7eb; padding-top: 24px;">
-          <h3 style="font-size: 18px; font-weight: 600; color: #374151; margin: 0 0 16px 0;">표시 옵션</h3>
-          <div style="display: grid; gap: 12px;">
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="showCommentCount" checked style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">댓글 수 표시</span>
+        <!-- 표시 옵션 -->
+        <div class="pt-6 border-t border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">표시 옵션</h3>
+          <div class="space-y-4">
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="showCommentCount" checked 
+                     class="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">댓글 수 표시</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="showTimestamp" checked style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">작성 시간 표시</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="showTimestamp" checked 
+                     class="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">작성 시간 표시</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="allowAnonymous" checked style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">익명 댓글 허용</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="allowAnonymous" checked 
+                     class="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">익명 댓글 허용</span>
             </label>
           </div>
         </div>
@@ -220,93 +218,99 @@ class SettingsPage {
   }
 
   createSecuritySettings() {
-    const section = Utils.createElement('div');
-    section.style.cssText = `
-      background: white !important;
-      border-radius: 16px !important;
-      padding: 32px !important;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
-      border: 1px solid #e5e7eb !important;
-    `;
+    const section = Utils.createElement('div', 'bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300');
 
     section.innerHTML = `
-      <div style="margin-bottom: 24px;">
-        <h2 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0 0 8px 0; display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-shield-alt" style="color: white; font-size: 20px;"></i>
+      <!-- 섹션 헤더 -->
+      <div class="mb-6">
+        <div class="flex items-center space-x-3 mb-2">
+          <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+            <i class="fas fa-shield-alt text-white text-xl"></i>
           </div>
-          보안 설정
-        </h2>
-        <p style="color: #6b7280; margin: 0;">댓글 시스템의 보안 및 스팸 방지 설정을 관리합니다</p>
+          <h2 class="text-2xl font-bold text-gray-900">보안 설정</h2>
+        </div>
+        <p class="text-gray-600">댓글 시스템의 보안 및 스팸 방지 설정을 관리합니다</p>
       </div>
       
-      <div style="display: grid; gap: 24px;">
-        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 20px;">
-          <h3 style="font-size: 18px; font-weight: 600; color: #991b1b; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-exclamation-triangle"></i>
-            스팸 방지 설정
+      <!-- 설정 섹션들 -->
+      <div class="space-y-6">
+        <!-- 스팸 방지 설정 -->
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-red-800 mb-4 flex items-center space-x-2">
+            <i class="fas fa-exclamation-triangle text-red-600"></i>
+            <span>스팸 방지 설정</span>
           </h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div>
-              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">스팸 임계값</label>
-              <input type="range" id="spamThreshold" min="0" max="1" step="0.1" value="0.7" style="width: 100%;">
-              <div style="display: flex; justify-content: space-between; color: #6b7280; font-size: 12px;">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700">스팸 임계값</label>
+              <input type="range" id="spamThreshold" min="0" max="1" step="0.1" value="0.7" 
+                     class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+              <div class="flex justify-between text-xs text-gray-500 mt-1">
                 <span>낮음 (0)</span>
                 <span>높음 (1)</span>
               </div>
             </div>
-            <div>
-              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">댓글 승인 방식</label>
-              <select id="approvalMode" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700">댓글 승인 방식</label>
+              <select id="approvalMode" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200 bg-white">
                 <option value="auto">자동 승인</option>
                 <option value="manual">수동 승인</option>
                 <option value="first-time">첫 댓글만 승인</option>
               </select>
             </div>
           </div>
-          <div style="margin-top: 16px;">
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="enableSpamFilter" checked style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">AI 스팸 필터 활성화</span>
+          <div class="mt-4">
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="enableSpamFilter" checked 
+                     class="w-5 h-5 text-red-600 rounded focus:ring-red-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">AI 스팸 필터 활성화</span>
             </label>
           </div>
         </div>
         
-        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px;">
-          <h3 style="font-size: 18px; font-weight: 600; color: #1e40af; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-user-shield"></i>
-            접근 제어
+        <!-- 접근 제어 설정 -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-blue-800 mb-4 flex items-center space-x-2">
+            <i class="fas fa-user-shield text-blue-600"></i>
+            <span>접근 제어</span>
           </h3>
-          <div style="display: grid; gap: 12px;">
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="requireLogin" style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">댓글 작성 시 로그인 필수</span>
+          <div class="space-y-4 mb-6">
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="requireLogin" 
+                     class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">댓글 작성 시 로그인 필수</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="enableCaptcha" style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">CAPTCHA 인증 활성화</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="enableCaptcha" 
+                     class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">CAPTCHA 인증 활성화</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="enableRateLimit" checked style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">댓글 작성 속도 제한</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="enableRateLimit" checked 
+                     class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">댓글 작성 속도 제한</span>
             </label>
           </div>
           
-          <div style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div>
-              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">최대 댓글 길이</label>
-              <input type="number" id="maxCommentLength" value="2000" min="100" max="10000" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700">최대 댓글 길이</label>
+              <input type="number" id="maxCommentLength" value="2000" min="100" max="10000" 
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white">
             </div>
-            <div>
-              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">댓글 작성 간격 (초)</label>
-              <input type="number" id="commentInterval" value="30" min="5" max="300" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700">댓글 작성 간격 (초)</label>
+              <input type="number" id="commentInterval" value="30" min="5" max="300" 
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white">
             </div>
           </div>
         </div>
         
-        <div>
-          <h3 style="font-size: 18px; font-weight: 600; color: #374151; margin: 0 0 16px 0;">차단 키워드</h3>
-          <textarea id="blockedWords" rows="4" placeholder="쉼표로 구분하여 차단할 키워드를 입력하세요" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+        <!-- 차단 키워드 -->
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold text-gray-900">차단 키워드</h3>
+          <textarea id="blockedWords" rows="4" placeholder="쉼표로 구분하여 차단할 키워드를 입력하세요" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-colors duration-200 bg-white resize-vertical"></textarea>
         </div>
       </div>
     `;
@@ -315,84 +319,89 @@ class SettingsPage {
   }
 
   createNotificationSettings() {
-    const section = Utils.createElement('div');
-    section.style.cssText = `
-      background: white !important;
-      border-radius: 16px !important;
-      padding: 32px !important;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
-      border: 1px solid #e5e7eb !important;
-    `;
+    const section = Utils.createElement('div', 'bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300');
 
     section.innerHTML = `
-      <div style="margin-bottom: 24px;">
-        <h2 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0 0 8px 0; display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-bell" style="color: white; font-size: 20px;"></i>
+      <!-- 섹션 헤더 -->
+      <div class="mb-6">
+        <div class="flex items-center space-x-3 mb-2">
+          <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <i class="fas fa-bell text-white text-xl"></i>
           </div>
-          알림 설정
-        </h2>
-        <p style="color: #6b7280; margin: 0;">이메일 및 시스템 알림 설정을 관리합니다</p>
+          <h2 class="text-2xl font-bold text-gray-900">알림 설정</h2>
+        </div>
+        <p class="text-gray-600">이메일 및 시스템 알림 설정을 관리합니다</p>
       </div>
       
-      <div style="display: grid; gap: 24px;">
-        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 20px;">
-          <h3 style="font-size: 18px; font-weight: 600; color: #0369a1; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-envelope"></i>
-            이메일 알림
+      <!-- 알림 설정들 -->
+      <div class="space-y-6">
+        <!-- 이메일 알림 -->
+        <div class="bg-sky-50 border border-sky-200 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-sky-800 mb-4 flex items-center space-x-2">
+            <i class="fas fa-envelope text-sky-600"></i>
+            <span>이메일 알림</span>
           </h3>
-          <div style="display: grid; gap: 12px;">
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="emailNewComment" checked style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">새 댓글 알림</span>
+          <div class="space-y-4">
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="emailNewComment" checked 
+                     class="w-5 h-5 text-sky-600 rounded focus:ring-sky-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">새 댓글 알림</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="emailSpamDetected" checked style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">스팸 탐지 알림</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="emailSpamDetected" checked 
+                     class="w-5 h-5 text-sky-600 rounded focus:ring-sky-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">스팸 탐지 알림</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="emailSystemUpdate" style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">시스템 업데이트 알림</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="emailSystemUpdate" 
+                     class="w-5 h-5 text-sky-600 rounded focus:ring-sky-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">시스템 업데이트 알림</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="emailWeeklyReport" style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">주간 리포트</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="emailWeeklyReport" 
+                     class="w-5 h-5 text-sky-600 rounded focus:ring-sky-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">주간 리포트</span>
             </label>
           </div>
         </div>
         
-        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px;">
-          <h3 style="font-size: 18px; font-weight: 600; color: #15803d; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-mobile-alt"></i>
-            푸시 알림
+        <!-- 푸시 알림 -->
+        <div class="bg-green-50 border border-green-200 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center space-x-2">
+            <i class="fas fa-mobile-alt text-green-600"></i>
+            <span>푸시 알림</span>
           </h3>
-          <div style="display: grid; gap: 12px;">
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="pushNewComment" style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">브라우저 푸시 알림</span>
+          <div class="space-y-4">
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="pushNewComment" 
+                     class="w-5 h-5 text-green-600 rounded focus:ring-green-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">브라우저 푸시 알림</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="pushSpamAlert" style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">스팸 경고 알림</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="pushSpamAlert" 
+                     class="w-5 h-5 text-green-600 rounded focus:ring-green-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">스팸 경고 알림</span>
             </label>
           </div>
         </div>
         
-        <div>
-          <h3 style="font-size: 18px; font-weight: 600; color: #374151; margin: 0 0 16px 0;">알림 빈도</h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div>
-              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">이메일 묶음 발송 간격</label>
-              <select id="emailBatchInterval" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+        <!-- 알림 빈도 설정 -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold text-gray-900">알림 빈도</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700">이메일 묶음 발송 간격</label>
+              <select id="emailBatchInterval" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200 bg-white">
                 <option value="immediate">즉시</option>
                 <option value="hourly">매시간</option>
                 <option value="daily">매일</option>
                 <option value="weekly">매주</option>
               </select>
             </div>
-            <div>
-              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">최대 알림 개수</label>
-              <input type="number" id="maxNotifications" value="100" min="10" max="1000" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700">최대 알림 개수</label>
+              <input type="number" id="maxNotifications" value="100" min="10" max="1000" 
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200 bg-white">
             </div>
           </div>
         </div>
@@ -403,107 +412,113 @@ class SettingsPage {
   }
 
   createAdvancedSettings() {
-    const section = Utils.createElement('div');
-    section.style.cssText = `
-      background: white !important;
-      border-radius: 16px !important;
-      padding: 32px !important;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
-      border: 1px solid #e5e7eb !important;
-    `;
+    const section = Utils.createElement('div', 'bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300');
 
     section.innerHTML = `
-      <div style="margin-bottom: 24px;">
-        <h2 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0 0 8px 0; display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-cogs" style="color: white; font-size: 20px;"></i>
+      <!-- 섹션 헤더 -->
+      <div class="mb-6">
+        <div class="flex items-center space-x-3 mb-2">
+          <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
+            <i class="fas fa-cogs text-white text-xl"></i>
           </div>
-          고급 설정
-        </h2>
-        <p style="color: #6b7280; margin: 0;">시스템의 고급 기능과 개발자 옵션을 설정합니다</p>
+          <h2 class="text-2xl font-bold text-gray-900">고급 설정</h2>
+        </div>
+        <p class="text-gray-600">시스템의 고급 기능과 개발자 옵션을 설정합니다</p>
       </div>
       
-      <div style="display: grid; gap: 24px;">
-        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 20px;">
-          <h3 style="font-size: 18px; font-weight: 600; color: #92400e; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-database"></i>
-            데이터베이스 설정
+      <!-- 고급 설정들 -->
+      <div class="space-y-6">
+        <!-- 데이터베이스 설정 -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-amber-800 mb-4 flex items-center space-x-2">
+            <i class="fas fa-database text-amber-600"></i>
+            <span>데이터베이스 설정</span>
           </h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div>
-              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">백업 간격</label>
-              <select id="backupInterval" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700">백업 간격</label>
+              <select id="backupInterval" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200 bg-white">
                 <option value="daily">매일</option>
                 <option value="weekly">매주</option>
                 <option value="monthly">매월</option>
               </select>
             </div>
-            <div>
-              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">백업 보관 기간 (일)</label>
-              <input type="number" id="backupRetention" value="30" min="7" max="365" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700">백업 보관 기간 (일)</label>
+              <input type="number" id="backupRetention" value="30" min="7" max="365" 
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200 bg-white">
             </div>
           </div>
-          <div style="margin-top: 16px;">
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="autoBackup" checked style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">자동 백업 활성화</span>
-            </label>
-          </div>
+          <label class="flex items-center space-x-3 cursor-pointer group">
+            <input type="checkbox" id="autoBackup" checked 
+                   class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500 focus:ring-2 transition-colors duration-200">
+            <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">자동 백업 활성화</span>
+          </label>
         </div>
         
-        <div style="background: #f3e8ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 20px;">
-          <h3 style="font-size: 18px; font-weight: 600; color: #7c2d12; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-code"></i>
-            개발자 옵션
+        <!-- 개발자 옵션 -->
+        <div class="bg-violet-50 border border-violet-200 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-violet-800 mb-4 flex items-center space-x-2">
+            <i class="fas fa-code text-violet-600"></i>
+            <span>개발자 옵션</span>
           </h3>
-          <div style="display: grid; gap: 12px;">
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="enableDebugMode" style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">디버그 모드 활성화</span>
+          <div class="space-y-4 mb-6">
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="enableDebugMode" 
+                     class="w-5 h-5 text-violet-600 rounded focus:ring-violet-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">디버그 모드 활성화</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="enableApiLogging" style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">API 로깅 활성화</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="enableApiLogging" 
+                     class="w-5 h-5 text-violet-600 rounded focus:ring-violet-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">API 로깅 활성화</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-              <input type="checkbox" id="enablePerformanceMonitoring" checked style="width: 18px; height: 18px;">
-              <span style="font-weight: 500; color: #374151;">성능 모니터링 활성화</span>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="enablePerformanceMonitoring" checked 
+                     class="w-5 h-5 text-violet-600 rounded focus:ring-violet-500 focus:ring-2 transition-colors duration-200">
+              <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">성능 모니터링 활성화</span>
             </label>
           </div>
           
-          <div style="margin-top: 16px;">
-            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">로그 보관 기간 (일)</label>
-            <input type="number" id="logRetention" value="90" min="7" max="365" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700">로그 보관 기간 (일)</label>
+            <input type="number" id="logRetention" value="90" min="7" max="365" 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors duration-200 bg-white">
           </div>
         </div>
         
-        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 20px;">
-          <h3 style="font-size: 18px; font-weight: 600; color: #991b1b; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-exclamation-triangle"></i>
-            위험 구역
+        <!-- 위험 구역 -->
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-red-800 mb-4 flex items-center space-x-2">
+            <i class="fas fa-exclamation-triangle text-red-600"></i>
+            <span>위험 구역</span>
           </h3>
-          <p style="color: #6b7280; margin-bottom: 16px;">아래 작업들은 시스템에 영구적인 영향을 줄 수 있습니다.</p>
-          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <button style="background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; min-height: 44px;" onclick="settingsPage.resetAllSettings()">
-              모든 설정 초기화
+          <p class="text-gray-600 mb-6">아래 작업들은 시스템에 영구적인 영향을 줄 수 있습니다.</p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center space-x-2 min-h-[44px]" onclick="settingsPage.resetAllSettings()">
+              <i class="fas fa-undo"></i>
+              <span>모든 설정 초기화</span>
             </button>
-            <button style="background: #dc2626; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; min-height: 44px;" onclick="settingsPage.clearAllData()">
-              모든 데이터 삭제
+            <button class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center space-x-2 min-h-[44px]" onclick="settingsPage.clearAllData()">
+              <i class="fas fa-trash-alt"></i>
+              <span>모든 데이터 삭제</span>
             </button>
           </div>
         </div>
       </div>
       
-      <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-        <div style="color: #6b7280; font-size: 14px;">
-          마지막 저장: <span id="lastSaved">방금 전</span>
+      <!-- 푸터 액션 영역 -->
+      <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-sm text-gray-500">
+          마지막 저장: <span id="lastSaved" class="font-medium text-gray-700">방금 전</span>
         </div>
-        <div style="display: flex; gap: 12px;">
-          <button style="background: #6b7280; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; min-height: 44px;" onclick="settingsPage.resetToDefaults()">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 min-h-[44px]" onclick="settingsPage.resetToDefaults()">
             기본값으로 복원
           </button>
-          <button style="background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; min-height: 44px;" onclick="settingsPage.saveAllSettings()">
-            변경사항 저장
+          <button class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2 min-h-[44px] shadow-lg hover:shadow-xl" onclick="settingsPage.saveAllSettings()">
+            <i class="fas fa-save"></i>
+            <span>변경사항 저장</span>
           </button>
         </div>
       </div>
