@@ -5,14 +5,14 @@
   "type": "module",
   "description": "Open-source embeddable comment widget - Ad-free alternative to Disqus",
   "scripts": {
-    "dev": "vite",
-    "dev:dashboard": "vite --config vite.dashboard.config.js --port 3001",
-    "build": "vite build",
-    "build:widget": "vite build --config vite.widget.config.js",
-    "build:dashboard": "vite build --config vite.dashboard.config.js",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "serve": "vite preview --port 3000"
+    "dev": "node --max-old-space-size=8192 ./node_modules/.bin/vite",
+    "dev:dashboard": "node --max-old-space-size=8192 ./node_modules/.bin/vite --config vite.dashboard.config.js --port 3001",
+    "build": "node --max-old-space-size=8192 ./node_modules/.bin/vite build",
+    "build:widget": "node --max-old-space-size=8192 ./node_modules/.bin/vite build --config vite.widget.config.js",
+    "build:dashboard": "node --max-old-space-size=8192 ./node_modules/.bin/vite build --config vite.dashboard.config.js",
+    "lint": "node --max-old-space-size=4096 ./node_modules/.bin/eslint .",
+    "preview": "node --max-old-space-size=4096 ./node_modules/.bin/vite preview",
+    "serve": "node --max-old-space-size=4096 ./node_modules/.bin/vite preview --port 3000"
   },
   "dependencies": {
     "@heroui/react": "^2.7.9",
