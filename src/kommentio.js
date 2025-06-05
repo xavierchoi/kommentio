@@ -24,8 +24,8 @@ class Kommentio {
         twitter: { enabled: true, label: 'X.com', color: '#000', icon: '🐦' },
         apple: { enabled: false, label: 'Apple', color: '#000', icon: '🍎' },
         linkedin: { enabled: false, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
-        kakao: { enabled: false, label: '카카오톡', color: '#fee500', icon: '💬' },
-        line: { enabled: false, label: 'LINE', color: '#00b900', icon: '💚' }
+        kakao: { enabled: true, label: '카카오톡', color: '#fee500', icon: '💬' },
+        line: { enabled: true, label: 'LINE', color: '#00b900', icon: '💚' }
       },
       
       ...options
@@ -79,9 +79,18 @@ class Kommentio {
         this.options.supabaseKey
       );
 
-      // 현재 사용자 확인
+      // 현재 사용자 확인 (Supabase + 커스텀 로그인)
       const { data: { user } } = await this.supabase.auth.getUser();
-      this.currentUser = user;
+      
+      // 커스텀 로그인 사용자 확인 (카카오, 라인)
+      const customUser = localStorage.getItem('kommentio_custom_user');
+      
+      if (user) {
+        this.currentUser = user;
+      } else if (customUser) {
+        this.currentUser = JSON.parse(customUser);
+      }
+      
       this.mockMode = false;
     } catch (error) {
       console.warn('Failed to connect to Supabase. Falling back to mock mode.', error);
@@ -365,14 +374,208 @@ class Kommentio {
         margin-bottom: 1rem;
       }
 
-      /* 반응형 */
-      @media (max-width: 640px) {
+      /* 반응형 디자인 - Desktop First 접근법 */
+      
+      /* 태블릿 최적화 (1024px 이하) */
+      @media (max-width: 1024px) {
+        .kommentio-header {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: stretch;
+        }
+        
+        .kommentio-social-login {
+          justify-content: center;
+          gap: 0.75rem;
+        }
+        
+        .kommentio-btn-social {
+          min-height: 44px;
+          min-width: 44px;
+          padding: 12px 16px;
+          flex: 1;
+          max-width: 200px;
+        }
+        
+        .kommentio-textarea {
+          min-height: 100px;
+        }
+      }
+      
+      /* 모바일 최적화 (768px 이하) */
+      @media (max-width: 768px) {
         .kommentio-container {
           padding: 1rem;
+          border-radius: 8px;
+          margin: 0.5rem;
+        }
+        
+        .kommentio-title {
+          font-size: 1.125rem;
+          margin-bottom: 1rem;
+        }
+        
+        .kommentio-widget {
+          font-size: 16px; /* iOS 줌 방지 */
+        }
+        
+        .kommentio-textarea {
+          font-size: 16px; /* iOS 줌 방지 */
+          min-height: 120px;
+          padding: 12px;
         }
         
         .kommentio-comment-nested {
-          margin-left: 1rem;
+          margin-left: 1rem; /* 모바일에서 중첩 간격 줄임 */
+        }
+        
+        .kommentio-comment-nested .kommentio-comment-nested {
+          margin-left: 0.5rem; /* 3단계 중첩 더 줄임 */
+        }
+        
+        .kommentio-author {
+          font-size: 0.875rem;
+        }
+        
+        .kommentio-timestamp {
+          font-size: 0.75rem;
+        }
+        
+        .kommentio-actions {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+        
+        .kommentio-btn-action {
+          min-height: 44px;
+          min-width: 44px;
+          padding: 8px 12px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .kommentio-notification {
+          left: 10px !important;
+          right: 10px !important;
+          top: 10px !important;
+          width: auto !important;
+          font-size: 0.875rem;
+        }
+      }
+      
+      /* 소형 모바일 (640px 이하) */
+      @media (max-width: 640px) {
+        .kommentio-container {
+          padding: 0.75rem;
+          margin: 0.25rem;
+        }
+        
+        .kommentio-social-login {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        
+        .kommentio-btn-social {
+          width: 100%;
+          justify-content: center;
+          max-width: none;
+        }
+        
+        .kommentio-comment {
+          border-left: none;
+          border-right: none;
+          border-radius: 0;
+          margin-left: -0.75rem;
+          margin-right: -0.75rem;
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+        }
+        
+        .kommentio-comment-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.25rem;
+        }
+        
+        .kommentio-form {
+          padding: 0.75rem;
+        }
+        
+        .kommentio-form-actions {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        
+        .kommentio-btn {
+          width: 100%;
+          min-height: 44px;
+          justify-content: center;
+        }
+      }
+      
+      /* 초소형 모바일 (480px 이하) */
+      @media (max-width: 480px) {
+        .kommentio-title {
+          font-size: 1rem;
+        }
+        
+        .kommentio-comment-nested {
+          margin-left: 0.5rem;
+        }
+        
+        .kommentio-comment-nested .kommentio-comment-nested {
+          margin-left: 0.25rem;
+        }
+        
+        .kommentio-author {
+          font-size: 0.8125rem;
+        }
+        
+        .kommentio-timestamp {
+          font-size: 0.6875rem;
+        }
+        
+        .kommentio-textarea {
+          min-height: 100px;
+          padding: 10px;
+        }
+      }
+      
+      /* 터치 친화적 인터페이스 */
+      @media (hover: none) and (pointer: coarse) {
+        .kommentio-btn:hover {
+          transform: none; /* 터치 디바이스에서 호버 효과 제거 */
+        }
+        
+        .kommentio-btn:active {
+          transform: scale(0.98);
+          transition: transform 0.1s ease;
+        }
+        
+        .kommentio-comment-actions button:hover {
+          background: transparent;
+        }
+        
+        .kommentio-comment-actions button:active {
+          background: var(--kommentio-bg-secondary);
+          border-radius: 4px;
+        }
+      }
+      
+      /* 가로 모드 최적화 */
+      @media (max-height: 500px) and (orientation: landscape) {
+        .kommentio-container {
+          padding: 0.5rem;
+        }
+        
+        .kommentio-textarea {
+          min-height: 80px;
+        }
+        
+        .kommentio-title {
+          font-size: 1rem;
+          margin-bottom: 0.5rem;
         }
       }
     `;
@@ -418,7 +621,7 @@ class Kommentio {
 
     // 활성화된 소셜 프로바이더들만 필터링
     const enabledProviders = Object.entries(this.options.socialProviders)
-      .filter(([_, config]) => config.enabled);
+      .filter(([, config]) => config.enabled);
 
     if (enabledProviders.length === 0) {
       return '<p class="kommentio-text-secondary">로그인 옵션이 설정되지 않았습니다.</p>';
@@ -1028,6 +1231,12 @@ class Kommentio {
     }
 
     try {
+      // 한국 소셜 로그인 (카카오, 라인)은 커스텀 구현
+      if (provider === 'kakao' || provider === 'line') {
+        await this.handleKoreanSocialLogin(provider);
+        return;
+      }
+
       const supabaseProvider = this.getSupabaseProvider(provider);
       const providerOptions = this.getProviderOptions(provider);
 
@@ -1065,10 +1274,241 @@ class Kommentio {
 
     try {
       await this.supabase.auth.signOut();
+      
+      // 커스텀 로그인 정보도 정리 (카카오, 라인)
+      localStorage.removeItem('kommentio_custom_user');
+      localStorage.removeItem('kommentio_custom_token');
+      
       this.currentUser = null;
       this.render();
     } catch (error) {
       console.error('Logout failed:', error);
+    }
+  }
+
+  /**
+   * 한국 소셜 로그인 (카카오, 라인) 커스텀 처리
+   */
+  async handleKoreanSocialLogin(provider) {
+    const providerConfig = this.options.socialProviders[provider];
+    
+    try {
+      if (provider === 'kakao') {
+        await this.handleKakaoLogin();
+      } else if (provider === 'line') {
+        await this.handleLineLogin();
+      }
+    } catch (error) {
+      console.error(`${provider} login failed:`, error);
+      alert(`${providerConfig.label} 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.`);
+    }
+  }
+
+  /**
+   * 카카오 로그인 처리
+   */
+  async handleKakaoLogin() {
+    const kakaoConfig = this.getKakaoConfig();
+    
+    if (!kakaoConfig.apiKey) {
+      this.showNotification('카카오 로그인 설정이 필요합니다. 관리자에게 문의하세요.', 'error');
+      return;
+    }
+
+    // 카카오 SDK 로드
+    await this.loadKakaoSDK();
+    
+    return new Promise((resolve, reject) => {
+      window.Kakao.Auth.login({
+        success: async (authObj) => {
+          try {
+            // 카카오 사용자 정보 가져오기
+            window.Kakao.API.request({
+              url: '/v2/user/me',
+              success: async (userInfo) => {
+                // Supabase 커스텀 토큰으로 로그인
+                await this.loginWithKakaoUser(userInfo, authObj.access_token);
+                resolve();
+              },
+              fail: reject
+            });
+          } catch (error) {
+            reject(error);
+          }
+        },
+        fail: reject
+      });
+    });
+  }
+
+  /**
+   * 라인 로그인 처리
+   */
+  async handleLineLogin() {
+    const lineConfig = this.getLineConfig();
+    
+    if (!lineConfig.clientId) {
+      this.showNotification('LINE 로그인 설정이 필요합니다. 관리자에게 문의하세요.', 'error');
+      return;
+    }
+
+    // LINE 로그인 URL 생성
+    const lineLoginUrl = this.generateLineLoginUrl(lineConfig);
+    
+    // 팝업으로 LINE 로그인 처리
+    return new Promise((resolve, reject) => {
+      const popup = window.open(lineLoginUrl, 'line-login', 'width=400,height=600');
+      
+      // 메시지 리스너로 로그인 결과 받기
+      const messageListener = async (event) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'LINE_LOGIN_SUCCESS') {
+          window.removeEventListener('message', messageListener);
+          popup.close();
+          
+          try {
+            await this.loginWithLineUser(event.data.userInfo, event.data.accessToken);
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        } else if (event.data.type === 'LINE_LOGIN_ERROR') {
+          window.removeEventListener('message', messageListener);
+          popup.close();
+          reject(new Error(event.data.error));
+        }
+      };
+      
+      window.addEventListener('message', messageListener);
+      
+      // 팝업이 닫히면 취소로 처리
+      const checkClosed = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(checkClosed);
+          window.removeEventListener('message', messageListener);
+          reject(new Error('로그인이 취소되었습니다.'));
+        }
+      }, 1000);
+    });
+  }
+
+  /**
+   * 카카오 SDK 로드
+   */
+  async loadKakaoSDK() {
+    if (window.Kakao) return;
+    
+    await this.loadScript('https://developers.kakao.com/sdk/js/kakao.js');
+    
+    const kakaoConfig = this.getKakaoConfig();
+    window.Kakao.init(kakaoConfig.apiKey);
+  }
+
+  /**
+   * 카카오 설정 가져오기
+   */
+  getKakaoConfig() {
+    return {
+      apiKey: this.options.kakaoApiKey || process.env.VITE_KAKAO_API_KEY,
+      redirectUri: `${window.location.origin}/auth/kakao/callback`
+    };
+  }
+
+  /**
+   * 라인 설정 가져오기
+   */
+  getLineConfig() {
+    return {
+      clientId: this.options.lineClientId || process.env.VITE_LINE_CLIENT_ID,
+      redirectUri: `${window.location.origin}/auth/line/callback`
+    };
+  }
+
+  /**
+   * 라인 로그인 URL 생성
+   */
+  generateLineLoginUrl(config) {
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: config.clientId,
+      redirect_uri: config.redirectUri,
+      state: Math.random().toString(36).substring(7),
+      scope: 'profile openid email'
+    });
+    
+    return `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`;
+  }
+
+  /**
+   * 카카오 사용자로 Supabase 로그인
+   */
+  async loginWithKakaoUser(userInfo, accessToken) {
+    // 사용자 정보 변환
+    const userData = {
+      id: `kakao_${userInfo.id}`,
+      email: userInfo.kakao_account?.email || `kakao_${userInfo.id}@kakao.local`,
+      user_metadata: {
+        name: userInfo.kakao_account?.profile?.nickname || '카카오 사용자',
+        avatar_url: userInfo.kakao_account?.profile?.profile_image_url,
+        provider: 'kakao',
+        provider_id: userInfo.id.toString(),
+        full_name: userInfo.kakao_account?.profile?.nickname
+      }
+    };
+
+    // Supabase에 커스텀 사용자로 로그인
+    await this.loginWithCustomUser(userData, accessToken);
+    this.showNotification('카카오 로그인 완료! 🎉');
+  }
+
+  /**
+   * 라인 사용자로 Supabase 로그인
+   */
+  async loginWithLineUser(userInfo, accessToken) {
+    // 사용자 정보 변환
+    const userData = {
+      id: `line_${userInfo.userId}`,
+      email: userInfo.email || `line_${userInfo.userId}@line.local`,
+      user_metadata: {
+        name: userInfo.displayName || 'LINE 사용자',
+        avatar_url: userInfo.pictureUrl,
+        provider: 'line',
+        provider_id: userInfo.userId,
+        full_name: userInfo.displayName
+      }
+    };
+
+    // Supabase에 커스텀 사용자로 로그인
+    await this.loginWithCustomUser(userData, accessToken);
+    this.showNotification('LINE 로그인 완료! 💚');
+  }
+
+  /**
+   * 커스텀 사용자로 Supabase 로그인
+   */
+  async loginWithCustomUser(userData, accessToken) {
+    try {
+      // 실제 환경에서는 백엔드 서버에서 JWT 토큰 생성이 필요
+      // 여기서는 간단한 구현으로 로컬 저장소 사용
+      
+      // 현재 사용자 설정
+      this.currentUser = {
+        id: userData.id,
+        email: userData.email,
+        user_metadata: userData.user_metadata
+      };
+
+      // 로컬 저장소에 저장 (실제 환경에서는 Supabase JWT 토큰 사용)
+      localStorage.setItem('kommentio_custom_user', JSON.stringify(this.currentUser));
+      localStorage.setItem('kommentio_custom_token', accessToken);
+      
+      // UI 업데이트
+      this.render();
+      
+    } catch (error) {
+      console.error('Custom login failed:', error);
+      throw error;
     }
   }
 

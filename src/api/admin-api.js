@@ -536,7 +536,7 @@ class KommentioAdminAPI {
   /**
    * 소셜 프로바이더 통계 (어떤 로그인 방식이 많이 사용되는지)
    */
-  async getSocialProviderStats(siteId, timeRange = '30 days') {
+  async getSocialProviderStats(siteId) {
     const { data, error } = await this.supabase
       .from('comments')
       .select('author_id, users!inner(user_metadata)')
