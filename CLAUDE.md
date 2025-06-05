@@ -4,8 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Before you start any session, you must read some markdown files to understand last updates and reminds:
 To know what this project's Goal: comment_system_prd.md
 To know what this project's competitors and research of their specifics: competitor_research.md
-To know current status of this project: PROJECT_STATUS.md
-To know last update log: UPDATE_LOG.md
+To know last status of this project: LAST_PROJECT_STATUS.md
+To read or add update log: UPDATE_LOG.md
 
 If user says '빌드를 종료합니다.", ask user to commit and push current build. If user agree with that, you must update PROJECT_STATUS.md and add update log in UPDATE_LOG.md. please name the current version of build as possible as minor number(e.g. v0.1.0 to v0.1.1). After this, ask user to commit and push this project again.
 
