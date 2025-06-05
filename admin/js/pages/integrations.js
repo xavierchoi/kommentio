@@ -41,101 +41,364 @@ class IntegrationsPage {
     const header = Utils.createElement('div');
     header.style.cssText = `
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-      border-radius: 16px !important;
-      padding: 32px !important;
+      border-radius: 20px !important;
+      padding: 40px !important;
       margin-bottom: 32px !important;
       color: white !important;
       position: relative !important;
       overflow: hidden !important;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
     `;
+
+    // 배경 패턴 추가
+    const pattern = Utils.createElement('div');
+    pattern.style.cssText = `
+      position: absolute !important;
+      top: -50% !important;
+      right: -50% !important;
+      width: 200% !important;
+      height: 200% !important;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") !important;
+      pointer-events: none !important;
+    `;
+    header.appendChild(pattern);
+
+    const content = Utils.createElement('div');
+    content.style.cssText = `position: relative !important; z-index: 1 !important;`;
     
-    header.innerHTML = `
-      <div style="position: absolute; top: -50%; right: -10%; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 1;"></div>
-      <div style="position: absolute; bottom: -30%; left: -5%; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; z-index: 1;"></div>
-      
-      <div style="position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
-        <div style="flex: 1; min-width: 300px;">
-          <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
-            <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-              <i class="fas fa-link" style="font-size: 28px; color: white;"></i>
-            </div>
-            <div>
-              <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">연동 관리</h1>
-              <p style="font-size: 18px; opacity: 0.9; margin: 8px 0 0 0; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">API 키, 웹훅, 써드파티 서비스를 관리하세요</p>
-            </div>
-          </div>
-          
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px;">
-            <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-key" style="font-size: 24px; color: #ffd700;"></i>
-                <div>
-                  <div style="font-size: 24px; font-weight: 700;">${this.apiKeys ? this.apiKeys.length : 0}</div>
-                  <div style="font-size: 14px; opacity: 0.8;">API 키</div>
-                </div>
-              </div>
-            </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-share-alt" style="font-size: 24px; color: #98fb98;"></i>
-                <div>
-                  <div style="font-size: 24px; font-weight: 700;">${this.webhooks ? this.webhooks.length : 0}</div>
-                  <div style="font-size: 14px; opacity: 0.8;">웹훅</div>
-                </div>
-              </div>
-            </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-plug" style="font-size: 24px; color: #dda0dd;"></i>
-                <div>
-                  <div style="font-size: 24px; font-weight: 700;">${this.thirdPartyIntegrations ? this.thirdPartyIntegrations.filter(i => i.status === 'connected').length : 0}</div>
-                  <div style="font-size: 14px; opacity: 0.8;">연결된 서비스</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          <button style="background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3); padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 8px; min-height: 44px;" onclick="integrationsPage.exportIntegrationsData()" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-            <i class="fas fa-download"></i>
-            <span>CSV 내보내기</span>
-          </button>
-          <button style="background: rgba(255,255,255,0.9); color: #667eea; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; min-height: 44px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="integrationsPage.openApiKeyModal()" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'">
-            <i class="fas fa-plus"></i>
-            <span>새 API 키</span>
-          </button>
-        </div>
-      </div>
+    // 상단 아이콘과 제목
+    const titleSection = Utils.createElement('div');
+    titleSection.style.cssText = `
+      display: flex !important;
+      align-items: center !important;
+      gap: 20px !important;
+      margin-bottom: 32px !important;
     `;
+
+    const icon = Utils.createElement('div');
+    icon.style.cssText = `
+      width: 80px !important;
+      height: 80px !important;
+      background: rgba(255, 255, 255, 0.2) !important;
+      border-radius: 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 36px !important;
+      color: white !important;
+      backdrop-filter: blur(10px) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    `;
+    icon.innerHTML = '<i class="fas fa-plug"></i>';
+
+    const titleContent = Utils.createElement('div');
+    titleContent.style.cssText = 'flex: 1 !important;';
+
+    const title = Utils.createElement('h1');
+    title.style.cssText = `
+      font-size: 48px !important;
+      font-weight: 900 !important;
+      margin: 0 0 8px 0 !important;
+      color: white !important;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      letter-spacing: -0.025em !important;
+    `;
+    title.textContent = '연동 & API 관리';
+
+    const subtitle = Utils.createElement('p');
+    subtitle.style.cssText = `
+      font-size: 20px !important;
+      margin: 0 !important;
+      opacity: 0.9 !important;
+      color: rgba(255, 255, 255, 0.9) !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    `;
+    subtitle.textContent = 'API 키, 웹훅, 써드파티 서비스를 통합 관리하고 시스템 연동을 최적화하세요';
+
+    const statusBadge = Utils.createElement('div');
+    statusBadge.style.cssText = `
+      background: rgba(34, 197, 94, 0.2) !important;
+      color: #dcfce7 !important;
+      padding: 8px 16px !important;
+      border-radius: 24px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      border: 1px solid rgba(34, 197, 94, 0.3) !important;
+      margin-top: 16px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    `;
+    statusBadge.innerHTML = '<span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite;"></span>모든 연동 서비스 정상 작동';
+
+    titleContent.appendChild(title);
+    titleContent.appendChild(subtitle);
+    titleContent.appendChild(statusBadge);
+
+    titleSection.appendChild(icon);
+    titleSection.appendChild(titleContent);
+
+    // 통계 카드들
+    const statsGrid = Utils.createElement('div');
+    statsGrid.style.cssText = `
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+      gap: 20px !important;
+      margin-bottom: 32px !important;
+    `;
+
+    const stats = [
+      {
+        icon: 'fas fa-key',
+        value: this.apiKeys ? this.apiKeys.length : 0,
+        label: 'API 키',
+        color: '#fbbf24',
+        gradient: 'linear-gradient(135deg, #fbbf24, #f59e0b)'
+      },
+      {
+        icon: 'fas fa-share-alt',
+        value: this.webhooks ? this.webhooks.length : 0,
+        label: '웹훅',
+        color: '#34d399',
+        gradient: 'linear-gradient(135deg, #34d399, #10b981)'
+      },
+      {
+        icon: 'fas fa-plug',
+        value: this.thirdPartyIntegrations ? this.thirdPartyIntegrations.filter(i => i.status === 'connected').length : 0,
+        label: '연결된 서비스',
+        color: '#a78bfa',
+        gradient: 'linear-gradient(135deg, #a78bfa, #8b5cf6)'
+      },
+      {
+        icon: 'fas fa-shield-check',
+        value: '100%',
+        label: '보안 수준',
+        color: '#fb7185',
+        gradient: 'linear-gradient(135deg, #fb7185, #f43f5e)'
+      }
+    ];
+
+    stats.forEach(stat => {
+      const statCard = Utils.createElement('div');
+      statCard.style.cssText = `
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(20px) !important;
+        border-radius: 16px !important;
+        padding: 20px !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        transition: all 0.3s ease !important;
+        cursor: pointer !important;
+        position: relative !important;
+        overflow: hidden !important;
+      `;
+
+      // 호버 효과
+      statCard.addEventListener('mouseenter', () => {
+        statCard.style.transform = 'translateY(-4px) !important';
+        statCard.style.background = 'rgba(255, 255, 255, 0.25) !important';
+      });
+
+      statCard.addEventListener('mouseleave', () => {
+        statCard.style.transform = 'translateY(0) !important';
+        statCard.style.background = 'rgba(255, 255, 255, 0.15) !important';
+      });
+
+      const cardContent = Utils.createElement('div');
+      cardContent.style.cssText = `
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important;
+        position: relative !important;
+        z-index: 2 !important;
+      `;
+
+      const iconContainer = Utils.createElement('div');
+      iconContainer.style.cssText = `
+        width: 48px !important;
+        height: 48px !important;
+        background: ${stat.gradient} !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 20px !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+      `;
+      iconContainer.innerHTML = `<i class="${stat.icon}"></i>`;
+
+      const statInfo = Utils.createElement('div');
+      
+      const value = Utils.createElement('div');
+      value.style.cssText = `
+        font-size: 28px !important;
+        font-weight: 800 !important;
+        color: white !important;
+        margin-bottom: 4px !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      `;
+      value.textContent = stat.value;
+
+      const label = Utils.createElement('div');
+      label.style.cssText = `
+        font-size: 14px !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-weight: 500 !important;
+      `;
+      label.textContent = stat.label;
+
+      statInfo.appendChild(value);
+      statInfo.appendChild(label);
+      cardContent.appendChild(iconContainer);
+      cardContent.appendChild(statInfo);
+      statCard.appendChild(cardContent);
+      statsGrid.appendChild(statCard);
+    });
+
+    // 액션 버튼들
+    const actionsSection = Utils.createElement('div');
+    actionsSection.style.cssText = `
+      display: flex !important;
+      justify-content: flex-end !important;
+      gap: 16px !important;
+      flex-wrap: wrap !important;
+    `;
+
+    const exportButton = Utils.createElement('button');
+    exportButton.style.cssText = `
+      background: rgba(255, 255, 255, 0.2) !important;
+      color: white !important;
+      border: 2px solid rgba(255, 255, 255, 0.3) !important;
+      padding: 14px 28px !important;
+      border-radius: 12px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      backdrop-filter: blur(10px) !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      min-height: 48px !important;
+      font-size: 14px !important;
+    `;
+    exportButton.innerHTML = '<i class="fas fa-download"></i><span>CSV 내보내기</span>';
+    exportButton.addEventListener('click', () => this.exportIntegrationsData());
+    exportButton.addEventListener('mouseenter', () => {
+      exportButton.style.background = 'rgba(255, 255, 255, 0.3) !important';
+      exportButton.style.transform = 'translateY(-2px) !important';
+    });
+    exportButton.addEventListener('mouseleave', () => {
+      exportButton.style.background = 'rgba(255, 255, 255, 0.2) !important';
+      exportButton.style.transform = 'translateY(0) !important';
+    });
+
+    const newApiButton = Utils.createElement('button');
+    newApiButton.style.cssText = `
+      background: rgba(255, 255, 255, 0.95) !important;
+      color: #667eea !important;
+      border: none !important;
+      padding: 14px 28px !important;
+      border-radius: 12px !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      min-height: 48px !important;
+      font-size: 14px !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    `;
+    newApiButton.innerHTML = '<i class="fas fa-plus"></i><span>새 API 키 생성</span>';
+    newApiButton.addEventListener('click', () => this.openApiKeyModal());
+    newApiButton.addEventListener('mouseenter', () => {
+      newApiButton.style.transform = 'translateY(-3px) !important';
+      newApiButton.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.25) !important';
+      newApiButton.style.background = 'white !important';
+    });
+    newApiButton.addEventListener('mouseleave', () => {
+      newApiButton.style.transform = 'translateY(0) !important';
+      newApiButton.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15) !important';
+      newApiButton.style.background = 'rgba(255, 255, 255, 0.95) !important';
+    });
+
+    actionsSection.appendChild(exportButton);
+    actionsSection.appendChild(newApiButton);
+
+    content.appendChild(titleSection);
+    content.appendChild(statsGrid);
+    content.appendChild(actionsSection);
+    header.appendChild(content);
     
     return header;
   }
 
   createTabNavigation() {
-    const nav = Utils.createElement('div', 'border-b border-gray-200 mb-6');
-    const tabList = Utils.createElement('nav', 'flex space-x-8');
+    const nav = Utils.createElement('div');
+    nav.style.cssText = `
+      margin-bottom: 32px !important;
+      background: white !important;
+      border-radius: 16px !important;
+      padding: 8px !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+      border: 1px solid #f1f5f9 !important;
+    `;
+
+    const tabList = Utils.createElement('div');
+    tabList.style.cssText = `
+      display: flex !important;
+      gap: 4px !important;
+    `;
 
     const tabs = [
-      { id: 'api-keys', name: 'API 키', icon: 'fas fa-key' },
-      { id: 'webhooks', name: '웹훅', icon: 'fas fa-share-alt' },
-      { id: 'third-party', name: '써드파티', icon: 'fas fa-plug' }
+      { id: 'api-keys', name: 'API 키', icon: 'fas fa-key', gradient: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
+      { id: 'webhooks', name: '웹훅', icon: 'fas fa-share-alt', gradient: 'linear-gradient(135deg, #34d399, #10b981)' },
+      { id: 'third-party', name: '써드파티', icon: 'fas fa-plug', gradient: 'linear-gradient(135deg, #a78bfa, #8b5cf6)' }
     ];
 
     tabs.forEach(tab => {
-      const tabButton = Utils.createElement('button', 
-        `flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-          this.currentTab === tab.id 
-            ? 'border-blue-500 text-blue-600' 
-            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-        }`
-      );
+      const tabButton = Utils.createElement('button');
+      const isActive = this.currentTab === tab.id;
+      
+      tabButton.style.cssText = `
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        padding: 14px 24px !important;
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        transition: all 0.3s ease !important;
+        cursor: pointer !important;
+        border: none !important;
+        flex: 1 !important;
+        justify-content: center !important;
+        min-height: 48px !important;
+        ${isActive 
+          ? `background: ${tab.gradient} !important; color: white !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;`
+          : `background: transparent !important; color: #64748b !important;`
+        }
+      `;
       
       tabButton.innerHTML = `
-        <i class="${tab.icon}"></i>
-        ${tab.name}
+        <i class="${tab.icon}" style="font-size: 16px;"></i>
+        <span>${tab.name}</span>
       `;
+
+      // 호버 효과
+      if (!isActive) {
+        tabButton.addEventListener('mouseenter', () => {
+          tabButton.style.background = '#f8fafc !important';
+          tabButton.style.color = '#1e293b !important';
+        });
+
+        tabButton.addEventListener('mouseleave', () => {
+          tabButton.style.background = 'transparent !important';
+          tabButton.style.color = '#64748b !important';
+        });
+      }
       
       Utils.on(tabButton, 'click', () => this.switchTab(tab.id));
       tabList.appendChild(tabButton);
@@ -241,20 +504,8 @@ class IntegrationsPage {
   switchTab(tabId) {
     this.currentTab = tabId;
     
-    // 탭 버튼 스타일 업데이트
-    Utils.$$('.tab-content').forEach(content => {
-      const buttons = content.parentElement.querySelectorAll('button');
-      buttons.forEach((btn, index) => {
-        const tabs = ['api-keys', 'webhooks', 'third-party'];
-        if (tabs[index] === tabId) {
-          btn.className = btn.className.replace('border-transparent text-gray-500', 'border-blue-500 text-blue-600');
-        } else {
-          btn.className = btn.className.replace('border-blue-500 text-blue-600', 'border-transparent text-gray-500');
-        }
-      });
-    });
-
-    this.renderCurrentTab();
+    // 페이지 전체 다시 렌더링
+    this.render();
   }
 
   renderCurrentTab() {
@@ -275,56 +526,540 @@ class IntegrationsPage {
   }
 
   renderApiKeysTab() {
-    const section = Utils.createElement('div', 'space-y-6');
+    const section = Utils.createElement('div');
+    section.style.cssText = 'display: flex; flex-direction: column; gap: 24px;';
 
-    // API 키 설명
-    const description = Utils.createElement('div', 'bg-blue-50 border border-blue-200 rounded-lg p-4');
-    description.innerHTML = `
-      <div class="flex items-start gap-3">
-        <i class="fas fa-info-circle text-blue-600 mt-1"></i>
-        <div>
-          <h3 class="font-medium text-blue-900">API 키 관리</h3>
-          <p class="text-blue-700 text-sm mt-1">
-            API 키를 사용하여 Kommentio 서비스에 프로그래밍 방식으로 접근할 수 있습니다.
-            각 키에는 특정 권한을 부여할 수 있습니다.
-          </p>
-        </div>
-      </div>
-    `;
+    // API 키 정보 카드
+    const infoCard = this.createPremiumInfoCard(
+      'API 키 관리',
+      'API 키를 사용하여 Kommentio 서비스에 프로그래밍 방식으로 접근할 수 있습니다. 각 키에는 특정 권한을 부여할 수 있습니다.',
+      'fas fa-key',
+      'linear-gradient(135deg, #fbbf24, #f59e0b)'
+    );
 
-    // API 키 목록
-    const apiKeysCard = Utils.createElement('div', 'card');
-    const header = Utils.createElement('div', 'card-header');
-    header.innerHTML = `
-      <div class="flex items-center justify-between">
-        <h2>API 키 목록</h2>
-        <button class="btn btn-sm btn-primary" onclick="integrationsPage.openApiKeyModal()">
-          <i class="fas fa-plus"></i> 새 API 키
-        </button>
-      </div>
-    `;
+    // API 키 목록 카드
+    const apiKeysCard = this.createPremiumApiKeysCard();
 
-    const body = Utils.createElement('div', 'card-body');
-    
-    if (this.apiKeys.length === 0) {
-      body.appendChild(Components.createEmptyState(
-        'API 키가 없습니다',
-        '새 API 키를 생성하여 시작하세요.',
-        '새 API 키 생성',
-        () => this.openApiKeyModal()
-      ));
-    } else {
-      const table = this.createApiKeysTable();
-      body.appendChild(table);
-    }
-
-    apiKeysCard.appendChild(header);
-    apiKeysCard.appendChild(body);
-
-    section.appendChild(description);
+    section.appendChild(infoCard);
     section.appendChild(apiKeysCard);
 
     return section;
+  }
+
+  createPremiumInfoCard(title, description, icon, gradient) {
+    const card = Utils.createElement('div');
+    card.style.cssText = `
+      background: white !important;
+      border-radius: 20px !important;
+      padding: 24px !important;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+      border: 1px solid #f1f5f9 !important;
+      position: relative !important;
+      overflow: hidden !important;
+    `;
+
+    // 배경 장식
+    const decoration = Utils.createElement('div');
+    decoration.style.cssText = `
+      position: absolute !important;
+      top: -20px !important;
+      right: -20px !important;
+      width: 100px !important;
+      height: 100px !important;
+      background: ${gradient} !important;
+      border-radius: 50% !important;
+      opacity: 0.1 !important;
+    `;
+    card.appendChild(decoration);
+
+    const content = Utils.createElement('div');
+    content.style.cssText = `
+      position: relative !important;
+      z-index: 1 !important;
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 16px !important;
+    `;
+
+    const iconContainer = Utils.createElement('div');
+    iconContainer.style.cssText = `
+      width: 48px !important;
+      height: 48px !important;
+      background: ${gradient} !important;
+      border-radius: 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: white !important;
+      font-size: 20px !important;
+      flex-shrink: 0 !important;
+    `;
+    iconContainer.innerHTML = `<i class="${icon}"></i>`;
+
+    const textContent = Utils.createElement('div');
+    textContent.style.cssText = 'flex: 1 !important;';
+
+    const titleElement = Utils.createElement('h3');
+    titleElement.style.cssText = `
+      font-size: 20px !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      margin: 0 0 8px 0 !important;
+    `;
+    titleElement.textContent = title;
+
+    const descriptionElement = Utils.createElement('p');
+    descriptionElement.style.cssText = `
+      font-size: 14px !important;
+      color: #64748b !important;
+      margin: 0 !important;
+      line-height: 1.6 !important;
+    `;
+    descriptionElement.textContent = description;
+
+    textContent.appendChild(titleElement);
+    textContent.appendChild(descriptionElement);
+    content.appendChild(iconContainer);
+    content.appendChild(textContent);
+    card.appendChild(content);
+
+    return card;
+  }
+
+  createPremiumApiKeysCard() {
+    const card = Utils.createElement('div');
+    card.style.cssText = `
+      background: white !important;
+      border-radius: 20px !important;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+      border: 1px solid #f1f5f9 !important;
+      overflow: hidden !important;
+    `;
+
+    // 헤더
+    const header = Utils.createElement('div');
+    header.style.cssText = `
+      background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+      padding: 24px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+    `;
+
+    const headerLeft = Utils.createElement('div');
+    headerLeft.style.cssText = 'display: flex !important; align-items: center !important; gap: 12px !important;';
+
+    const headerIcon = Utils.createElement('div');
+    headerIcon.style.cssText = `
+      width: 40px !important;
+      height: 40px !important;
+      background: rgba(255, 255, 255, 0.2) !important;
+      border-radius: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: white !important;
+      font-size: 18px !important;
+      backdrop-filter: blur(10px) !important;
+    `;
+    headerIcon.innerHTML = '<i class="fas fa-key"></i>';
+
+    const headerTitle = Utils.createElement('h2');
+    headerTitle.style.cssText = `
+      font-size: 20px !important;
+      font-weight: 700 !important;
+      margin: 0 !important;
+      color: white !important;
+    `;
+    headerTitle.textContent = `API 키 목록 (${this.apiKeys.length})`;
+
+    const headerButton = Utils.createElement('button');
+    headerButton.style.cssText = `
+      background: rgba(255, 255, 255, 0.2) !important;
+      color: white !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      padding: 10px 20px !important;
+      border-radius: 20px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      backdrop-filter: blur(10px) !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    `;
+    headerButton.innerHTML = '<i class="fas fa-plus"></i><span>새 API 키</span>';
+    headerButton.addEventListener('click', () => this.openApiKeyModal());
+
+    headerLeft.appendChild(headerIcon);
+    headerLeft.appendChild(headerTitle);
+    header.appendChild(headerLeft);
+    header.appendChild(headerButton);
+
+    // 본문
+    const body = Utils.createElement('div');
+    body.style.cssText = 'padding: 24px !important;';
+    
+    if (this.apiKeys.length === 0) {
+      const emptyState = this.createPremiumEmptyState(
+        'API 키가 없습니다',
+        '새 API 키를 생성하여 시작하세요.',
+        'fas fa-key',
+        '새 API 키 생성',
+        () => this.openApiKeyModal()
+      );
+      body.appendChild(emptyState);
+    } else {
+      const apiKeysList = this.createPremiumApiKeysList();
+      body.appendChild(apiKeysList);
+    }
+
+    card.appendChild(header);
+    card.appendChild(body);
+
+    return card;
+  }
+
+  createPremiumEmptyState(title, description, icon, buttonText, buttonAction) {
+    const emptyState = Utils.createElement('div');
+    emptyState.style.cssText = `
+      text-align: center !important;
+      padding: 48px 24px !important;
+    `;
+
+    const iconElement = Utils.createElement('div');
+    iconElement.style.cssText = `
+      width: 80px !important;
+      height: 80px !important;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+      border-radius: 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin: 0 auto 24px auto !important;
+      font-size: 32px !important;
+      color: #94a3b8 !important;
+    `;
+    iconElement.innerHTML = `<i class="${icon}"></i>`;
+
+    const titleElement = Utils.createElement('h3');
+    titleElement.style.cssText = `
+      font-size: 18px !important;
+      font-weight: 600 !important;
+      color: #475569 !important;
+      margin: 0 0 8px 0 !important;
+    `;
+    titleElement.textContent = title;
+
+    const descriptionElement = Utils.createElement('p');
+    descriptionElement.style.cssText = `
+      font-size: 14px !important;
+      color: #64748b !important;
+      margin: 0 0 24px 0 !important;
+    `;
+    descriptionElement.textContent = description;
+
+    const button = Utils.createElement('button');
+    button.style.cssText = `
+      background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+      color: white !important;
+      border: none !important;
+      padding: 12px 24px !important;
+      border-radius: 12px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    `;
+    button.innerHTML = `<i class="${icon}"></i><span>${buttonText}</span>`;
+    button.addEventListener('click', buttonAction);
+
+    emptyState.appendChild(iconElement);
+    emptyState.appendChild(titleElement);
+    emptyState.appendChild(descriptionElement);
+    emptyState.appendChild(button);
+
+    return emptyState;
+  }
+
+  createPremiumApiKeysList() {
+    const list = Utils.createElement('div');
+    list.style.cssText = 'display: flex; flex-direction: column; gap: 16px;';
+
+    this.apiKeys.forEach(apiKey => {
+      const item = this.createPremiumApiKeyItem(apiKey);
+      list.appendChild(item);
+    });
+
+    return list;
+  }
+
+  createPremiumApiKeyItem(apiKey) {
+    const item = Utils.createElement('div');
+    item.style.cssText = `
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 16px !important;
+      padding: 20px !important;
+      transition: all 0.2s ease !important;
+      cursor: pointer !important;
+    `;
+
+    // 호버 효과
+    item.addEventListener('mouseenter', () => {
+      item.style.background = '#f1f5f9 !important';
+      item.style.borderColor = '#cbd5e1 !important';
+      item.style.transform = 'translateY(-2px) !important';
+    });
+
+    item.addEventListener('mouseleave', () => {
+      item.style.background = '#f8fafc !important';
+      item.style.borderColor = '#e2e8f0 !important';
+      item.style.transform = 'translateY(0) !important';
+    });
+
+    const header = Utils.createElement('div');
+    header.style.cssText = `
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      margin-bottom: 16px !important;
+    `;
+
+    const headerLeft = Utils.createElement('div');
+    headerLeft.style.cssText = 'display: flex !important; align-items: center !important; gap: 12px !important;';
+
+    const keyIcon = Utils.createElement('div');
+    keyIcon.style.cssText = `
+      width: 40px !important;
+      height: 40px !important;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+      border-radius: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: white !important;
+      font-size: 16px !important;
+    `;
+    keyIcon.innerHTML = '<i class="fas fa-key"></i>';
+
+    const keyInfo = Utils.createElement('div');
+    
+    const keyName = Utils.createElement('div');
+    keyName.style.cssText = `
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      color: #1e293b !important;
+      margin-bottom: 2px !important;
+    `;
+    keyName.textContent = apiKey.name;
+
+    const keyId = Utils.createElement('div');
+    keyId.style.cssText = `
+      font-size: 12px !important;
+      color: #64748b !important;
+    `;
+    keyId.textContent = `ID: ${apiKey.id}`;
+
+    const statusBadge = Utils.createElement('div');
+    statusBadge.style.cssText = `
+      background: ${apiKey.status === 'active' ? '#dcfce7' : '#f1f5f9'} !important;
+      color: ${apiKey.status === 'active' ? '#166534' : '#64748b'} !important;
+      padding: 4px 12px !important;
+      border-radius: 12px !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+    `;
+    statusBadge.textContent = apiKey.status === 'active' ? '활성' : '비활성';
+
+    keyInfo.appendChild(keyName);
+    keyInfo.appendChild(keyId);
+    headerLeft.appendChild(keyIcon);
+    headerLeft.appendChild(keyInfo);
+    header.appendChild(headerLeft);
+    header.appendChild(statusBadge);
+
+    // API 키 정보
+    const keyDetails = Utils.createElement('div');
+    keyDetails.style.cssText = `
+      display: grid !important;
+      grid-template-columns: 1fr auto !important;
+      gap: 16px !important;
+      margin-bottom: 16px !important;
+    `;
+
+    const keyValueSection = Utils.createElement('div');
+    
+    const keyLabel = Utils.createElement('div');
+    keyLabel.style.cssText = `
+      font-size: 12px !important;
+      color: #64748b !important;
+      margin-bottom: 4px !important;
+      font-weight: 500 !important;
+    `;
+    keyLabel.textContent = 'API 키';
+
+    const keyValueContainer = Utils.createElement('div');
+    keyValueContainer.style.cssText = `
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    `;
+
+    const keyValue = Utils.createElement('code');
+    keyValue.style.cssText = `
+      background: #e2e8f0 !important;
+      color: #1e293b !important;
+      padding: 6px 12px !important;
+      border-radius: 8px !important;
+      font-size: 12px !important;
+      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace !important;
+      flex: 1 !important;
+    `;
+    keyValue.textContent = `${apiKey.key.substring(0, 20)}...`;
+
+    const copyButton = Utils.createElement('button');
+    copyButton.style.cssText = `
+      background: #667eea !important;
+      color: white !important;
+      border: none !important;
+      padding: 6px 12px !important;
+      border-radius: 6px !important;
+      font-size: 12px !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    `;
+    copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+    copyButton.addEventListener('click', () => this.copyApiKey(apiKey.key));
+
+    keyValueContainer.appendChild(keyValue);
+    keyValueContainer.appendChild(copyButton);
+    keyValueSection.appendChild(keyLabel);
+    keyValueSection.appendChild(keyValueContainer);
+
+    const permissionsSection = Utils.createElement('div');
+    
+    const permLabel = Utils.createElement('div');
+    permLabel.style.cssText = `
+      font-size: 12px !important;
+      color: #64748b !important;
+      margin-bottom: 4px !important;
+      font-weight: 500 !important;
+    `;
+    permLabel.textContent = '권한';
+
+    const permissionsContainer = Utils.createElement('div');
+    permissionsContainer.style.cssText = `
+      display: flex !important;
+      gap: 4px !important;
+      flex-wrap: wrap !important;
+    `;
+
+    apiKey.permissions.forEach(perm => {
+      const permBadge = Utils.createElement('span');
+      permBadge.style.cssText = `
+        background: #e0e7ff !important;
+        color: #3730a3 !important;
+        padding: 2px 8px !important;
+        border-radius: 6px !important;
+        font-size: 11px !important;
+        font-weight: 500 !important;
+        text-transform: uppercase !important;
+      `;
+      permBadge.textContent = perm;
+      permissionsContainer.appendChild(permBadge);
+    });
+
+    permissionsSection.appendChild(permLabel);
+    permissionsSection.appendChild(permissionsContainer);
+    keyDetails.appendChild(keyValueSection);
+    keyDetails.appendChild(permissionsSection);
+
+    // 메타데이터
+    const metadata = Utils.createElement('div');
+    metadata.style.cssText = `
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+      gap: 12px !important;
+      margin-bottom: 16px !important;
+      padding-top: 16px !important;
+      border-top: 1px solid #e2e8f0 !important;
+    `;
+
+    const createdDate = Utils.createElement('div');
+    createdDate.style.cssText = 'text-align: center !important;';
+    createdDate.innerHTML = `
+      <div style="font-size: 12px; color: #64748b; margin-bottom: 2px;">생성일</div>
+      <div style="font-size: 13px; font-weight: 500; color: #1e293b;">${Utils.formatDateTime(apiKey.created_at)}</div>
+    `;
+
+    const lastUsed = Utils.createElement('div');
+    lastUsed.style.cssText = 'text-align: center !important;';
+    lastUsed.innerHTML = `
+      <div style="font-size: 12px; color: #64748b; margin-bottom: 2px;">마지막 사용</div>
+      <div style="font-size: 13px; font-weight: 500; color: #1e293b;">${apiKey.last_used ? Utils.formatDateTime(apiKey.last_used) : '사용 안함'}</div>
+    `;
+
+    metadata.appendChild(createdDate);
+    metadata.appendChild(lastUsed);
+
+    // 액션 버튼들
+    const actions = Utils.createElement('div');
+    actions.style.cssText = `
+      display: flex !important;
+      gap: 8px !important;
+      justify-content: flex-end !important;
+    `;
+
+    const editButton = Utils.createElement('button');
+    editButton.style.cssText = `
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+      border: 1px solid #cbd5e1 !important;
+      padding: 8px 16px !important;
+      border-radius: 8px !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+    `;
+    editButton.innerHTML = '<i class="fas fa-edit"></i><span>편집</span>';
+    editButton.addEventListener('click', () => this.editApiKey(apiKey.id));
+
+    const deleteButton = Utils.createElement('button');
+    deleteButton.style.cssText = `
+      background: #fef2f2 !important;
+      color: #dc2626 !important;
+      border: 1px solid #fecaca !important;
+      padding: 8px 16px !important;
+      border-radius: 8px !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+    `;
+    deleteButton.innerHTML = '<i class="fas fa-trash"></i><span>삭제</span>';
+    deleteButton.addEventListener('click', () => this.deleteApiKey(apiKey.id));
+
+    actions.appendChild(editButton);
+    actions.appendChild(deleteButton);
+
+    item.appendChild(header);
+    item.appendChild(keyDetails);
+    item.appendChild(metadata);
+    item.appendChild(actions);
+
+    return item;
   }
 
   createApiKeysTable() {
