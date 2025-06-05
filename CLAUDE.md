@@ -2,12 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 Before you start any session, you must read some markdown files to understand last updates and reminds:
-To know what this project's Goal: comment_system_prd.md
-To know what this project's competitors and research of their specifics: competitor_research.md
-To know last status of this project: LAST_PROJECT_STATUS.md
+To remind what this project's Goal: comment_system_prd.md
+To learn about what this project's competitors and research of their specifics: competitor_research.md
+To check last status of this project: LAST_PROJECT_STATUS.md
 To read or add update log: UPDATE_LOG.md
 
-If user says '빌드를 종료합니다.", ask user to commit and push current build. If user agree with that, you must update PROJECT_STATUS.md and add update log in UPDATE_LOG.md. please name the current version of build as possible as minor number(e.g. v0.1.0 to v0.1.1). After this, ask user to commit and push this project again.
+If user says '빌드를 종료합니다.", ask user to commit and push current build. If user agree with that, you must update(e.g. latest todo list) LAST_PROJECT_STATUS.md and add update log in UPDATE_LOG.md. please name the current version of build as possible as minor number(e.g. v0.1.0 to v0.1.1). After this, ask user to commit and push this project again.
+
+If user says '코드 테스트를 실시합니다. CODE_TEST.md를 읽고 테스트를 시작하세요.", read CODE_TEST.md file and follow the prompts in the file to run code tests.
 
 During developing with user, if you learn very important thing which need to remember and remind everytime, please add the contents which contains what's your mistakes and what you learn from the mistakes in CLAUDE.md file.
 
