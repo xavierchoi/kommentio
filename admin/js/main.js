@@ -45,6 +45,9 @@ class AdminApp {
       // 연결 상태 표시
       this.showConnectionStatus();
 
+      // 사이드바 토글 기능 초기화
+      this.initSidebarToggle();
+
       this.initialized = true;
       console.log('Kommentio Admin Dashboard 초기화 완료');
 
@@ -236,6 +239,102 @@ class AdminApp {
     `;
 
     document.body.innerHTML = errorHtml;
+  }
+
+  initSidebarToggle() {
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    
+    if (!toggleBtn || !sidebar || !mainContent) {
+      console.warn('사이드바 토글 요소를 찾을 수 없습니다.');
+      return;
+    }
+
+    // 모바일/태블릿에서만 동작 (1024px 이하)
+    const isMobile = () => window.innerWidth <= 1024;
+
+    // 3단계 상태 관리: 'hidden', 'collapsed', 'expanded'
+    let currentState = 'collapsed'; // 기본값: 접힌 상태
+
+    // 사이드바 상태 설정
+    const setSidebarState = (state) => {
+      console.log('사이드바 상태 변경:', state);
+      
+      // 모든 상태 클래스 제거
+      sidebar.classList.remove('hidden', 'collapsed', 'expanded');
+      
+      // 새 상태 클래스 추가
+      sidebar.classList.add(state);
+      currentState = state;
+      
+      console.log('사이드바 클래스:', sidebar.className);
+      
+      this.updateToggleButton(state);
+      
+      // localStorage에 저장 (모바일만)
+      if (isMobile()) {
+        localStorage.setItem('sidebar-state-mobile', state);
+      }
+    };
+
+    // 초기 상태 설정
+    const updateSidebarState = () => {
+      if (isMobile()) {
+        // 모바일: localStorage에서 상태 복원 (기본값: collapsed)
+        const savedState = localStorage.getItem('sidebar-state-mobile') || 'collapsed';
+        console.log('모바일 모드: 사이드바 상태 설정 -', savedState);
+        setSidebarState(savedState);
+      } else {
+        // 데스크톱: 항상 펼친 상태
+        console.log('데스크톱 모드: 사이드바 초기화');
+        sidebar.classList.remove('hidden', 'collapsed', 'expanded');
+        localStorage.removeItem('sidebar-state-mobile');
+      }
+    };
+
+    // 버튼 아이콘 업데이트
+    this.updateToggleButton = (state) => {
+      const icon = toggleBtn.querySelector('i');
+      
+      switch(state) {
+        case 'hidden':
+        case 'collapsed':
+          icon.className = 'fas fa-angles-right'; // 펼치기
+          break;
+        case 'expanded':
+          icon.className = 'fas fa-angles-left'; // 접기
+          break;
+      }
+    };
+
+    // 다음 상태로 전환하는 함수
+    const getNextState = (current) => {
+      switch(current) {
+        case 'collapsed':
+          return 'expanded';
+        case 'expanded':
+          return 'collapsed';
+        default:
+          return 'collapsed';
+      }
+    };
+
+    // 토글 버튼 클릭 이벤트
+    toggleBtn.addEventListener('click', () => {
+      if (!isMobile()) return; // 데스크톱에서는 동작하지 않음
+      
+      const nextState = getNextState(currentState);
+      setSidebarState(nextState);
+    });
+
+    // 윈도우 리사이즈 이벤트
+    window.addEventListener('resize', updateSidebarState);
+    
+    // 초기 상태 설정
+    updateSidebarState();
+
+    console.log('사이드바 오버레이 토글 기능이 초기화되었습니다.');
   }
 }
 
