@@ -51,41 +51,303 @@ class BillingPage {
   }
 
   createPageHeader() {
-    const header = Utils.createElement('div', 'mb-8');
-    header.innerHTML = `
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        <div class="flex items-center space-x-4">
-          <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-xl">
-            <i class="fas fa-credit-card text-white text-2xl"></i>
-          </div>
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">요금제 및 결제</h1>
-            <p class="text-gray-600 mt-1">프리미엄 플랜으로 더 많은 기능을 경험하세요</p>
-          </div>
-        </div>
-        <div class="flex items-center space-x-3">
-          <div class="hidden lg:flex items-center space-x-2 px-3 py-2 bg-blue-50 rounded-lg border border-blue-200">
-            <i class="fas fa-shield-check text-blue-600"></i>
-            <span class="text-blue-700 text-sm font-medium">안전한 결제</span>
-          </div>
-          <button id="download-receipt-btn" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2 shadow-sm">
-            <i class="fas fa-download"></i>
-            <span>영수증</span>
-          </button>
-          <button id="manage-payment-btn" class="px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 flex items-center space-x-2 shadow-lg">
-            <i class="fas fa-credit-card"></i>
-            <span>결제 관리</span>
-          </button>
-        </div>
-      </div>
+    const header = Utils.createElement('div');
+    header.style.cssText = `
+      background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%) !important;
+      border-radius: 20px !important;
+      padding: 40px !important;
+      margin-bottom: 32px !important;
+      color: white !important;
+      position: relative !important;
+      overflow: hidden !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
     `;
+
+    // 배경 패턴 추가
+    const pattern = Utils.createElement('div');
+    pattern.style.cssText = `
+      position: absolute !important;
+      top: -50% !important;
+      right: -50% !important;
+      width: 200% !important;
+      height: 200% !important;
+      background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 20c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") !important;
+      pointer-events: none !important;
+    `;
+    header.appendChild(pattern);
+
+    const content = Utils.createElement('div');
+    content.style.cssText = `position: relative !important; z-index: 1 !important;`;
     
-    // 버튼 이벤트
-    const managePaymentBtn = Utils.$('#manage-payment-btn', header);
-    const downloadReceiptBtn = Utils.$('#download-receipt-btn', header);
-    
-    if (managePaymentBtn) Utils.on(managePaymentBtn, 'click', () => this.managePaymentMethod());
-    if (downloadReceiptBtn) Utils.on(downloadReceiptBtn, 'click', () => this.downloadReceipt());
+    // 상단 아이콘과 제목
+    const titleSection = Utils.createElement('div');
+    titleSection.style.cssText = `
+      display: flex !important;
+      align-items: center !important;
+      gap: 20px !important;
+      margin-bottom: 32px !important;
+    `;
+
+    const icon = Utils.createElement('div');
+    icon.style.cssText = `
+      width: 80px !important;
+      height: 80px !important;
+      background: rgba(255, 255, 255, 0.2) !important;
+      border-radius: 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 36px !important;
+      color: white !important;
+      backdrop-filter: blur(10px) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    `;
+    icon.innerHTML = '<i class="fas fa-credit-card"></i>';
+
+    const titleContent = Utils.createElement('div');
+    titleContent.style.cssText = 'flex: 1 !important;';
+
+    const title = Utils.createElement('h1');
+    title.style.cssText = `
+      font-size: 48px !important;
+      font-weight: 900 !important;
+      margin: 0 0 8px 0 !important;
+      color: white !important;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      letter-spacing: -0.025em !important;
+    `;
+    title.textContent = '요금제 & 결제 관리';
+
+    const subtitle = Utils.createElement('p');
+    subtitle.style.cssText = `
+      font-size: 20px !important;
+      margin: 0 !important;
+      opacity: 0.9 !important;
+      color: rgba(255, 255, 255, 0.9) !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    `;
+    subtitle.textContent = '프리미엄 플랜으로 더 많은 기능을 경험하고 비즈니스를 성장시키세요';
+
+    const statusBadge = Utils.createElement('div');
+    statusBadge.style.cssText = `
+      background: rgba(34, 197, 94, 0.2) !important;
+      color: #dcfce7 !important;
+      padding: 8px 16px !important;
+      border-radius: 24px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      border: 1px solid rgba(34, 197, 94, 0.3) !important;
+      margin-top: 16px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    `;
+    statusBadge.innerHTML = `<span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite;"></span>현재 ${this.currentPlan === 'free' ? '무료' : this.currentPlan === 'pro' ? '프로' : '엔터프라이즈'} 플랜 사용 중`;
+
+    titleContent.appendChild(title);
+    titleContent.appendChild(subtitle);
+    titleContent.appendChild(statusBadge);
+
+    titleSection.appendChild(icon);
+    titleSection.appendChild(titleContent);
+
+    // 통계 카드들
+    const statsGrid = Utils.createElement('div');
+    statsGrid.style.cssText = `
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+      gap: 20px !important;
+      margin-bottom: 32px !important;
+    `;
+
+    const planPrice = this.currentPlan === 'free' ? '$0' : this.currentPlan === 'pro' ? '$9.99' : '$29.99';
+    const planLimit = this.currentPlan === 'free' ? '1,000' : '무제한';
+    const siteLimit = this.currentPlan === 'free' ? '3개' : '무제한';
+
+    const stats = [
+      {
+        icon: 'fas fa-crown',
+        value: planPrice,
+        label: '월 요금',
+        color: '#fbbf24',
+        gradient: 'linear-gradient(135deg, #fbbf24, #f59e0b)'
+      },
+      {
+        icon: 'fas fa-comments',
+        value: planLimit,
+        label: '댓글 한도',
+        color: '#34d399',
+        gradient: 'linear-gradient(135deg, #34d399, #10b981)'
+      },
+      {
+        icon: 'fas fa-globe',
+        value: siteLimit,
+        label: '사이트 수',
+        color: '#a78bfa',
+        gradient: 'linear-gradient(135deg, #a78bfa, #8b5cf6)'
+      },
+      {
+        icon: 'fas fa-shield-check',
+        value: '99.9%',
+        label: '안정성',
+        color: '#fb7185',
+        gradient: 'linear-gradient(135deg, #fb7185, #f43f5e)'
+      }
+    ];
+
+    stats.forEach(stat => {
+      const statCard = Utils.createElement('div');
+      statCard.style.cssText = `
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(20px) !important;
+        border-radius: 16px !important;
+        padding: 20px !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        transition: all 0.3s ease !important;
+        cursor: pointer !important;
+        position: relative !important;
+        overflow: hidden !important;
+      `;
+
+      // 호버 효과
+      statCard.addEventListener('mouseenter', () => {
+        statCard.style.transform = 'translateY(-4px) !important';
+        statCard.style.background = 'rgba(255, 255, 255, 0.25) !important';
+      });
+
+      statCard.addEventListener('mouseleave', () => {
+        statCard.style.transform = 'translateY(0) !important';
+        statCard.style.background = 'rgba(255, 255, 255, 0.15) !important';
+      });
+
+      const cardContent = Utils.createElement('div');
+      cardContent.style.cssText = `
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important;
+        position: relative !important;
+        z-index: 2 !important;
+      `;
+
+      const iconContainer = Utils.createElement('div');
+      iconContainer.style.cssText = `
+        width: 48px !important;
+        height: 48px !important;
+        background: ${stat.gradient} !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 20px !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+      `;
+      iconContainer.innerHTML = `<i class="${stat.icon}"></i>`;
+
+      const statInfo = Utils.createElement('div');
+      
+      const value = Utils.createElement('div');
+      value.style.cssText = `
+        font-size: 28px !important;
+        font-weight: 800 !important;
+        color: white !important;
+        margin-bottom: 4px !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      `;
+      value.textContent = stat.value;
+
+      const label = Utils.createElement('div');
+      label.style.cssText = `
+        font-size: 14px !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-weight: 500 !important;
+      `;
+      label.textContent = stat.label;
+
+      statInfo.appendChild(value);
+      statInfo.appendChild(label);
+      cardContent.appendChild(iconContainer);
+      cardContent.appendChild(statInfo);
+      statCard.appendChild(cardContent);
+      statsGrid.appendChild(statCard);
+    });
+
+    // 액션 버튼들
+    const actionsSection = Utils.createElement('div');
+    actionsSection.style.cssText = `
+      display: flex !important;
+      justify-content: flex-end !important;
+      gap: 16px !important;
+      flex-wrap: wrap !important;
+    `;
+
+    const downloadReceiptBtn = Utils.createElement('button');
+    downloadReceiptBtn.style.cssText = `
+      background: rgba(255, 255, 255, 0.2) !important;
+      color: white !important;
+      border: 2px solid rgba(255, 255, 255, 0.3) !important;
+      padding: 14px 28px !important;
+      border-radius: 12px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      backdrop-filter: blur(10px) !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      min-height: 48px !important;
+      font-size: 14px !important;
+    `;
+    downloadReceiptBtn.innerHTML = '<i class="fas fa-download"></i><span>영수증 다운로드</span>';
+    downloadReceiptBtn.addEventListener('click', () => this.downloadReceipt());
+    downloadReceiptBtn.addEventListener('mouseenter', () => {
+      downloadReceiptBtn.style.background = 'rgba(255, 255, 255, 0.3) !important';
+      downloadReceiptBtn.style.transform = 'translateY(-2px) !important';
+    });
+    downloadReceiptBtn.addEventListener('mouseleave', () => {
+      downloadReceiptBtn.style.background = 'rgba(255, 255, 255, 0.2) !important';
+      downloadReceiptBtn.style.transform = 'translateY(0) !important';
+    });
+
+    const managePaymentBtn = Utils.createElement('button');
+    managePaymentBtn.style.cssText = `
+      background: rgba(255, 255, 255, 0.95) !important;
+      color: #059669 !important;
+      border: none !important;
+      padding: 14px 28px !important;
+      border-radius: 12px !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      min-height: 48px !important;
+      font-size: 14px !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    `;
+    managePaymentBtn.innerHTML = '<i class="fas fa-credit-card"></i><span>결제 수단 관리</span>';
+    managePaymentBtn.addEventListener('click', () => this.managePaymentMethod());
+    managePaymentBtn.addEventListener('mouseenter', () => {
+      managePaymentBtn.style.transform = 'translateY(-3px) !important';
+      managePaymentBtn.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.25) !important';
+      managePaymentBtn.style.background = 'white !important';
+    });
+    managePaymentBtn.addEventListener('mouseleave', () => {
+      managePaymentBtn.style.transform = 'translateY(0) !important';
+      managePaymentBtn.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15) !important';
+      managePaymentBtn.style.background = 'rgba(255, 255, 255, 0.95) !important';
+    });
+
+    actionsSection.appendChild(downloadReceiptBtn);
+    actionsSection.appendChild(managePaymentBtn);
+
+    content.appendChild(titleSection);
+    content.appendChild(statsGrid);
+    content.appendChild(actionsSection);
+    header.appendChild(content);
     
     return header;
   }
@@ -599,31 +861,237 @@ class BillingPage {
   }
 
   managePaymentMethod() {
-    // Mock 결제 수단 관리 모달
-    const modal = Components.createModal('결제 수단 관리', `
-      <div class="space-y-4">
-        <div class="p-4 border border-gray-200 rounded-lg">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <i class="fas fa-credit-card text-gray-600 mr-3"></i>
-              <div>
-                <div class="font-medium">Visa **** **** **** 4242</div>
-                <div class="text-sm text-gray-600">만료일: 12/25</div>
-              </div>
-            </div>
-            <button class="text-red-600 hover:text-red-500 text-sm">삭제</button>
-          </div>
-        </div>
-        
-        <button class="w-full btn btn-outline">
-          <i class="fas fa-plus mr-2"></i>새 결제 수단 추가
-        </button>
-      </div>
-    `, [
-      { text: '닫기', className: 'btn btn-outline', action: 'close' }
-    ]);
-    
-    Components.showModal(modal);
+    // 프리미엄 결제 수단 관리 모달
+    const modalContent = Utils.createElement('div');
+    modalContent.style.cssText = `
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      color: #1e293b !important;
+      line-height: 1.6 !important;
+    `;
+
+    // 현재 결제 수단 카드
+    const currentCard = Utils.createElement('div');
+    currentCard.style.cssText = `
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      border-radius: 16px !important;
+      padding: 24px !important;
+      color: white !important;
+      position: relative !important;
+      overflow: hidden !important;
+      margin-bottom: 24px !important;
+    `;
+
+    const cardHeader = Utils.createElement('div');
+    cardHeader.style.cssText = `
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      margin-bottom: 16px !important;
+    `;
+
+    const cardTitle = Utils.createElement('h3');
+    cardTitle.style.cssText = `
+      font-size: 18px !important;
+      font-weight: 600 !important;
+      margin: 0 !important;
+      color: white !important;
+    `;
+    cardTitle.textContent = '현재 결제 수단';
+
+    const cardBrand = Utils.createElement('div');
+    cardBrand.style.cssText = `
+      background: rgba(255, 255, 255, 0.2) !important;
+      padding: 4px 12px !important;
+      border-radius: 8px !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+    `;
+    cardBrand.textContent = 'Visa';
+
+    const cardInfo = Utils.createElement('div');
+    cardInfo.style.cssText = `
+      display: flex !important;
+      align-items: center !important;
+      gap: 16px !important;
+    `;
+
+    const cardIcon = Utils.createElement('div');
+    cardIcon.style.cssText = `
+      width: 48px !important;
+      height: 48px !important;
+      background: rgba(255, 255, 255, 0.2) !important;
+      border-radius: 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 20px !important;
+    `;
+    cardIcon.innerHTML = '<i class="fas fa-credit-card"></i>';
+
+    const cardDetails = Utils.createElement('div');
+    cardDetails.style.cssText = 'flex: 1 !important;';
+
+    const cardNumber = Utils.createElement('div');
+    cardNumber.style.cssText = `
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      margin-bottom: 4px !important;
+      letter-spacing: 2px !important;
+    `;
+    cardNumber.textContent = '**** **** **** 4242';
+
+    const cardExpiry = Utils.createElement('div');
+    cardExpiry.style.cssText = `
+      font-size: 14px !important;
+      opacity: 0.8 !important;
+    `;
+    cardExpiry.textContent = '만료일: 12/25';
+
+    const deleteCardBtn = Utils.createElement('button');
+    deleteCardBtn.style.cssText = `
+      background: rgba(220, 38, 38, 0.2) !important;
+      color: #fecaca !important;
+      border: 1px solid rgba(220, 38, 38, 0.3) !important;
+      padding: 8px 16px !important;
+      border-radius: 8px !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    `;
+    deleteCardBtn.innerHTML = '<i class="fas fa-trash mr-1"></i>삭제';
+
+    cardDetails.appendChild(cardNumber);
+    cardDetails.appendChild(cardExpiry);
+    cardInfo.appendChild(cardIcon);
+    cardInfo.appendChild(cardDetails);
+    cardInfo.appendChild(deleteCardBtn);
+    cardHeader.appendChild(cardTitle);
+    cardHeader.appendChild(cardBrand);
+    currentCard.appendChild(cardHeader);
+    currentCard.appendChild(cardInfo);
+
+    // 새 결제 수단 추가 버튼
+    const addCardBtn = Utils.createElement('button');
+    addCardBtn.style.cssText = `
+      width: 100% !important;
+      background: #f8fafc !important;
+      border: 2px dashed #cbd5e1 !important;
+      border-radius: 12px !important;
+      padding: 20px !important;
+      color: #64748b !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+    `;
+    addCardBtn.innerHTML = '<i class="fas fa-plus"></i><span>새 결제 수단 추가</span>';
+    addCardBtn.addEventListener('mouseenter', () => {
+      addCardBtn.style.background = '#f1f5f9 !important';
+      addCardBtn.style.borderColor = '#94a3b8 !important';
+      addCardBtn.style.color = '#475569 !important';
+    });
+    addCardBtn.addEventListener('mouseleave', () => {
+      addCardBtn.style.background = '#f8fafc !important';
+      addCardBtn.style.borderColor = '#cbd5e1 !important';
+      addCardBtn.style.color = '#64748b !important';
+    });
+
+    modalContent.appendChild(currentCard);
+    modalContent.appendChild(addCardBtn);
+
+    // 모달 버튼들
+    const buttons = Utils.createElement('div');
+    buttons.style.cssText = `
+      display: flex !important;
+      justify-content: flex-end !important;
+      gap: 12px !important;
+      margin-top: 24px !important;
+    `;
+
+    const closeBtn = Utils.createElement('button');
+    closeBtn.style.cssText = `
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+      border: 1px solid #cbd5e1 !important;
+      padding: 10px 20px !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    `;
+    closeBtn.textContent = '닫기';
+    closeBtn.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    buttons.appendChild(closeBtn);
+    modalContent.appendChild(buttons);
+
+    // 모달 생성
+    const modal = Utils.createElement('div');
+    modal.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: rgba(0, 0, 0, 0.5) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 9999 !important;
+      backdrop-filter: blur(8px) !important;
+    `;
+
+    const modalDialog = Utils.createElement('div');
+    modalDialog.style.cssText = `
+      background: white !important;
+      border-radius: 20px !important;
+      padding: 32px !important;
+      max-width: 500px !important;
+      width: 90% !important;
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    `;
+
+    const modalHeader = Utils.createElement('div');
+    modalHeader.style.cssText = `
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      margin-bottom: 24px !important;
+    `;
+
+    const modalTitle = Utils.createElement('h2');
+    modalTitle.style.cssText = `
+      font-size: 24px !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      margin: 0 !important;
+    `;
+    modalTitle.textContent = '결제 수단 관리';
+
+    modalHeader.appendChild(modalTitle);
+    modalDialog.appendChild(modalHeader);
+    modalDialog.appendChild(modalContent);
+    modal.appendChild(modalDialog);
+
+    // 모달 외부 클릭시 닫기
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    });
+
+    document.body.appendChild(modal);
   }
 
   downloadReceipt() {

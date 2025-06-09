@@ -478,6 +478,15 @@ class SettingsPage {
                      class="w-5 h-5 text-violet-600 rounded focus:ring-violet-500 focus:ring-2 transition-colors duration-200">
               <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">성능 모니터링 활성화</span>
             </label>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" id="enableSidebarAutoClose" checked 
+                     class="w-5 h-5 text-violet-600 rounded focus:ring-violet-500 focus:ring-2 transition-colors duration-200"
+                     onchange="settingsPage.toggleSidebarAutoClose(this.checked)">
+              <div class="flex-1">
+                <span class="font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">모바일 사이드바 자동 닫기</span>
+                <div class="text-sm text-gray-500 mt-1">페이지 이동 시 모바일에서 사이드바 자동 닫기 (권장)</div>
+              </div>
+            </label>
           </div>
           
           <div class="space-y-2">
@@ -569,6 +578,7 @@ class SettingsPage {
           enableDebugMode: false,
           enableApiLogging: false,
           enablePerformanceMonitoring: true,
+          enableSidebarAutoClose: true, // 기본값: 활성화
           logRetention: 90
         }
       };
@@ -588,6 +598,12 @@ class SettingsPage {
     if (Utils.$('#defaultLanguage')) Utils.$('#defaultLanguage').value = this.settings.general.defaultLanguage;
     if (Utils.$('#timezone')) Utils.$('#timezone').value = this.settings.general.timezone;
     if (Utils.$('#showCommentCount')) Utils.$('#showCommentCount').checked = this.settings.general.showCommentCount;
+    
+    // localStorage에서 실제 사이드바 자동 닫기 설정 확인
+    const actualAutoCloseEnabled = localStorage.getItem('sidebar-auto-close') !== 'false';
+    
+    // 실제 설정으로 UI 업데이트
+    this.settings.advanced.enableSidebarAutoClose = actualAutoCloseEnabled;
     if (Utils.$('#showTimestamp')) Utils.$('#showTimestamp').checked = this.settings.general.showTimestamp;
     if (Utils.$('#allowAnonymous')) Utils.$('#allowAnonymous').checked = this.settings.general.allowAnonymous;
 
@@ -619,6 +635,7 @@ class SettingsPage {
     if (Utils.$('#enableDebugMode')) Utils.$('#enableDebugMode').checked = this.settings.advanced.enableDebugMode;
     if (Utils.$('#enableApiLogging')) Utils.$('#enableApiLogging').checked = this.settings.advanced.enableApiLogging;
     if (Utils.$('#enablePerformanceMonitoring')) Utils.$('#enablePerformanceMonitoring').checked = this.settings.advanced.enablePerformanceMonitoring;
+    if (Utils.$('#enableSidebarAutoClose')) Utils.$('#enableSidebarAutoClose').checked = this.settings.advanced.enableSidebarAutoClose;
     if (Utils.$('#logRetention')) Utils.$('#logRetention').value = this.settings.advanced.logRetention;
   }
 
@@ -689,6 +706,7 @@ class SettingsPage {
       enableDebugMode: Utils.$('#enableDebugMode')?.checked || false,
       enableApiLogging: Utils.$('#enableApiLogging')?.checked || false,
       enablePerformanceMonitoring: Utils.$('#enablePerformanceMonitoring')?.checked || false,
+      enableSidebarAutoClose: Utils.$('#enableSidebarAutoClose')?.checked !== false, // 기본값: true
       logRetention: parseInt(Utils.$('#logRetention')?.value || '90')
     };
   }
@@ -725,6 +743,34 @@ class SettingsPage {
     }
 
     Utils.showNotification('데이터 삭제는 실제 환경에서만 가능합니다.', 'warning');
+  }
+
+  toggleSidebarAutoClose(enabled) {
+    try {
+      // 라우터가 존재하는지 확인
+      if (window.router && typeof window.router.toggleAutoCloseSidebar === 'function') {
+        // 라우터의 설정 업데이트
+        window.router.toggleAutoCloseSidebar(enabled);
+        
+        // 사용자 피드백 제공
+        const message = enabled ? 
+          '모바일 사이드바 자동 닫기가 활성화되었습니다.' : 
+          '모바일 사이드바 자동 닫기가 비활성화되었습니다.';
+        
+        Utils.showToast(message, enabled ? 'success' : 'info');
+        
+        // 설정 dirty 상태 업데이트
+        this.isDirty = true;
+        
+        console.log(`사이드바 자동 닫기 설정 변경: ${enabled}`);
+      } else {
+        console.warn('라우터 인스턴스를 찾을 수 없습니다.');
+        Utils.showToast('설정을 적용할 수 없습니다. 페이지를 새로고침해주세요.', 'warning');
+      }
+    } catch (error) {
+      console.error('사이드바 설정 변경 실패:', error);
+      Utils.showToast('설정 변경 중 오류가 발생했습니다.', 'error');
+    }
   }
 
   exportSettings() {

@@ -11,6 +11,8 @@ If user says '빌드를 종료합니다.", ask user to commit and push current b
 
 If user says '코드 테스트를 실시합니다. CODE_TEST.md를 읽고 테스트를 시작하세요.", read CODE_TEST.md file and follow the prompts in the file to run code tests.
 
+If the user's prompt starts with “EP:”, then the user wants to enhance the prompt. Read the PROMPT_ENHANCER.md file and follow the guidelines to enhance the user's prompt. Show the user the enhancement and get their permission to run it before taking action on the enhanced prompt. The enhanced prompts will follow the language of the original prompt (e.g., Korean prompt input will output Korean prompt enhancements, English prompt input will output English prompt enhancements, etc.)
+
 During developing with user, if you learn very important thing which need to remember and remind everytime, please add the contents which contains what's your mistakes and what you learn from the mistakes in CLAUDE.md file.
 
 

@@ -1299,79 +1299,330 @@ class IntegrationsPage {
 
   // API 키 관련 메서드
   openApiKeyModal() {
+    // 프리미엄 API 키 생성 모달
     const modalContent = Utils.createElement('div');
-    
+    modalContent.style.cssText = `
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      color: #1e293b !important;
+      line-height: 1.6 !important;
+    `;
+
     // API 키 이름 섹션
-    const nameSection = Utils.createElement('div', 'form-section');
-    const nameLabel = Utils.createElement('label', 'input-label', 'API 키 이름');
-    const nameInput = Utils.createElement('input', 'input');
+    const nameSection = Utils.createElement('div');
+    nameSection.style.cssText = 'margin-bottom: 24px !important;';
+
+    const nameLabel = Utils.createElement('label');
+    nameLabel.style.cssText = `
+      display: block !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #374151 !important;
+      margin-bottom: 8px !important;
+    `;
+    nameLabel.textContent = 'API 키 이름';
+
+    const nameInput = Utils.createElement('input');
+    nameInput.style.cssText = `
+      width: 100% !important;
+      padding: 12px 16px !important;
+      border: 2px solid #e5e7eb !important;
+      border-radius: 12px !important;
+      font-size: 14px !important;
+      transition: all 0.2s ease !important;
+      background: white !important;
+      box-sizing: border-box !important;
+    `;
     nameInput.type = 'text';
     nameInput.id = 'apiKeyName';
     nameInput.placeholder = '예: Production API Key';
     
+    // 포커스 효과
+    nameInput.addEventListener('focus', () => {
+      nameInput.style.borderColor = '#667eea !important';
+      nameInput.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1) !important';
+    });
+    nameInput.addEventListener('blur', () => {
+      nameInput.style.borderColor = '#e5e7eb !important';
+      nameInput.style.boxShadow = 'none !important';
+    });
+
     nameSection.appendChild(nameLabel);
     nameSection.appendChild(nameInput);
-    
+
     // 권한 섹션
-    const permSection = Utils.createElement('div', 'form-section');
-    const permLabel = Utils.createElement('div', 'input-label', '권한 설정');
-    const permGroup = Utils.createElement('div', 'checkbox-group');
-    const permGroupTitle = Utils.createElement('div', 'checkbox-group-title', '이 API 키로 허용할 작업을 선택하세요');
-    
-    // 체크박스들
-    const readLabel = Utils.createElement('label');
-    const readCheckbox = Utils.createElement('input');
-    readCheckbox.type = 'checkbox';
-    readCheckbox.id = 'permRead';
-    readCheckbox.checked = true;
-    readLabel.appendChild(readCheckbox);
-    readLabel.appendChild(document.createTextNode('읽기 권한 (Read) - 댓글 조회'));
-    
-    const writeLabel = Utils.createElement('label');
-    const writeCheckbox = Utils.createElement('input');
-    writeCheckbox.type = 'checkbox';
-    writeCheckbox.id = 'permWrite';
-    writeLabel.appendChild(writeCheckbox);
-    writeLabel.appendChild(document.createTextNode('쓰기 권한 (Write) - 댓글 작성, 수정'));
-    
-    const adminLabel = Utils.createElement('label');
-    const adminCheckbox = Utils.createElement('input');
-    adminCheckbox.type = 'checkbox';
-    adminCheckbox.id = 'permAdmin';
-    adminLabel.appendChild(adminCheckbox);
-    adminLabel.appendChild(document.createTextNode('관리자 권한 (Admin) - 모든 작업'));
-    
-    permGroup.appendChild(permGroupTitle);
-    permGroup.appendChild(readLabel);
-    permGroup.appendChild(writeLabel);
-    permGroup.appendChild(adminLabel);
-    
+    const permSection = Utils.createElement('div');
+    permSection.style.cssText = 'margin-bottom: 24px !important;';
+
+    const permLabel = Utils.createElement('div');
+    permLabel.style.cssText = `
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #374151 !important;
+      margin-bottom: 12px !important;
+    `;
+    permLabel.textContent = '권한 설정';
+
+    const permDescription = Utils.createElement('div');
+    permDescription.style.cssText = `
+      font-size: 13px !important;
+      color: #6b7280 !important;
+      margin-bottom: 16px !important;
+      padding: 12px !important;
+      background: #f9fafb !important;
+      border-radius: 8px !important;
+      border-left: 3px solid #667eea !important;
+    `;
+    permDescription.textContent = '이 API 키로 허용할 작업을 선택하세요. 최소 권한 원칙에 따라 필요한 권한만 부여하는 것을 권장합니다.';
+
+    const permGroup = Utils.createElement('div');
+    permGroup.style.cssText = 'display: flex !important; flex-direction: column !important; gap: 12px !important;';
+
+    // 읽기 권한 체크박스
+    const readOption = this.createPermissionOption(
+      'permRead',
+      '읽기 권한 (Read)',
+      '댓글 조회 및 통계 확인',
+      'fas fa-eye',
+      '#10b981',
+      true
+    );
+
+    // 쓰기 권한 체크박스
+    const writeOption = this.createPermissionOption(
+      'permWrite',
+      '쓰기 권한 (Write)',
+      '댓글 작성, 수정, 삭제',
+      'fas fa-edit',
+      '#f59e0b',
+      false
+    );
+
+    // 관리자 권한 체크박스
+    const adminOption = this.createPermissionOption(
+      'permAdmin',
+      '관리자 권한 (Admin)',
+      '모든 작업 및 설정 관리',
+      'fas fa-crown',
+      '#ef4444',
+      false
+    );
+
+    permGroup.appendChild(readOption);
+    permGroup.appendChild(writeOption);
+    permGroup.appendChild(adminOption);
+
     permSection.appendChild(permLabel);
+    permSection.appendChild(permDescription);
     permSection.appendChild(permGroup);
-    
+
     modalContent.appendChild(nameSection);
     modalContent.appendChild(permSection);
 
-    const modal = Components.createModal('새 API 키 생성', modalContent, [
-      {
-        text: '취소',
-        class: 'btn-secondary',
-        onclick: () => Components.closeModal(modal)
-      },
-      {
-        text: '생성',
-        class: 'btn-primary',
-        onclick: () => this.createApiKey(modal)
-      }
-    ]);
+    // 모달 버튼들
+    const buttons = Utils.createElement('div');
+    buttons.style.cssText = `
+      display: flex !important;
+      justify-content: flex-end !important;
+      gap: 12px !important;
+      margin-top: 24px !important;
+    `;
 
-    Components.showModal(modal);
+    const cancelBtn = Utils.createElement('button');
+    cancelBtn.style.cssText = `
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+      border: 1px solid #cbd5e1 !important;
+      padding: 10px 20px !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    `;
+    cancelBtn.textContent = '취소';
+    cancelBtn.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    const createBtn = Utils.createElement('button');
+    createBtn.style.cssText = `
+      background: linear-gradient(135deg, #667eea, #764ba2) !important;
+      color: white !important;
+      border: none !important;
+      padding: 10px 20px !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    `;
+    createBtn.textContent = '생성';
+    createBtn.addEventListener('click', () => this.createApiKey(modal));
+
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(createBtn);
+    modalContent.appendChild(buttons);
+
+    // 모달 생성
+    const modal = this.createPremiumModal('새 API 키 생성', modalContent);
+    document.body.appendChild(modal);
+  }
+
+  createPermissionOption(id, title, description, icon, color, checked) {
+    const option = Utils.createElement('label');
+    option.style.cssText = `
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 12px !important;
+      padding: 16px !important;
+      border: 2px solid #e5e7eb !important;
+      border-radius: 12px !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      background: white !important;
+    `;
+
+    const checkbox = Utils.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = id;
+    checkbox.checked = checked;
+    checkbox.style.cssText = `
+      width: 18px !important;
+      height: 18px !important;
+      margin-top: 2px !important;
+      cursor: pointer !important;
+    `;
+
+    const iconContainer = Utils.createElement('div');
+    iconContainer.style.cssText = `
+      width: 40px !important;
+      height: 40px !important;
+      background: ${color}15 !important;
+      border-radius: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: ${color} !important;
+      font-size: 16px !important;
+    `;
+    iconContainer.innerHTML = `<i class="${icon}"></i>`;
+
+    const textContent = Utils.createElement('div');
+    textContent.style.cssText = 'flex: 1 !important;';
+
+    const titleEl = Utils.createElement('div');
+    titleEl.style.cssText = `
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #1e293b !important;
+      margin-bottom: 4px !important;
+    `;
+    titleEl.textContent = title;
+
+    const descEl = Utils.createElement('div');
+    descEl.style.cssText = `
+      font-size: 13px !important;
+      color: #64748b !important;
+    `;
+    descEl.textContent = description;
+
+    textContent.appendChild(titleEl);
+    textContent.appendChild(descEl);
+
+    option.appendChild(checkbox);
+    option.appendChild(iconContainer);
+    option.appendChild(textContent);
+
+    // 호버 및 체크 효과
+    const updateStyle = () => {
+      if (checkbox.checked) {
+        option.style.borderColor = `${color} !important`;
+        option.style.background = `${color}05 !important`;
+      } else {
+        option.style.borderColor = '#e5e7eb !important';
+        option.style.background = 'white !important';
+      }
+    };
+
+    checkbox.addEventListener('change', updateStyle);
+    updateStyle();
+
+    option.addEventListener('mouseenter', () => {
+      if (!checkbox.checked) {
+        option.style.borderColor = '#cbd5e1 !important';
+        option.style.background = '#f9fafb !important';
+      }
+    });
+
+    option.addEventListener('mouseleave', updateStyle);
+
+    return option;
+  }
+
+  createPremiumModal(title, content) {
+    const modal = Utils.createElement('div');
+    modal.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: rgba(0, 0, 0, 0.5) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 9999 !important;
+      backdrop-filter: blur(8px) !important;
+    `;
+
+    const modalDialog = Utils.createElement('div');
+    modalDialog.style.cssText = `
+      background: white !important;
+      border-radius: 20px !important;
+      padding: 32px !important;
+      max-width: 600px !important;
+      width: 90% !important;
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    `;
+
+    const modalHeader = Utils.createElement('div');
+    modalHeader.style.cssText = `
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      margin-bottom: 24px !important;
+    `;
+
+    const modalTitle = Utils.createElement('h2');
+    modalTitle.style.cssText = `
+      font-size: 24px !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      margin: 0 !important;
+    `;
+    modalTitle.textContent = title;
+
+    modalHeader.appendChild(modalTitle);
+    modalDialog.appendChild(modalHeader);
+    modalDialog.appendChild(content);
+    modal.appendChild(modalDialog);
+
+    // 모달 외부 클릭시 닫기
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    });
+
+    return modal;
   }
 
   createApiKey(modal) {
     const name = Utils.$('#apiKeyName').value;
     if (!name.trim()) {
-      Utils.showNotification('API 키 이름을 입력하세요.', 'warning');
+      Utils.showToast('API 키 이름을 입력하세요.', 'warning');
       return;
     }
 
@@ -1379,6 +1630,11 @@ class IntegrationsPage {
     if (Utils.$('#permRead').checked) permissions.push('read');
     if (Utils.$('#permWrite').checked) permissions.push('write');
     if (Utils.$('#permAdmin').checked) permissions.push('admin');
+
+    if (permissions.length === 0) {
+      Utils.showToast('최소 하나의 권한을 선택하세요.', 'warning');
+      return;
+    }
 
     const newApiKey = {
       id: this.apiKeys.length + 1,
@@ -1391,21 +1647,21 @@ class IntegrationsPage {
     };
 
     this.apiKeys.push(newApiKey);
-    Components.closeModal(modal);
+    document.body.removeChild(modal);
     this.renderCurrentTab();
-    Utils.showNotification('API 키가 생성되었습니다.', 'success');
+    Utils.showToast('API 키가 생성되었습니다.', 'success');
   }
 
   copyApiKey(key) {
     navigator.clipboard.writeText(key).then(() => {
-      Utils.showNotification('API 키가 클립보드에 복사되었습니다.', 'success');
+      Utils.showToast('API 키가 클립보드에 복사되었습니다.', 'success');
     }).catch(() => {
-      Utils.showNotification('복사에 실패했습니다.', 'error');
+      Utils.showToast('복사에 실패했습니다.', 'error');
     });
   }
 
   editApiKey(keyId) {
-    Utils.showNotification('API 키 편집 기능은 곧 제공될 예정입니다.', 'info');
+    Utils.showToast('API 키 편집 기능은 곧 제공될 예정입니다.', 'info');
   }
 
   deleteApiKey(keyId) {
@@ -1415,56 +1671,326 @@ class IntegrationsPage {
 
     this.apiKeys = this.apiKeys.filter(key => key.id !== keyId);
     this.renderCurrentTab();
-    Utils.showNotification('API 키가 삭제되었습니다.', 'success');
+    Utils.showToast('API 키가 삭제되었습니다.', 'success');
   }
 
   // 웹훅 관련 메서드
   openWebhookModal() {
-    const modalContent = Utils.createElement('div', 'space-y-4');
-    modalContent.innerHTML = `
-      <div>
-        <label class="input-label">웹훅 이름</label>
-        <input type="text" class="input" id="webhookName" placeholder="예: Slack 알림">
-      </div>
-      
-      <div>
-        <label class="input-label">웹훅 URL</label>
-        <input type="url" class="input" id="webhookUrl" placeholder="https://hooks.slack.com/services/...">
-      </div>
-      
-      <div>
-        <label class="input-label">이벤트 선택</label>
-        <div class="space-y-2">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" id="eventCommentCreated" checked>
-            <span>댓글 생성 (comment.created)</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="checkbox" id="eventCommentApproved">
-            <span>댓글 승인 (comment.approved)</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="checkbox" id="eventSpamDetected">
-            <span>스팸 탐지 (spam.detected)</span>
-          </label>
-        </div>
-      </div>
+    // 프리미엄 웹훅 생성 모달
+    const modalContent = Utils.createElement('div');
+    modalContent.style.cssText = `
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      color: #1e293b !important;
+      line-height: 1.6 !important;
     `;
 
-    const modal = Components.createModal('새 웹훅 생성', modalContent, [
+    // 웹훅 이름 섹션
+    const nameSection = Utils.createElement('div');
+    nameSection.style.cssText = 'margin-bottom: 24px !important;';
+
+    const nameLabel = Utils.createElement('label');
+    nameLabel.style.cssText = `
+      display: block !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #374151 !important;
+      margin-bottom: 8px !important;
+    `;
+    nameLabel.textContent = '웹훅 이름';
+
+    const nameInput = Utils.createElement('input');
+    nameInput.style.cssText = `
+      width: 100% !important;
+      padding: 12px 16px !important;
+      border: 2px solid #e5e7eb !important;
+      border-radius: 12px !important;
+      font-size: 14px !important;
+      transition: all 0.2s ease !important;
+      background: white !important;
+      box-sizing: border-box !important;
+    `;
+    nameInput.type = 'text';
+    nameInput.id = 'webhookName';
+    nameInput.placeholder = '예: Slack 알림';
+
+    // 포커스 효과
+    nameInput.addEventListener('focus', () => {
+      nameInput.style.borderColor = '#34d399 !important';
+      nameInput.style.boxShadow = '0 0 0 3px rgba(52, 211, 153, 0.1) !important';
+    });
+    nameInput.addEventListener('blur', () => {
+      nameInput.style.borderColor = '#e5e7eb !important';
+      nameInput.style.boxShadow = 'none !important';
+    });
+
+    nameSection.appendChild(nameLabel);
+    nameSection.appendChild(nameInput);
+
+    // 웹훅 URL 섹션
+    const urlSection = Utils.createElement('div');
+    urlSection.style.cssText = 'margin-bottom: 24px !important;';
+
+    const urlLabel = Utils.createElement('label');
+    urlLabel.style.cssText = `
+      display: block !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #374151 !important;
+      margin-bottom: 8px !important;
+    `;
+    urlLabel.textContent = '웹훅 URL';
+
+    const urlInput = Utils.createElement('input');
+    urlInput.style.cssText = `
+      width: 100% !important;
+      padding: 12px 16px !important;
+      border: 2px solid #e5e7eb !important;
+      border-radius: 12px !important;
+      font-size: 14px !important;
+      transition: all 0.2s ease !important;
+      background: white !important;
+      box-sizing: border-box !important;
+    `;
+    urlInput.type = 'url';
+    urlInput.id = 'webhookUrl';
+    urlInput.placeholder = 'https://hooks.slack.com/services/...';
+
+    urlInput.addEventListener('focus', () => {
+      urlInput.style.borderColor = '#34d399 !important';
+      urlInput.style.boxShadow = '0 0 0 3px rgba(52, 211, 153, 0.1) !important';
+    });
+    urlInput.addEventListener('blur', () => {
+      urlInput.style.borderColor = '#e5e7eb !important';
+      urlInput.style.boxShadow = 'none !important';
+    });
+
+    const urlHint = Utils.createElement('div');
+    urlHint.style.cssText = `
+      font-size: 12px !important;
+      color: #6b7280 !important;
+      margin-top: 4px !important;
+    `;
+    urlHint.textContent = 'HTTPS URL이어야 하며, POST 요청을 받을 수 있어야 합니다.';
+
+    urlSection.appendChild(urlLabel);
+    urlSection.appendChild(urlInput);
+    urlSection.appendChild(urlHint);
+
+    // 이벤트 선택 섹션
+    const eventsSection = Utils.createElement('div');
+    eventsSection.style.cssText = 'margin-bottom: 24px !important;';
+
+    const eventsLabel = Utils.createElement('div');
+    eventsLabel.style.cssText = `
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #374151 !important;
+      margin-bottom: 12px !important;
+    `;
+    eventsLabel.textContent = '이벤트 선택';
+
+    const eventsDescription = Utils.createElement('div');
+    eventsDescription.style.cssText = `
+      font-size: 13px !important;
+      color: #6b7280 !important;
+      margin-bottom: 16px !important;
+      padding: 12px !important;
+      background: #f9fafb !important;
+      border-radius: 8px !important;
+      border-left: 3px solid #34d399 !important;
+    `;
+    eventsDescription.textContent = '웹훅이 트리거될 이벤트를 선택하세요. 선택한 이벤트가 발생할 때마다 지정된 URL로 HTTP POST 요청이 전송됩니다.';
+
+    const eventsGroup = Utils.createElement('div');
+    eventsGroup.style.cssText = 'display: flex !important; flex-direction: column !important; gap: 12px !important;';
+
+    // 이벤트 옵션들
+    const events = [
       {
-        text: '취소',
-        class: 'btn-secondary',
-        onclick: () => Components.closeModal(modal)
+        id: 'eventCommentCreated',
+        title: '댓글 생성 (comment.created)',
+        description: '새 댓글이 작성될 때 트리거',
+        icon: 'fas fa-comment',
+        color: '#10b981',
+        checked: true
       },
       {
-        text: '생성',
-        class: 'btn-primary',
-        onclick: () => this.createWebhook(modal)
+        id: 'eventCommentApproved',
+        title: '댓글 승인 (comment.approved)', 
+        description: '댓글이 승인될 때 트리거',
+        icon: 'fas fa-check-circle',
+        color: '#34d399',
+        checked: false
+      },
+      {
+        id: 'eventSpamDetected',
+        title: '스팸 탐지 (spam.detected)',
+        description: '스팸 댓글이 감지될 때 트리거',
+        icon: 'fas fa-shield-alt',
+        color: '#ef4444',
+        checked: false
       }
-    ]);
+    ];
 
-    Components.showModal(modal);
+    events.forEach(event => {
+      const eventOption = this.createEventOption(
+        event.id,
+        event.title,
+        event.description,
+        event.icon,
+        event.color,
+        event.checked
+      );
+      eventsGroup.appendChild(eventOption);
+    });
+
+    eventsSection.appendChild(eventsLabel);
+    eventsSection.appendChild(eventsDescription);
+    eventsSection.appendChild(eventsGroup);
+
+    modalContent.appendChild(nameSection);
+    modalContent.appendChild(urlSection);
+    modalContent.appendChild(eventsSection);
+
+    // 모달 버튼들
+    const buttons = Utils.createElement('div');
+    buttons.style.cssText = `
+      display: flex !important;
+      justify-content: flex-end !important;
+      gap: 12px !important;
+      margin-top: 24px !important;
+    `;
+
+    const cancelBtn = Utils.createElement('button');
+    cancelBtn.style.cssText = `
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+      border: 1px solid #cbd5e1 !important;
+      padding: 10px 20px !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    `;
+    cancelBtn.textContent = '취소';
+    cancelBtn.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    const createBtn = Utils.createElement('button');
+    createBtn.style.cssText = `
+      background: linear-gradient(135deg, #34d399, #10b981) !important;
+      color: white !important;
+      border: none !important;
+      padding: 10px 20px !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    `;
+    createBtn.textContent = '생성';
+    createBtn.addEventListener('click', () => this.createWebhook(modal));
+
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(createBtn);
+    modalContent.appendChild(buttons);
+
+    // 모달 생성
+    const modal = this.createPremiumModal('새 웹훅 생성', modalContent);
+    document.body.appendChild(modal);
+  }
+
+  createEventOption(id, title, description, icon, color, checked) {
+    const option = Utils.createElement('label');
+    option.style.cssText = `
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 12px !important;
+      padding: 16px !important;
+      border: 2px solid #e5e7eb !important;
+      border-radius: 12px !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      background: white !important;
+    `;
+
+    const checkbox = Utils.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = id;
+    checkbox.checked = checked;
+    checkbox.style.cssText = `
+      width: 18px !important;
+      height: 18px !important;
+      margin-top: 2px !important;
+      cursor: pointer !important;
+    `;
+
+    const iconContainer = Utils.createElement('div');
+    iconContainer.style.cssText = `
+      width: 40px !important;
+      height: 40px !important;
+      background: ${color}15 !important;
+      border-radius: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: ${color} !important;
+      font-size: 16px !important;
+    `;
+    iconContainer.innerHTML = `<i class="${icon}"></i>`;
+
+    const textContent = Utils.createElement('div');
+    textContent.style.cssText = 'flex: 1 !important;';
+
+    const titleEl = Utils.createElement('div');
+    titleEl.style.cssText = `
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #1e293b !important;
+      margin-bottom: 4px !important;
+    `;
+    titleEl.textContent = title;
+
+    const descEl = Utils.createElement('div');
+    descEl.style.cssText = `
+      font-size: 13px !important;
+      color: #64748b !important;
+    `;
+    descEl.textContent = description;
+
+    textContent.appendChild(titleEl);
+    textContent.appendChild(descEl);
+
+    option.appendChild(checkbox);
+    option.appendChild(iconContainer);
+    option.appendChild(textContent);
+
+    // 호버 및 체크 효과
+    const updateStyle = () => {
+      if (checkbox.checked) {
+        option.style.borderColor = `${color} !important`;
+        option.style.background = `${color}05 !important`;
+      } else {
+        option.style.borderColor = '#e5e7eb !important';
+        option.style.background = 'white !important';
+      }
+    };
+
+    checkbox.addEventListener('change', updateStyle);
+    updateStyle();
+
+    option.addEventListener('mouseenter', () => {
+      if (!checkbox.checked) {
+        option.style.borderColor = '#cbd5e1 !important';
+        option.style.background = '#f9fafb !important';
+      }
+    });
+
+    option.addEventListener('mouseleave', updateStyle);
+
+    return option;
   }
 
   createWebhook(modal) {
@@ -1472,7 +1998,19 @@ class IntegrationsPage {
     const url = Utils.$('#webhookUrl').value;
     
     if (!name.trim() || !url.trim()) {
-      Utils.showNotification('모든 필드를 입력하세요.', 'warning');
+      Utils.showToast('모든 필드를 입력하세요.', 'warning');
+      return;
+    }
+
+    // URL 유효성 검사
+    try {
+      new URL(url);
+      if (!url.startsWith('https://')) {
+        Utils.showToast('HTTPS URL을 입력하세요.', 'warning');
+        return;
+      }
+    } catch {
+      Utils.showToast('유효한 URL을 입력하세요.', 'warning');
       return;
     }
 
@@ -1480,6 +2018,11 @@ class IntegrationsPage {
     if (Utils.$('#eventCommentCreated').checked) events.push('comment.created');
     if (Utils.$('#eventCommentApproved').checked) events.push('comment.approved');
     if (Utils.$('#eventSpamDetected').checked) events.push('spam.detected');
+
+    if (events.length === 0) {
+      Utils.showToast('최소 하나의 이벤트를 선택하세요.', 'warning');
+      return;
+    }
 
     const newWebhook = {
       id: this.webhooks.length + 1,
@@ -1492,28 +2035,28 @@ class IntegrationsPage {
     };
 
     this.webhooks.push(newWebhook);
-    Components.closeModal(modal);
+    document.body.removeChild(modal);
     this.renderCurrentTab();
-    Utils.showNotification('웹훅이 생성되었습니다.', 'success');
+    Utils.showToast('웹훅이 생성되었습니다.', 'success');
   }
 
   testWebhook(webhookId) {
     const webhook = this.webhooks.find(w => w.id === webhookId);
     if (!webhook) return;
 
-    Utils.showNotification('웹훅 테스트를 전송했습니다.', 'info');
+    Utils.showToast('웹훅 테스트를 전송했습니다.', 'info');
     
     // 마지막 실행 시간 업데이트
     webhook.last_triggered = new Date().toISOString();
     this.renderCurrentTab();
     
     setTimeout(() => {
-      Utils.showNotification('웹훅 테스트가 성공적으로 완료되었습니다.', 'success');
+      Utils.showToast('웹훅 테스트가 성공적으로 완료되었습니다.', 'success');
     }, 2000);
   }
 
   editWebhook(webhookId) {
-    Utils.showNotification('웹훅 편집 기능은 곧 제공될 예정입니다.', 'info');
+    Utils.showToast('웹훅 편집 기능은 곧 제공될 예정입니다.', 'info');
   }
 
   deleteWebhook(webhookId) {
@@ -1523,7 +2066,7 @@ class IntegrationsPage {
 
     this.webhooks = this.webhooks.filter(w => w.id !== webhookId);
     this.renderCurrentTab();
-    Utils.showNotification('웹훅이 삭제되었습니다.', 'success');
+    Utils.showToast('웹훅이 삭제되었습니다.', 'success');
   }
 
   // 써드파티 서비스 관련 메서드
@@ -1541,36 +2084,162 @@ class IntegrationsPage {
   }
 
   openSlackConfigModal(service) {
-    const modalContent = Utils.createElement('div', 'space-y-4');
-    modalContent.innerHTML = `
-      <div>
-        <label class="input-label">Slack 웹훅 URL</label>
-        <input type="url" class="input" id="slackWebhookUrl" placeholder="https://hooks.slack.com/services/...">
-        <p class="text-sm text-gray-600 mt-1">
-          Slack 앱에서 Incoming Webhooks를 설정하고 URL을 입력하세요.
-        </p>
-      </div>
-      
-      <div>
-        <label class="input-label">채널</label>
-        <input type="text" class="input" id="slackChannel" placeholder="#comments" value="#comments">
-      </div>
+    // 프리미엄 Slack 설정 모달
+    const modalContent = Utils.createElement('div');
+    modalContent.style.cssText = `
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      color: #1e293b !important;
+      line-height: 1.6 !important;
     `;
 
-    const modal = Components.createModal('Slack 연동 설정', modalContent, [
-      {
-        text: '취소',
-        class: 'btn-secondary',
-        onclick: () => Components.closeModal(modal)
-      },
-      {
-        text: '연결',
-        class: 'btn-primary',
-        onclick: () => this.saveSlackConfig(modal, service)
-      }
-    ]);
+    // Slack 웹훅 URL 섹션
+    const urlSection = Utils.createElement('div');
+    urlSection.style.cssText = 'margin-bottom: 24px !important;';
 
-    Components.showModal(modal);
+    const urlLabel = Utils.createElement('label');
+    urlLabel.style.cssText = `
+      display: block !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #374151 !important;
+      margin-bottom: 8px !important;
+    `;
+    urlLabel.textContent = 'Slack 웹훅 URL';
+
+    const urlInput = Utils.createElement('input');
+    urlInput.style.cssText = `
+      width: 100% !important;
+      padding: 12px 16px !important;
+      border: 2px solid #e5e7eb !important;
+      border-radius: 12px !important;
+      font-size: 14px !important;
+      transition: all 0.2s ease !important;
+      background: white !important;
+      box-sizing: border-box !important;
+    `;
+    urlInput.type = 'url';
+    urlInput.id = 'slackWebhookUrl';
+    urlInput.placeholder = 'https://hooks.slack.com/services/...';
+    urlInput.value = service.config?.webhook_url || '';
+
+    urlInput.addEventListener('focus', () => {
+      urlInput.style.borderColor = '#4285f4 !important';
+      urlInput.style.boxShadow = '0 0 0 3px rgba(66, 133, 244, 0.1) !important';
+    });
+    urlInput.addEventListener('blur', () => {
+      urlInput.style.borderColor = '#e5e7eb !important';
+      urlInput.style.boxShadow = 'none !important';
+    });
+
+    const urlHint = Utils.createElement('div');
+    urlHint.style.cssText = `
+      font-size: 12px !important;
+      color: #6b7280 !important;
+      margin-top: 8px !important;
+      padding: 12px !important;
+      background: #eff6ff !important;
+      border-radius: 8px !important;
+      border-left: 3px solid #2563eb !important;
+    `;
+    urlHint.innerHTML = '💡 Slack 앱에서 Incoming Webhooks를 설정하고 URL을 입력하세요. <a href="https://api.slack.com/messaging/webhooks" target="_blank" style="color: #2563eb; text-decoration: underline;">설정 가이드 보기</a>';
+
+    urlSection.appendChild(urlLabel);
+    urlSection.appendChild(urlInput);
+    urlSection.appendChild(urlHint);
+
+    // 채널 섹션
+    const channelSection = Utils.createElement('div');
+    channelSection.style.cssText = 'margin-bottom: 24px !important;';
+
+    const channelLabel = Utils.createElement('label');
+    channelLabel.style.cssText = `
+      display: block !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #374151 !important;
+      margin-bottom: 8px !important;
+    `;
+    channelLabel.textContent = '채널';
+
+    const channelInput = Utils.createElement('input');
+    channelInput.style.cssText = `
+      width: 100% !important;
+      padding: 12px 16px !important;
+      border: 2px solid #e5e7eb !important;
+      border-radius: 12px !important;
+      font-size: 14px !important;
+      transition: all 0.2s ease !important;
+      background: white !important;
+      box-sizing: border-box !important;
+    `;
+    channelInput.type = 'text';
+    channelInput.id = 'slackChannel';
+    channelInput.placeholder = '#comments';
+    channelInput.value = service.config?.channel || '#comments';
+
+    channelInput.addEventListener('focus', () => {
+      channelInput.style.borderColor = '#4285f4 !important';
+      channelInput.style.boxShadow = '0 0 0 3px rgba(66, 133, 244, 0.1) !important';
+    });
+    channelInput.addEventListener('blur', () => {
+      channelInput.style.borderColor = '#e5e7eb !important';
+      channelInput.style.boxShadow = 'none !important';
+    });
+
+    channelSection.appendChild(channelLabel);
+    channelSection.appendChild(channelInput);
+
+    modalContent.appendChild(urlSection);
+    modalContent.appendChild(channelSection);
+
+    // 모달 버튼들
+    const buttons = Utils.createElement('div');
+    buttons.style.cssText = `
+      display: flex !important;
+      justify-content: flex-end !important;
+      gap: 12px !important;
+      margin-top: 24px !important;
+    `;
+
+    const cancelBtn = Utils.createElement('button');
+    cancelBtn.style.cssText = `
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+      border: 1px solid #cbd5e1 !important;
+      padding: 10px 20px !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    `;
+    cancelBtn.textContent = '취소';
+    cancelBtn.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    const connectBtn = Utils.createElement('button');
+    connectBtn.style.cssText = `
+      background: linear-gradient(135deg, #4285f4, #1a73e8) !important;
+      color: white !important;
+      border: none !important;
+      padding: 10px 20px !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    `;
+    connectBtn.textContent = '연결';
+    connectBtn.addEventListener('click', () => this.saveSlackConfig(modal, service));
+
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(connectBtn);
+    modalContent.appendChild(buttons);
+
+    // 모달 생성
+    const modal = this.createPremiumModal('Slack 연동 설정', modalContent);
+    document.body.appendChild(modal);
   }
 
   saveSlackConfig(modal, service) {
@@ -1578,7 +2247,13 @@ class IntegrationsPage {
     const channel = Utils.$('#slackChannel').value;
 
     if (!webhookUrl.trim()) {
-      Utils.showNotification('웹훅 URL을 입력하세요.', 'warning');
+      Utils.showToast('웹훅 URL을 입력하세요.', 'warning');
+      return;
+    }
+
+    // Slack 웹훅 URL 유효성 검사
+    if (!webhookUrl.includes('hooks.slack.com')) {
+      Utils.showToast('유효한 Slack 웹훅 URL을 입력하세요.', 'warning');
       return;
     }
 
@@ -1588,9 +2263,9 @@ class IntegrationsPage {
       channel: channel || '#comments'
     };
 
-    Components.closeModal(modal);
+    document.body.removeChild(modal);
     this.renderCurrentTab();
-    Utils.showNotification('Slack 연동이 완료되었습니다.', 'success');
+    Utils.showToast('Slack 연동이 완료되었습니다.', 'success');
   }
 
   openDiscordConfigModal(service) {
@@ -1625,7 +2300,13 @@ class IntegrationsPage {
     const webhookUrl = Utils.$('#discordWebhookUrl').value;
 
     if (!webhookUrl.trim()) {
-      Utils.showNotification('웹훅 URL을 입력하세요.', 'warning');
+      Utils.showToast('웹훅 URL을 입력하세요.', 'warning');
+      return;
+    }
+
+    // Discord 웹훅 URL 유효성 검사
+    if (!webhookUrl.includes('discord.com/api/webhooks/')) {
+      Utils.showToast('유효한 Discord 웹훅 URL을 입력하세요.', 'warning');
       return;
     }
 
@@ -1634,9 +2315,9 @@ class IntegrationsPage {
       webhook_url: webhookUrl
     };
 
-    Components.closeModal(modal);
+    document.body.removeChild(modal);
     this.renderCurrentTab();
-    Utils.showNotification('Discord 연동이 완료되었습니다.', 'success');
+    Utils.showToast('Discord 연동이 완료되었습니다.', 'success');
   }
 
   openEmailConfigModal(service) {
@@ -1692,7 +2373,17 @@ class IntegrationsPage {
     const recipients = Utils.$('#emailRecipients').value;
 
     if (!smtpHost.trim() || !username.trim() || !password.trim() || !recipients.trim()) {
-      Utils.showNotification('모든 필드를 입력하세요.', 'warning');
+      Utils.showToast('모든 필드를 입력하세요.', 'warning');
+      return;
+    }
+
+    // 이메일 유효성 검사
+    const emailList = recipients.split(',').map(email => email.trim()).filter(email => email);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const invalidEmails = emailList.filter(email => !emailRegex.test(email));
+    
+    if (invalidEmails.length > 0) {
+      Utils.showToast(`유효하지 않은 이메일: ${invalidEmails.join(', ')}`, 'warning');
       return;
     }
 
@@ -1702,12 +2393,12 @@ class IntegrationsPage {
       smtp_port: parseInt(smtpPort) || 587,
       username: username,
       password: password,
-      recipients: recipients.split(',').map(email => email.trim()).filter(email => email)
+      recipients: emailList
     };
 
-    Components.closeModal(modal);
+    document.body.removeChild(modal);
     this.renderCurrentTab();
-    Utils.showNotification('이메일 알림 설정이 완료되었습니다.', 'success');
+    Utils.showToast('이메일 알림 설정이 완료되었습니다.', 'success');
   }
 
   configureService(serviceId) {
@@ -1734,7 +2425,7 @@ class IntegrationsPage {
       service.status = 'disconnected';
       service.config = null;
       this.renderCurrentTab();
-      Utils.showNotification(`${service.name} 연동이 해제되었습니다.`, 'success');
+      Utils.showToast(`${service.name} 연동이 해제되었습니다.`, 'success');
     }
   }
 
@@ -1810,10 +2501,10 @@ class IntegrationsPage {
         document.body.removeChild(link);
       }
 
-      Utils.showNotification('연동 데이터가 CSV 파일로 내보내졌습니다.', 'success');
+      Utils.showToast('연동 데이터가 CSV 파일로 내보내졌습니다.', 'success');
     } catch (error) {
       console.error('CSV 내보내기 실패:', error);
-      Utils.showNotification('CSV 내보내기에 실패했습니다.', 'error');
+      Utils.showToast('CSV 내보내기에 실패했습니다.', 'error');
     }
   }
 }

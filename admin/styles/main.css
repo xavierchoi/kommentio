@@ -448,7 +448,8 @@ body {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
-  padding: var(--spacing-3);
+  padding: 14px var(--spacing-3); /* 높이를 44px+ 보장하도록 패딩 증가 */
+  min-height: 44px; /* 터치 타겟 최소 크기 보장 */
   border-radius: var(--radius-lg);
   color: var(--gray-600);
   text-decoration: none;
@@ -456,17 +457,31 @@ body {
   font-weight: 500;
   transition: all 0.2s ease;
   cursor: pointer;
+  /* 터치 피드백 개선 */
+  -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+  user-select: none;
+  position: relative;
+  box-sizing: border-box;
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.nav-link:focus {
   background: var(--gray-50);
   color: var(--gray-900);
+  transform: translateX(2px); /* 미세한 슬라이드 효과 */
 }
 
 .nav-link.active {
   background: var(--primary-50);
   color: var(--primary-700);
   border-right: 2px solid var(--primary-700);
+  font-weight: 600;
+}
+
+/* 터치 활성화 상태 */
+.nav-link:active {
+  transform: translateX(0);
+  background: var(--gray-100);
 }
 
 .nav-link i {
@@ -629,7 +644,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2);
-  padding: var(--spacing-2) var(--spacing-4);
+  padding: 12px var(--spacing-4); /* 44px+ 높이 보장 */
+  min-height: 44px; /* 터치 타겟 최소 크기 */
   border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-weight: 500;
@@ -637,6 +653,11 @@ body {
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  /* 터치 피드백 개선 */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  box-sizing: border-box;
+  position: relative;
 }
 
 .btn-primary {
@@ -644,8 +665,16 @@ body {
   color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-primary:focus {
   background: var(--primary-700);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
 }
 
 .btn-secondary {
@@ -653,8 +682,16 @@ body {
   color: var(--gray-700);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover,
+.btn-secondary:focus {
   background: var(--gray-200);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+  background: var(--gray-300);
 }
 
 .btn-success {
@@ -662,8 +699,16 @@ body {
   color: white;
 }
 
-.btn-success:hover {
+.btn-success:hover,
+.btn-success:focus {
   background: var(--success-600);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+}
+
+.btn-success:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.2);
 }
 
 .btn-danger {
@@ -671,29 +716,265 @@ body {
   color: white;
 }
 
-.btn-danger:hover {
+.btn-danger:hover,
+.btn-danger:focus {
   background: var(--danger-600);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.btn-danger:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
 }
 
 .btn-sm {
-  padding: var(--spacing-1) var(--spacing-3);
+  padding: 8px var(--spacing-3); /* 최소 36px 높이 보장 */
+  min-height: 36px; /* 작은 버튼도 터치 가능한 크기 */
   font-size: 0.75rem;
+}
+
+/* 태블릿/모바일에서 작은 버튼도 44px로 확장 */
+@media (max-width: 1024px) {
+  .btn-sm {
+    min-height: 44px;
+    padding: 10px var(--spacing-3);
+    font-size: 0.875rem; /* 가독성을 위해 폰트 크기도 증가 */
+  }
+  
+  /* 모든 클릭 가능한 요소에 터치 최적화 */
+  a, button, input, select, textarea, [role="button"], [tabindex="0"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  /* 링크와 버튼 터치 영역 확장 */
+  a:not(.btn), button:not(.btn) {
+    padding: 12px 16px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* 체크박스와 라디오 버튼 터치 영역 확장 */
+  input[type="checkbox"], input[type="radio"] {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    position: relative !important;
+  }
+  
+  input[type="checkbox"]::before, input[type="radio"]::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 44px !important;
+    height: 44px !important;
+    background: transparent !important;
+    border-radius: 50% !important;
+    z-index: -1 !important;
+  }
+  
+  /* 드롭다운 및 선택 요소 터치 최적화 */
+  select {
+    min-height: 52px !important;
+    padding: 14px 16px !important;
+    font-size: 16px !important; /* iOS 확대 방지 */
+    border-radius: 12px !important;
+  }
+  
+  /* 탭 버튼 터치 최적화 */
+  [role="tab"], .tab-button {
+    min-height: 48px !important;
+    padding: 12px 20px !important;
+    border-radius: 12px !important;
+    margin: 4px !important;
+  }
+  
+  /* 모달 내 요소들 터치 최적화 */
+  .modal button, .modal .btn {
+    min-height: 48px !important;
+    padding: 12px 24px !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+  }
+  
+  .modal input, .modal textarea, .modal select {
+    min-height: 48px !important;
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    border-radius: 12px !important;
+  }
+  
+  /* 테이블 행 터치 최적화 */
+  .table tr {
+    min-height: 56px !important;
+  }
+  
+  .table td, .table th {
+    padding: 16px 12px !important;
+    vertical-align: middle !important;
+  }
+  
+  /* 알림 토스트 터치 최적화 */
+  .notification {
+    min-height: 60px !important;
+    padding: 16px 20px !important;
+    font-size: 16px !important;
+    border-radius: 16px !important;
+  }
+  
+  /* 아코디언 및 접기/펼치기 요소 터치 최적화 */
+  .accordion-header, .collapsible-header {
+    min-height: 56px !important;
+    padding: 16px 20px !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .accordion-header:active, .collapsible-header:active {
+    transform: scale(0.98) !important;
+  }
+  
+  /* 접근성 개선: 포커스 표시 */
+  button:focus, input:focus, select:focus, textarea:focus, a:focus {
+    outline: 3px solid rgba(59, 130, 246, 0.5) !important;
+    outline-offset: 2px !important;
+  }
+  
+  /* 고대비 모드 지원 */
+  @media (prefers-contrast: high) {
+    button, .btn {
+      border: 2px solid !important;
+    }
+    
+    .nav-link {
+      border: 1px solid transparent !important;
+    }
+    
+    .nav-link.active {
+      border-color: var(--primary-700) !important;
+    }
+  }
+  
+  /* 애니메이션 비활성화 선호 사용자 지원 */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transform: none !important;
+    }
+    
+    .sidebar {
+      transition: none !important;
+    }
+    
+    .nav-link:hover {
+      transform: none !important;
+    }
+    
+    button:hover, .btn:hover {
+      transform: none !important;
+    }
+  }
+  
+  /* 다크 모드 선호 사용자 지원 */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --gray-50: #1f2937;
+      --gray-100: #374151;
+      --gray-200: #4b5563;
+      --gray-300: #6b7280;
+      --gray-900: #f9fafb;
+    }
+  }
+  
+  /* 세밀한 포인터 (마우스) vs 거친 포인터 (터치) 구분 */
+  @media (pointer: coarse) {
+    /* 터치 기기에서만 적용되는 스타일 */
+    .btn, button {
+      min-height: 48px !important;
+      padding: 14px 20px !important;
+    }
+    
+    .nav-link {
+      min-height: 48px !important;
+      padding: 16px var(--spacing-3) !important;
+    }
+  }
+  
+  @media (pointer: fine) {
+    /* 마우스 등 정밀한 포인터에서만 적용 */
+    .btn:hover, button:hover {
+      transform: translateY(-1px) !important;
+    }
+  }
+  
+  /* 성능 최적화: GPU 가속 활성화 */
+  .sidebar, .main-content, .modal {
+    will-change: transform !important;
+    transform: translateZ(0) !important;
+  }
+  
+  /* 터치 스크롤 최적화 */
+  .page-content, .modal-body, .table-container {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  /* iOS Safari 상태바 및 노치 대응 */
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .header {
+      padding-top: calc(20px + env(safe-area-inset-top)) !important;
+    }
+    
+    .sidebar {
+      padding-top: env(safe-area-inset-top) !important;
+    }
+    
+    .page-content {
+      padding-bottom: calc(var(--spacing-6) + env(safe-area-inset-bottom)) !important;
+    }
+  }
 }
 
 /* Input */
 .input {
   width: 100%;
-  padding: var(--spacing-3);
-  border: 1px solid var(--gray-300);
+  padding: 12px var(--spacing-3); /* 44px+ 높이 보장 */
+  min-height: 44px; /* 터치 타겟 최소 크기 */
+  border: 2px solid var(--gray-300); /* 더 굵은 테두리로 터치 피드백 개선 */
   border-radius: var(--radius-md);
   font-size: 0.875rem;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  background: white;
+  /* 터치 기기에서 확대 방지 */
+  font-size: 16px; /* iOS에서 자동 확대 방지 */
 }
 
 .input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-50);
+  box-shadow: 0 0 0 3px var(--primary-50), 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px); /* 미세한 상승 효과 */
+}
+
+.input:hover {
+  border-color: var(--gray-400);
+}
+
+/* 모바일에서 폰트 크기 조정 */
+@media (max-width: 1024px) {
+  .input {
+    font-size: 16px; /* iOS Safari 자동 확대 방지 */
+    padding: 14px var(--spacing-3);
+  }
 }
 
 .input-group {
@@ -813,6 +1094,114 @@ body {
     font-size: 1.25rem !important;
   }
   
+  /* 테이블 터치 최적화 */
+  .table td {
+    padding: 16px !important; /* 터치하기 편한 패딩 */
+    min-height: 48px !important;
+  }
+  
+  .table button,
+  .table .btn {
+    min-height: 40px !important; /* 테이블 내 버튼 터치 최적화 */
+    padding: 8px 12px !important;
+  }
+  
+  /* 카드 터치 최적화 */
+  .card {
+    border-radius: 16px !important; /* 더 둥근 모서리 */
+    margin-bottom: 20px !important; /* 카드 간격 증가 */
+  }
+  
+  .stat-card {
+    border-radius: 16px !important;
+    padding: 20px !important; /* 더 넓은 패딩 */
+    margin-bottom: 16px !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .stat-card:active {
+    transform: scale(0.98) !important; /* 터치 피드백 */
+  }
+  
+  /* 테이블 가로 스크롤 개선 */
+  .table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important; /* iOS 스무스 스크롤 */
+    border-radius: 12px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .table {
+    min-width: 600px !important; /* 최소 너비 보장 */
+  }
+  
+  /* 페이지 컨텐츠 터치 스크롤 개선 */
+  .page-content {
+    -webkit-overflow-scrolling: touch !important; /* iOS 스무스 스크롤 */
+    overscroll-behavior-y: contain !important; /* 바운스 효과 제한 */
+  }
+  
+  /* 그리드 반응형 개선 */
+  .stats-grid {
+    grid-template-columns: 1fr !important; /* 태블릿에서 단일 컬럼 */
+    gap: 16px !important;
+  }
+  
+  /* 모달 터치 최적화 */
+  .modal {
+    margin: 20px !important;
+    border-radius: 20px !important;
+    max-height: calc(100vh - 40px) !important;
+  }
+  
+  .modal .modal-header {
+    padding: 24px !important;
+    min-height: 60px !important;
+  }
+  
+  .modal .modal-body {
+    padding: 24px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* 헤더에 모바일 토글 버튼 추가 */
+  .header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    position: relative !important;
+  }
+  
+  .header::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 16px !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/%3e%3c/svg%3e") no-repeat center !important;
+    background-size: 24px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    opacity: 0.7 !important;
+  }
+  
+  .header::before:hover {
+    background-color: var(--gray-100) !important;
+    opacity: 1 !important;
+  }
+  
+  .header::before:active {
+    transform: scale(0.95) !important;
+    background-color: var(--gray-200) !important;
+  }
+  
+  .page-title {
+    margin-left: 60px !important; /* 토글 버튼 공간 확보 */
+    flex: 1 !important;
+  }
+  
   /* 사이드바 토글 버튼 - 모바일/태블릿에서만 표시 */
   .sidebar-toggle-container {
     display: block !important;
@@ -826,7 +1215,8 @@ body {
     align-items: center !important;
     justify-content: center !important;
     width: 100% !important;
-    height: 2.5rem !important;
+    min-height: 44px !important; /* 터치 타겟 최소 크기 보장 */
+    height: 3rem !important; /* 48px로 증가 */
     padding: var(--spacing-3) !important;
     background: var(--gray-50) !important;
     border: 1px solid var(--gray-200) !important;
@@ -835,11 +1225,23 @@ body {
     font-size: 1rem !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
+    /* 터치 피드백 개선 */
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3) !important;
+    user-select: none !important;
   }
   
-  .sidebar-toggle-btn:hover {
+  .sidebar-toggle-btn:hover,
+  .sidebar-toggle-btn:focus {
     background: var(--gray-100) !important;
     color: var(--gray-900) !important;
+    transform: translateY(-1px) !important; /* 미세한 상승 효과 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* 터치 활성화 상태 */
+  .sidebar-toggle-btn:active {
+    transform: translateY(0) !important;
+    background: var(--gray-200) !important;
   }
   
   /* 사이드바 오버레이 모드 */
@@ -968,7 +1370,7 @@ body {
     filter: blur(1px) brightness(0.7) !important;
   }
   
-  /* 배경 오버레이 (펼친 상태에서만) */
+  /* 배경 오버레이 (펼친 상태에서만) - 클릭 가능한 닫기 영역 */
   .sidebar.expanded::before {
     content: '' !important;
     position: fixed !important;
@@ -976,10 +1378,147 @@ body {
     left: 16rem !important;
     right: 0 !important;
     bottom: 0 !important;
-    background: rgba(0, 0, 0, 0.2) !important;
-    z-index: -1 !important;
-    backdrop-filter: blur(2px) !important;
-    -webkit-backdrop-filter: blur(2px) !important;
+    background: rgba(0, 0, 0, 0.3) !important; /* 약간 더 진한 배경으로 클릭 영역 암시 */
+    z-index: 999 !important; /* 메인 컨텐츠보다 위에 위치하여 클릭 가능 */
+    backdrop-filter: blur(3px) !important;
+    -webkit-backdrop-filter: blur(3px) !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    /* 터치 최적화 */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+    touch-action: manipulation !important;
+  }
+  
+  /* 오버레이 호버/터치 피드백 */
+  .sidebar.expanded::before:hover {
+    background: rgba(0, 0, 0, 0.4) !important;
+  }
+  
+  /* 오버레이 활성화 피드백 */
+  .sidebar.expanded::before:active {
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+  
+  /* 동적 피드백 효과 (JavaScript에서 제어) */
+  .sidebar.expanded::before {
+    background: var(--overlay-feedback, rgba(0, 0, 0, 0.3)) !important;
+  }
+  
+  /* 클릭 리플 효과 애니메이션 */
+  @keyframes overlayClickRipple {
+    0% {
+      background: rgba(0, 0, 0, 0.6) !important;
+      transform: scale(1) !important;
+    }
+    100% {
+      background: rgba(0, 0, 0, 0.3) !important;
+      transform: scale(1.02) !important;
+    }
+  }
+  
+  .sidebar.expanded.click-feedback::before {
+    animation: overlayClickRipple 0.2s ease-out !important;
+  }
+  
+  /* 네비게이션 피드백 효과 */
+  .sidebar.navigation-feedback {
+    transform: translateX(-2px) !important;
+    transition: transform 0.2s ease-out !important;
+  }
+  
+  .sidebar.navigation-feedback .nav-link.active {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: white !important;
+    transform: scale(0.98) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+  }
+  
+  /* 네비게이션 클릭 시 즉각적인 시각적 피드백 */
+  @keyframes navigationSuccess {
+    0% {
+      background: var(--primary-50) !important;
+      transform: scale(1) !important;
+    }
+    50% {
+      background: var(--primary-100) !important;
+      transform: scale(1.02) !important;
+    }
+    100% {
+      background: var(--primary-50) !important;
+      transform: scale(1) !important;
+    }
+  }
+  
+  .nav-link.navigation-clicked {
+    animation: navigationSuccess 0.3s ease-out !important;
+  }
+  
+  /* 접근성: 클릭 영역임을 나타내는 시각적 힌트 */
+  .sidebar.expanded::before {
+    /* 포커스 시 더 명확한 시각적 표시 */
+    outline: 0 !important;
+  }
+  
+  /* 고대비 모드에서 오버레이 가시성 개선 */
+  @media (prefers-contrast: high) {
+    .sidebar.expanded::before {
+      background: rgba(0, 0, 0, 0.7) !important;
+      border: 2px solid rgba(255, 255, 255, 0.5) !important;
+    }
+  }
+  
+  /* 애니메이션 감소 모드에서 피드백 단순화 */
+  @media (prefers-reduced-motion: reduce) {
+    .sidebar.expanded.click-feedback::before {
+      animation: none !important;
+      background: rgba(0, 0, 0, 0.5) !important;
+      transition: background 0.1s ease !important;
+    }
+  }
+  
+  /* 터치 기기에서 더 명확한 시각적 피드백 */
+  @media (pointer: coarse) {
+    .sidebar.expanded::before {
+      background: rgba(0, 0, 0, 0.35) !important; /* 터치 기기에서 약간 더 진한 배경 */
+    }
+    
+    .sidebar.expanded::before:active {
+      background: rgba(0, 0, 0, 0.6) !important;
+    }
+  }
+  
+  /* 스와이프 제스처 지원을 위한 터치 영역 */
+  .sidebar::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: -20px !important;
+    width: 20px !important;
+    height: 100% !important;
+    background: transparent !important;
+    z-index: 1001 !important;
+    touch-action: pan-x !important;
+  }
+  
+  /* 메인 컨텐츠 스와이프 영역 */
+  .main-content::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 20px !important;
+    height: 100% !important;
+    background: transparent !important;
+    z-index: 1000 !important;
+    touch-action: pan-x !important;
+    pointer-events: none !important;
+  }
+  
+  .sidebar.collapsed ~ .main-content::before,
+  .sidebar.hidden ~ .main-content::before {
+    pointer-events: auto !important;
   }
 }
 

@@ -334,7 +334,260 @@ class AdminApp {
     // 초기 상태 설정
     updateSidebarState();
 
+    // 헤더 토글 버튼 추가 (모바일용)
+    this.setupHeaderToggle(() => {
+      if (!isMobile()) return;
+      const nextState = getNextState(currentState);
+      setSidebarState(nextState);
+    });
+
     console.log('사이드바 오버레이 토글 기능이 초기화되었습니다.');
+  }
+
+  setupHeaderToggle(toggleFunction) {
+    // 헤더에 클릭 이벤트 추가 (::before 가상 요소 클릭 감지)
+    const header = document.querySelector('.header');
+    if (!header) return;
+
+    header.addEventListener('click', (e) => {
+      // 헤더 왼쪽 60px 영역 클릭 시 토글
+      const rect = header.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      
+      if (clickX <= 60 && window.innerWidth <= 1024) {
+        toggleFunction();
+      }
+    });
+
+    // 터치 이벤트도 추가
+    header.addEventListener('touchstart', (e) => {
+      const rect = header.getBoundingClientRect();
+      const touch = e.touches[0];
+      const touchX = touch.clientX - rect.left;
+      
+      if (touchX <= 60 && window.innerWidth <= 1024) {
+        e.preventDefault(); // 기본 터치 동작 방지
+        toggleFunction();
+      }
+    });
+
+    // 스와이프 제스처 지원 추가
+    this.setupSwipeGestures(toggleFunction);
+    
+    // 오버레이 클릭으로 사이드바 닫기 기능 추가
+    this.setupOverlayClickClose(toggleFunction);
+  }
+
+  setupSwipeGestures(toggleFunction) {
+    const mainContent = document.querySelector('.main-content');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (!mainContent || !sidebar) return;
+
+    let startX = 0;
+    let startY = 0;
+    let isSwipeGesture = false;
+    let currentState = 'collapsed';
+
+    // 스와이프 시작
+    const handleTouchStart = (e) => {
+      if (window.innerWidth > 1024) return; // 데스크톱에서는 비활성화
+      
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+      isSwipeGesture = false;
+    };
+
+    // 스와이프 이동
+    const handleTouchMove = (e) => {
+      if (window.innerWidth > 1024) return;
+      if (!isSwipeGesture) return;
+      
+      e.preventDefault(); // 스크롤 방지
+    };
+
+    // 스와이프 종료
+    const handleTouchEnd = (e) => {
+      if (window.innerWidth > 1024) return;
+      
+      const touch = e.changedTouches[0];
+      const deltaX = touch.clientX - startX;
+      const deltaY = touch.clientY - startY;
+      
+      // 수평 스와이프인지 확인 (수직 움직임이 수평보다 작아야 함)
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+        const rect = mainContent.getBoundingClientRect();
+        const startArea = startX - rect.left;
+        
+        // 왼쪽 가장자리에서 오른쪽으로 스와이프: 사이드바 열기
+        if (startArea < 20 && deltaX > 80) {
+          const currentState = sidebar.classList.contains('expanded') ? 'expanded' : 
+                              sidebar.classList.contains('collapsed') ? 'collapsed' : 'hidden';
+          
+          if (currentState === 'collapsed' || currentState === 'hidden') {
+            toggleFunction(); // 사이드바 열기
+          }
+        }
+        
+        // 사이드바 영역에서 왼쪽으로 스와이프: 사이드바 닫기
+        if (startArea < 256 && deltaX < -80) {
+          const currentState = sidebar.classList.contains('expanded') ? 'expanded' : 
+                              sidebar.classList.contains('collapsed') ? 'collapsed' : 'hidden';
+          
+          if (currentState === 'expanded') {
+            toggleFunction(); // 사이드바 닫기
+          }
+        }
+      }
+      
+      isSwipeGesture = false;
+    };
+
+    // 스와이프 감지 개선
+    const handleTouchMoveImproved = (e) => {
+      if (window.innerWidth > 1024) return;
+      
+      const touch = e.touches[0];
+      const deltaX = Math.abs(touch.clientX - startX);
+      const deltaY = Math.abs(touch.clientY - startY);
+      
+      // 수평 움직임이 수직 움직임보다 크면 스와이프로 인식
+      if (deltaX > deltaY && deltaX > 10) {
+        isSwipeGesture = true;
+        e.preventDefault(); // 스크롤 방지
+      }
+    };
+
+    // 이벤트 리스너 등록
+    mainContent.addEventListener('touchstart', handleTouchStart, { passive: false });
+    mainContent.addEventListener('touchmove', handleTouchMoveImproved, { passive: false });
+    mainContent.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    sidebar.addEventListener('touchstart', handleTouchStart, { passive: false });
+    sidebar.addEventListener('touchmove', handleTouchMoveImproved, { passive: false });
+    sidebar.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    console.log('스와이프 제스처 기능이 초기화되었습니다.');
+  }
+
+  setupOverlayClickClose(toggleFunction) {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // 클릭과 스와이프를 구분하기 위한 변수들
+    let isClick = false;
+    let startTime = 0;
+    let startX = 0;
+    let startY = 0;
+
+    // 터치/클릭 시작 감지
+    const handleStart = (e) => {
+      if (window.innerWidth > 1024) return; // 데스크톱에서는 비활성화
+      
+      const currentState = sidebar.classList.contains('expanded');
+      if (!currentState) return; // 사이드바가 펼쳐져 있을 때만 작동
+
+      // 이벤트 타입에 따른 좌표 추출
+      const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+      const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+
+      // 사이드바 영역 클릭인지 확인 (사이드바 내부 클릭은 무시)
+      const sidebarRect = sidebar.getBoundingClientRect();
+      if (clientX < sidebarRect.right) {
+        return; // 사이드바 내부 클릭이므로 무시
+      }
+
+      isClick = true;
+      startTime = Date.now();
+      startX = clientX;
+      startY = clientY;
+    };
+
+    // 터치/클릭 이동 감지
+    const handleMove = (e) => {
+      if (!isClick) return;
+
+      const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+      const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+      const deltaX = Math.abs(clientX - startX);
+      const deltaY = Math.abs(clientY - startY);
+
+      // 이동 거리가 5px을 초과하면 클릭이 아닌 것으로 판단
+      if (deltaX > 5 || deltaY > 5) {
+        isClick = false;
+      }
+    };
+
+    // 터치/클릭 종료 감지
+    const handleEnd = (e) => {
+      if (!isClick) {
+        isClick = false;
+        return;
+      }
+
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+
+      // 클릭 조건: 500ms 이내, 5px 이내 이동
+      if (duration < 500 && isClick) {
+        const currentState = sidebar.classList.contains('expanded');
+        
+        if (currentState) {
+          console.log('오버레이 클릭 감지: 사이드바 닫기 실행');
+          
+          // 사이드바가 펼쳐진 상태에서만 닫기
+          toggleFunction();
+          
+          // 클릭 피드백 제공
+          this.showOverlayClickFeedback();
+        }
+      }
+
+      isClick = false;
+    };
+
+    // 마우스 이벤트 (데스크톱)
+    document.addEventListener('mousedown', handleStart);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+
+    // 터치 이벤트 (모바일/태블릿)
+    document.addEventListener('touchstart', handleStart, { passive: false });
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('touchend', handleEnd, { passive: false });
+
+    // ESC 키로 사이드바 닫기 (접근성)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && window.innerWidth <= 1024) {
+        const currentState = sidebar.classList.contains('expanded');
+        if (currentState) {
+          toggleFunction();
+        }
+      }
+    });
+
+    console.log('오버레이 클릭으로 사이드바 닫기 기능이 초기화되었습니다.');
+  }
+
+  showOverlayClickFeedback() {
+    // 시각적 피드백을 위한 리플 효과
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar && sidebar.classList.contains('expanded')) {
+      // 클릭 피드백 클래스 추가
+      sidebar.classList.add('click-feedback');
+      
+      // 짧은 진동 효과 (지원하는 기기에서만)
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+      
+      // 피드백 클래스 제거
+      setTimeout(() => {
+        sidebar.classList.remove('click-feedback');
+      }, 200);
+    }
   }
 }
 
