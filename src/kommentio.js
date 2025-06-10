@@ -16,16 +16,80 @@ class Kommentio {
       supabaseKey: null,
       claudeApiKey: null, // 사용자가 제공하는 스팸 필터링용
       
-      // 소셜 로그인 프로바이더 설정
+      // 소셜 로그인 프로바이더 설정 (SVG 아이콘 기반)
       socialProviders: {
-        google: { enabled: true, label: 'Google', color: '#4285f4', icon: '🔍' },
-        github: { enabled: true, label: 'GitHub', color: '#333', icon: '🐙' },
-        facebook: { enabled: true, label: 'Facebook', color: '#1877f2', icon: '📘' },
-        twitter: { enabled: true, label: 'X.com', color: '#000', icon: '🐦' },
-        apple: { enabled: false, label: 'Apple', color: '#000', icon: '🍎' },
-        linkedin: { enabled: false, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
-        kakao: { enabled: true, label: '카카오톡', color: '#fee500', icon: '💬' },
-        line: { enabled: true, label: 'LINE', color: '#00b900', icon: '💚' }
+        google: { 
+          enabled: true, 
+          label: 'Google', 
+          color: '#ffffff', 
+          borderColor: '#dadce0',
+          iconColor: '#4285f4',
+          textColor: '#3c4043',
+          hoverColor: '#f8f9fa'
+        },
+        github: { 
+          enabled: true, 
+          label: 'GitHub', 
+          color: '#24292f', 
+          borderColor: '#24292f',
+          iconColor: '#ffffff',
+          textColor: '#ffffff',
+          hoverColor: '#32383f'
+        },
+        facebook: { 
+          enabled: true, 
+          label: 'Facebook', 
+          color: '#1877f2', 
+          borderColor: '#1877f2',
+          iconColor: '#ffffff',
+          textColor: '#ffffff',
+          hoverColor: '#166fe5'
+        },
+        twitter: { 
+          enabled: true, 
+          label: 'X.com', 
+          color: '#000000', 
+          borderColor: '#000000',
+          iconColor: '#ffffff',
+          textColor: '#ffffff',
+          hoverColor: '#272c30'
+        },
+        apple: { 
+          enabled: false, 
+          label: 'Apple', 
+          color: '#000000', 
+          borderColor: '#000000',
+          iconColor: '#ffffff',
+          textColor: '#ffffff',
+          hoverColor: '#1d1d1f'
+        },
+        linkedin: { 
+          enabled: false, 
+          label: 'LinkedIn', 
+          color: '#0a66c2', 
+          borderColor: '#0a66c2',
+          iconColor: '#ffffff',
+          textColor: '#ffffff',
+          hoverColor: '#004182'
+        },
+        kakao: { 
+          enabled: true, 
+          label: '카카오톡', 
+          color: '#fee500', 
+          borderColor: '#fee500',
+          iconColor: '#000000',
+          textColor: '#000000',
+          hoverColor: '#fdd835'
+        },
+        line: { 
+          enabled: true, 
+          label: 'LINE', 
+          color: '#00b900', 
+          borderColor: '#00b900',
+          iconColor: '#ffffff',
+          textColor: '#ffffff',
+          hoverColor: '#009900'
+        }
       },
       
       ...options
@@ -54,6 +118,84 @@ class Kommentio {
     } catch (error) {
       console.error('Kommentio initialization failed:', error);
     }
+  }
+
+  /**
+   * 소셜 프로바이더 SVG 아이콘 생성
+   */
+  getSocialProviderIcon(provider, size = 20) {
+    const icons = {
+      google: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>`,
+      github: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.1 8.1 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>`,
+      facebook: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/></svg>`,
+      twitter: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>`,
+      apple: `<svg width="100%" height="100%" viewBox="0 0 56 56" fill="none" style="border-radius: 50%; overflow: hidden;">
+        <defs>
+          <style>
+            .apple-bg-light { fill: #ffffff; }
+            .apple-logo-light { fill: #000000; }
+            .apple-bg-dark { fill: #000000; }
+            .apple-logo-dark { fill: #ffffff; }
+            
+            /* 라이트 모드 기본 - 검은 배경에 흰 로고 표시 (바뀜) */
+            .apple-bg-light { display: none; }
+            .apple-logo-light { display: none; }
+            .apple-bg-dark { display: block; }
+            .apple-logo-dark { display: block; }
+            
+            /* 다크 모드 시 - 흰 배경에 검은 로고 표시 (바뀜) */
+            @media (prefers-color-scheme: dark) {
+              .apple-bg-light { display: block; }
+              .apple-logo-light { display: block; }
+              .apple-bg-dark { display: none; }
+              .apple-logo-dark { display: none; }
+            }
+            
+            /* Kommentio 위젯 다크테마 대응 (바뀜) */
+            .kommentio-widget[data-theme="dark"] .apple-bg-light { display: block; }
+            .kommentio-widget[data-theme="dark"] .apple-logo-light { display: block; }
+            .kommentio-widget[data-theme="dark"] .apple-bg-dark { display: none; }
+            .kommentio-widget[data-theme="dark"] .apple-logo-dark { display: none; }
+            
+            .kommentio-widget[data-theme="light"] .apple-bg-light { display: none; }
+            .kommentio-widget[data-theme="light"] .apple-logo-light { display: none; }
+            .kommentio-widget[data-theme="light"] .apple-bg-dark { display: block; }
+            .kommentio-widget[data-theme="light"] .apple-logo-dark { display: block; }
+          </style>
+          <!-- 원형 마스크 정의 -->
+          <mask id="apple-circle-mask">
+            <circle cx="28" cy="28" r="28" fill="white"/>
+          </mask>
+        </defs>
+        <!-- 원형 마스크 적용된 그룹 -->
+        <g mask="url(#apple-circle-mask)">
+          <!-- 라이트 모드용 (흰 배경 + 검은 로고) -->
+          <rect class="apple-bg-light" x="0" y="0" width="56" height="56"/>
+          <g class="apple-logo-light" transform="translate(28, 28) scale(1.2) translate(-28, -28)">
+            <path d="M28.2226562,20.3846154 C29.0546875,20.3846154 30.0976562,19.8048315 30.71875,19.0317864 C31.28125,18.3312142 31.6914062,17.352829 31.6914062,16.3744437 C31.6914062,16.2415766 31.6796875,16.1087095 31.65625,16 C30.7304687,16.0362365 29.6171875,16.640178 28.9492187,17.4494596 C28.421875,18.06548 27.9414062,19.0317864 27.9414062,20.0222505 C27.9414062,20.1671964 27.9648438,20.3121424 27.9765625,20.3604577 C28.0351562,20.3725366 28.1289062,20.3846154 28.2226562,20.3846154 Z M25.2929688,35 C26.4296875,35 26.9335938,34.214876 28.3515625,34.214876 C29.7929688,34.214876 30.109375,34.9758423 31.375,34.9758423 C32.6171875,34.9758423 33.4492188,33.792117 34.234375,32.6325493 C35.1132812,31.3038779 35.4765625,29.9993643 35.5,29.9389701 C35.4179688,29.9148125 33.0390625,28.9122695 33.0390625,26.0979021 C33.0390625,23.6579784 34.9140625,22.5588048 35.0195312,22.474253 C33.7773438,20.6382708 31.890625,20.5899555 31.375,20.5899555 C29.9804688,20.5899555 28.84375,21.4596313 28.1289062,21.4596313 C27.3554688,21.4596313 26.3359375,20.6382708 25.1289062,20.6382708 C22.8320312,20.6382708 20.5,22.5950413 20.5,26.2911634 C20.5,28.5861411 21.3671875,31.013986 22.4335938,32.5842339 C23.3476562,33.9129053 24.1445312,35 25.2929688,35 Z"/>
+          </g>
+          <!-- 다크 모드용 (검은 배경 + 흰 로고) -->
+          <rect class="apple-bg-dark" x="0" y="0" width="56" height="56"/>
+          <g class="apple-logo-dark" transform="translate(28, 28) scale(1.2) translate(-28, -28)">
+            <path d="M28.2226562,20.3846154 C29.0546875,20.3846154 30.0976562,19.8048315 30.71875,19.0317864 C31.28125,18.3312142 31.6914062,17.352829 31.6914062,16.3744437 C31.6914062,16.2415766 31.6796875,16.1087095 31.65625,16 C30.7304687,16.0362365 29.6171875,16.640178 28.9492187,17.4494596 C28.421875,18.06548 27.9414062,19.0317864 27.9414062,20.0222505 C27.9414062,20.1671964 27.9648438,20.3121424 27.9765625,20.3604577 C28.0351562,20.3725366 28.1289062,20.3846154 28.2226562,20.3846154 Z M25.2929688,35 C26.4296875,35 26.9335938,34.214876 28.3515625,34.214876 C29.7929688,34.214876 30.109375,34.9758423 31.375,34.9758423 C32.6171875,34.9758423 33.4492188,33.792117 34.234375,32.6325493 C35.1132812,31.3038779 35.4765625,29.9993643 35.5,29.9389701 C35.4179688,29.9148125 33.0390625,28.9122695 33.0390625,26.0979021 C33.0390625,23.6579784 34.9140625,22.5588048 35.0195312,22.474253 C33.7773438,20.6382708 31.890625,20.5899555 31.375,20.5899555 C29.9804688,20.5899555 28.84375,21.4596313 28.1289062,21.4596313 C27.3554688,21.4596313 26.3359375,20.6382708 25.1289062,20.6382708 C22.8320312,20.6382708 20.5,22.5950413 20.5,26.2911634 C20.5,28.5861411 21.3671875,31.013986 22.4335938,32.5842339 C23.3476562,33.9129053 24.1445312,35 25.2929688,35 Z"/>
+          </g>
+        </g>
+      </svg>`,
+      linkedin: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></svg>`,
+      kakao: `<svg width="${size}" height="${size}" viewBox="0 0 512 512" fill="none" style="transform: scale(2.3);"><path fill="#FFEB3B" d="M289 513C268 513 247 513 226 513C224 512 224 512 223 511C209 508 195 506 182 502C164 497 147 490 131 481C115 472 100 461 87 449C75 437 63 425 53 412C37 392 25 369 16 345C10 328 5 310 3 291C3 290 2 290 1 289C1 268 1 246 1 225C2 224 3 223 3 223C4 217 5 210 6 204C11 177 21 151 35 127C50 102 69 81 91 62C105 50 120 39 136 31C163 16 192 6 223 3C224 3 224 2 225 1C246 1 267 1 288 1C289 2 290 3 291 3C298 4 306 5 313 6C337 12 361 21 383 33C399 42 414 52 427 65C438 75 447 85 457 97C471 113 482 131 491 151C501 174 508 198 511 223C511 224 512 224 513 225C513 246 513 267 513 288C512 289 511 290 511 290C510 297 509 303 508 310C503 337 493 363 479 387C464 412 445 433 423 452C409 464 394 475 378 484C350 498 322 508 291 511C290 511 290 512 289 513ZM412 219C401 188 380 166 353 150C311 126 266 120 219 129C182 135 150 151 125 179C102 205 92 235 99 270C105 299 121 321 143 338C152 345 162 351 172 357C168 371 163 385 159 400C157 404 156 409 156 413C155 418 158 419 162 418C166 416 170 414 173 412C190 400 207 388 224 377C227 375 231 374 233 374C254 376 274 376 295 372C329 365 360 351 384 326C413 296 424 261 412 219Z"/><path fill="#3F2823" d="M412 219C424 261 413 296 384 326C360 351 329 365 295 372C274 376 254 376 233 374C231 374 227 375 224 377C207 388 190 400 173 412C170 414 166 416 162 418C158 419 155 418 156 413C156 409 157 404 159 400C163 385 168 371 172 357C162 351 152 345 143 338C121 321 105 299 99 270C92 235 102 205 125 179C150 151 182 135 219 129C266 120 311 126 353 150C380 166 401 188 412 219ZM374 284C373 281 372 279 371 277C364 267 357 258 350 249C357 242 363 236 370 229C374 225 374 221 370 217C367 213 362 213 358 217C352 223 346 229 340 235C338 237 336 239 333 242C333 234 333 228 333 222C332 215 328 212 323 213C317 213 314 218 314 224C314 238 314 252 314 266C314 272 314 279 315 285C316 292 319 294 324 294C329 293 333 290 333 284C333 278 333 273 333 267C333 265 335 264 336 261C343 271 350 280 357 289C359 292 362 295 367 293C371 292 374 289 374 284ZM246 250C242 241 239 232 236 223C233 216 229 213 223 213C217 213 213 216 210 223C205 238 199 252 193 267C191 272 189 277 188 283C187 289 188 292 194 294C199 295 203 294 205 288C206 286 207 284 208 281C208 279 210 278 213 278C220 278 227 278 234 278C237 278 238 279 239 282C240 284 241 288 242 290C245 294 249 295 254 293C258 292 259 288 258 284C258 281 257 278 256 276C253 267 249 259 246 250ZM177 246C177 241 177 236 177 231C180 231 183 231 185 231C187 231 189 231 192 231C198 230 201 227 201 221C201 216 198 213 192 213C176 213 160 213 144 213C139 213 137 216 136 221C135 227 139 230 146 231C150 231 155 231 159 231C159 235 160 238 160 241C160 254 159 266 159 278C159 281 159 284 160 287C161 292 164 294 168 294C173 294 176 292 177 287C178 284 178 281 178 278C178 267 177 257 177 246ZM266 290C268 291 270 292 272 292C281 293 289 293 298 293C301 293 303 292 305 292C309 291 311 288 311 284C311 281 309 278 306 277C302 276 299 276 296 276C291 275 287 276 283 276C283 273 283 271 283 269C283 254 283 238 282 222C282 216 279 213 273 213C267 213 264 216 264 223C264 241 263 259 263 277C263 281 265 286 266 290Z"/><path fill="#FCE83B" d="M374 284C374 289 371 292 367 293C362 295 359 292 357 289C350 280 343 271 336 261C335 264 333 265 333 267C333 273 333 278 333 284C333 290 329 293 324 294C319 294 316 292 315 285C314 279 314 272 314 266C314 252 314 238 314 224C314 218 317 213 323 213C328 212 332 215 333 222C333 228 333 234 333 242C336 239 338 237 340 235C346 229 352 223 358 217C362 213 367 213 370 217C374 221 374 225 370 229C363 236 357 242 350 249C357 258 364 267 371 277C372 279 373 281 374 284Z"/><path fill="#FDE93B" d="M246 250C249 259 253 267 256 276C257 278 258 281 258 284C259 288 258 292 254 293C249 295 245 294 242 290C241 288 240 284 239 282C238 279 237 278 234 278C227 278 220 278 213 278C210 278 208 279 208 281C207 284 206 286 205 288C203 294 199 295 194 294C188 292 187 289 188 283C189 277 191 272 193 267C199 252 205 238 210 223C213 216 217 213 223 213C229 213 233 216 236 223C239 232 242 241 246 250ZM217 253C216 256 215 259 214 261C220 261 226 261 232 261C229 253 226 245 223 236C221 242 219 247 217 253Z"/><path fill="#FCE83B" d="M177 246C178 257 178 267 178 278C178 281 178 284 177 287C176 292 173 294 168 294C164 294 161 292 160 287C159 284 159 281 159 278C159 266 160 254 160 241C160 238 159 235 159 231C155 231 150 231 146 231C139 230 135 227 136 221C137 216 139 213 144 213C160 213 176 213 192 213C198 213 201 216 201 221C201 227 198 230 192 231C189 231 187 231 185 231C183 231 180 231 177 231C177 236 177 241 177 246Z"/><path fill="#FAE63A" d="M266 290C265 286 263 281 263 277C263 259 264 241 264 223C264 216 267 213 273 213C279 213 282 216 282 222C283 238 283 254 283 269C283 271 283 273 283 276C287 276 291 275 296 276C299 276 302 276 306 277C309 278 311 281 311 284C311 288 309 291 305 292C303 292 301 293 298 293C289 293 281 293 272 292C270 292 268 291 266 290Z"/><path fill="#483124" d="M217 253C219 247 221 242 223 236C226 245 229 253 232 261C226 261 220 261 214 261C215 259 216 256 217 253Z"/></svg>`,
+      line: `<svg width="100%" height="100%" viewBox="0 0 320 320" fill="none">
+        <circle fill="#4cc764" cx="160" cy="160" r="160"/>
+        <path fill="#fff" d="M266.7,150.68c0-47.8-47.92-86.68-106.81-86.68s-106.81,38.89-106.81,86.68c0,42.85,38,78.73,89.33,85.52,3.48.75,8.21,2.29,9.41,5.27,1.08,2.7.7,6.93.35,9.66,0,0-1.25,7.54-1.52,9.14-.47,2.7-2.15,10.56,9.25,5.76,11.4-4.8,61.51-36.22,83.92-62.01h0c15.48-16.98,22.9-34.2,22.9-53.33Z"/>
+        <g>
+          <path fill="#4cc764" d="M231.17,178.28c1.13,0,2.04-.91,2.04-2.04v-7.58c0-1.12-.92-2.04-2.04-2.04h-20.39v-7.87h20.39c1.13,0,2.04-.91,2.04-2.04v-7.57c0-1.12-.92-2.04-2.04-2.04h-20.39v-7.87h20.39c1.13,0,2.04-.91,2.04-2.04v-7.57c0-1.12-.92-2.04-2.04-2.04h-30.01c-1.13,0-2.04.91-2.04,2.04v.04h0v46.54h0v.04c0,1.13.91,2.04,2.04,2.04h30.01Z"/>
+          <path fill="#4cc764" d="M120.17,178.28c1.13,0,2.04-.91,2.04-2.04v-7.58c0-1.12-.92-2.04-2.04-2.04h-20.39v-37c0-1.12-.92-2.04-2.04-2.04h-7.58c-1.13,0-2.04.91-2.04,2.04v46.58h0v.04c0,1.13.91,2.04,2.04,2.04h30.01Z"/>
+          <rect fill="#4cc764" x="128.62" y="127.58" width="11.65" height="50.69" rx="2.04" ry="2.04"/>
+          <path fill="#4cc764" d="M189.8,127.58h-7.58c-1.13,0-2.04.91-2.04,2.04v27.69l-21.33-28.8c-.05-.07-.11-.14-.16-.21,0,0,0,0-.01-.01-.04-.04-.08-.09-.12-.13-.01-.01-.03-.02-.04-.03-.04-.03-.07-.06-.11-.09-.02-.01-.04-.03-.06-.04-.03-.03-.07-.05-.11-.07-.02-.01-.04-.03-.06-.04-.04-.02-.07-.04-.11-.06-.02-.01-.04-.02-.06-.03-.04-.02-.08-.04-.12-.05-.02,0-.04-.02-.07-.02-.04-.01-.08-.03-.12-.04-.02,0-.05-.01-.07-.02-.04,0-.08-.02-.12-.03-.03,0-.06,0-.09-.01-.04,0-.07-.01-.11-.01-.04,0-.07,0-.11,0-.02,0-.05,0-.07,0h-7.53c-1.13,0-2.04.91-2.04,2.04v46.62c0,1.13.91,2.04,2.04,2.04h7.58c1.13,0,2.04-.91,2.04-2.04v-27.68l21.35,28.84c.15.21.33.38.53.51,0,0,.02.01.02.02.04.03.08.05.13.08.02.01.04.02.06.03.03.02.07.03.1.05.03.02.07.03.1.04.02,0,.04.02.06.02.05.02.09.03.14.04,0,0,.02,0,.03,0,.17.04.35.07.53.07h7.53c1.13,0,2.04-.91,2.04-2.04v-46.62c0-1.13-.91-2.04-2.04-2.04Z"/>
+        </g>
+      </svg>`
+    };
+    
+    return icons[provider] || '';
   }
 
   /**
@@ -199,11 +341,14 @@ class Kommentio {
         align-items: center;
       }
 
+      /* 🎨 새로운 원형 소셜 로그인 시스템 */
       .kommentio-social-login {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
+        gap: 12px;
+        margin-bottom: 1rem;
+        max-width: 400px;
+        justify-content: center;
       }
 
       .kommentio-btn {
@@ -227,51 +372,143 @@ class Kommentio {
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
 
+      .kommentio-btn:focus {
+        outline: 2px solid var(--kommentio-primary);
+        outline-offset: 2px;
+      }
+
       .kommentio-btn-primary {
         background: var(--kommentio-primary);
         color: white;
         border-color: var(--kommentio-primary);
       }
 
-      /* 소셜 로그인 버튼 스타일 */
+      /* 🔥 프리미엄 원형 소셜 로그인 버튼 */
       .kommentio-btn-social {
-        border: none;
-        color: white;
-        font-weight: 500;
-        padding: 0.625rem 1rem;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 1px solid;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        min-width: 48px;
+        min-height: 48px;
+        overflow: hidden;
       }
 
+      /* Apple 아이콘은 전체 크기 + 원형 마스크 (Apple 가이드라인 준수) */
+      .kommentio-btn-apple svg {
+        /* 스케일링 제거 - Apple 로고가 이제 100% 크기로 원형 마스크 적용됨 */
+      }
+
+      .kommentio-btn-social:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .kommentio-btn-social:active {
+        transform: translateY(0) scale(0.98);
+        transition: transform 0.1s ease;
+      }
+
+      .kommentio-btn-social:focus {
+        outline: 3px solid var(--kommentio-primary);
+        outline-offset: 2px;
+      }
+
+      /* Google 브랜딩 가이드라인 준수 */
       .kommentio-btn-google {
-        background: #4285f4;
+        background: #ffffff;
+        border-color: #dadce0;
+        color: #3c4043;
+      }
+
+      .kommentio-btn-google:hover {
+        background: #f8f9fa;
+        border-color: #dadce0;
+        box-shadow: 0 8px 25px rgba(60, 64, 67, 0.15);
       }
 
       .kommentio-btn-github {
-        background: #333;
+        background: #24292f;
+        border-color: #24292f;
+        color: #ffffff;
+      }
+
+      .kommentio-btn-github:hover {
+        background: #32383f;
+        border-color: #32383f;
       }
 
       .kommentio-btn-facebook {
         background: #1877f2;
+        border-color: #1877f2;
+        color: #ffffff;
+      }
+
+      .kommentio-btn-facebook:hover {
+        background: #166fe5;
+        border-color: #166fe5;
       }
 
       .kommentio-btn-twitter {
-        background: #000;
+        background: #000000;
+        border-color: #000000;
+        color: #ffffff;
+      }
+
+      .kommentio-btn-twitter:hover {
+        background: #272c30;
+        border-color: #272c30;
       }
 
       .kommentio-btn-apple {
-        background: #000;
+        background: #000000;
+        border: none;
+        color: #ffffff;
+      }
+
+      .kommentio-btn-apple:hover {
+        background: #1d1d1f;
+        border: none;
       }
 
       .kommentio-btn-linkedin {
-        background: #0077b5;
+        background: #0a66c2;
+        border-color: #0a66c2;
+        color: #ffffff;
+      }
+
+      .kommentio-btn-linkedin:hover {
+        background: #004182;
+        border-color: #004182;
       }
 
       .kommentio-btn-kakao {
         background: #fee500;
-        color: #000;
+        border: none;
+        color: #000000;
+      }
+
+      .kommentio-btn-kakao:hover {
+        background: #fdd835;
+        border: none;
       }
 
       .kommentio-btn-line {
         background: #00b900;
+        border: none;
+        color: #ffffff;
+      }
+
+      .kommentio-btn-line:hover {
+        background: #009900;
+        border: none;
       }
 
       .kommentio-user-info {
@@ -384,17 +621,24 @@ class Kommentio {
           align-items: stretch;
         }
         
+        /* 태블릿에서 소셜 로그인 최적화 */
         .kommentio-social-login {
+          grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+          gap: 16px;
           justify-content: center;
-          gap: 0.75rem;
+          max-width: 450px;
         }
         
         .kommentio-btn-social {
-          min-height: 44px;
-          min-width: 44px;
-          padding: 12px 16px;
-          flex: 1;
-          max-width: 200px;
+          width: 56px;
+          height: 56px;
+          min-width: 56px;
+          min-height: 56px;
+        }
+        
+        /* 태블릿에서 Apple 아이콘 (원형 마스크 적용으로 스케일링 불필요) */
+        .kommentio-btn-apple svg {
+          /* 스케일링 제거 - 100% 크기 + 원형 마스크로 처리 */
         }
         
         .kommentio-textarea {
@@ -471,15 +715,26 @@ class Kommentio {
           margin: 0.25rem;
         }
         
+        /* 모바일에서 소셜 로그인 2열 그리드 */
         .kommentio-social-login {
-          flex-direction: column;
-          gap: 0.5rem;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+          justify-content: center;
+          max-width: 300px;
+          margin: 0 auto 1rem auto;
         }
         
         .kommentio-btn-social {
-          width: 100%;
-          justify-content: center;
-          max-width: none;
+          width: 56px;
+          height: 56px;
+          min-width: 56px;
+          min-height: 56px;
+          justify-self: center;
+        }
+        
+        /* 모바일에서 Apple 아이콘 (원형 마스크 적용으로 스케일링 불필요) */
+        .kommentio-btn-apple svg {
+          /* 스케일링 제거 - 100% 크기 + 원형 마스크로 처리 */
         }
         
         .kommentio-comment {
@@ -550,6 +805,17 @@ class Kommentio {
         
         .kommentio-btn:active {
           transform: scale(0.98);
+          transition: transform 0.1s ease;
+        }
+        
+        /* 소셜 버튼 터치 최적화 */
+        .kommentio-btn-social:hover {
+          transform: none;
+          box-shadow: none;
+        }
+        
+        .kommentio-btn-social:active {
+          transform: scale(0.95);
           transition: transform 0.1s ease;
         }
         
@@ -627,15 +893,17 @@ class Kommentio {
       return '<p class="kommentio-text-secondary">로그인 옵션이 설정되지 않았습니다.</p>';
     }
 
-    const socialButtons = enabledProviders.map(([provider, config]) => {
+    const socialButtons = enabledProviders.map(([provider, config], index) => {
       return `
         <button 
           class="kommentio-btn kommentio-btn-social kommentio-btn-${provider}" 
           onclick="kommentio.login('${provider}')"
           title="${config.label}로 로그인"
+          aria-label="${config.label}로 로그인"
+          tabindex="${index === 0 ? '0' : '-1'}"
+          role="button"
         >
-          <span>${config.icon}</span>
-          <span>${config.label}</span>
+          ${this.getSocialProviderIcon(provider, 24)}
         </button>
       `;
     }).join('');
@@ -885,6 +1153,25 @@ class Kommentio {
    * 이벤트 리스너 등록
    */
   attachEventListeners() {
+    // 키보드 네비게이션 지원
+    this.container.addEventListener('keydown', (e) => {
+      // Tab 키로 소셜 로그인 버튼 간 이동
+      if (e.key === 'Tab') {
+        this.handleTabNavigation(e);
+      }
+      
+      // Enter 키 또는 Space 키로 버튼 활성화
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('kommentio-btn-social')) {
+        e.preventDefault();
+        e.target.click();
+      }
+      
+      // Escape 키로 포커스 제거
+      if (e.key === 'Escape') {
+        e.target.blur();
+      }
+    });
+
     if (this.mockMode) {
       // Mock 모드에서는 실시간 업데이트 시뮬레이션
       this.simulateRealtimeUpdates();
@@ -905,6 +1192,30 @@ class Kommentio {
           }
         )
         .subscribe();
+    }
+  }
+
+  /**
+   * Tab 키 네비게이션 처리
+   */
+  handleTabNavigation(e) {
+    const socialButtons = this.container.querySelectorAll('.kommentio-btn-social');
+    const currentIndex = Array.from(socialButtons).indexOf(e.target);
+    
+    if (socialButtons.length === 0) return;
+    
+    // Shift + Tab으로 역순 이동
+    if (e.shiftKey) {
+      if (currentIndex === 0) {
+        e.preventDefault();
+        socialButtons[socialButtons.length - 1].focus();
+      }
+    } else {
+      // Tab으로 순차 이동
+      if (currentIndex === socialButtons.length - 1) {
+        e.preventDefault();
+        socialButtons[0].focus();
+      }
     }
   }
 
@@ -1558,9 +1869,40 @@ function autoInit() {
     };
     
     kommentio = new Kommentio(options);
+    
+    // 인스턴스 생성 후 즉시 전역 객체에 할당
+    window.kommentio = kommentio;
+    
+    // 디버깅용 로그
+    console.log('✅ Kommentio 위젯 초기화 완료!', window.kommentio);
   }
 }
 
 // 전역 접근을 위한 window 객체에 추가
 window.Kommentio = Kommentio;
-window.kommentio = kommentio;
+
+// 초기에는 null로 설정, autoInit에서 실제 인스턴스 할당
+window.kommentio = null;
+
+// 위젯 로딩 대기 및 안전한 함수 실행을 위한 헬퍼
+window.waitForKommentio = function(callback, timeout = 5000) {
+  const startTime = Date.now();
+  
+  function check() {
+    if (window.kommentio && window.kommentio.updateSocialProviders) {
+      console.log('✅ Kommentio 위젯 준비 완료!');
+      callback(window.kommentio);
+      return;
+    }
+    
+    if (Date.now() - startTime > timeout) {
+      console.error('❌ Kommentio 위젯 로딩 타임아웃');
+      alert('위젯 로딩이 너무 오래 걸립니다. 페이지를 새로고침해주세요.');
+      return;
+    }
+    
+    setTimeout(check, 50); // 50ms마다 확인
+  }
+  
+  check();
+};
