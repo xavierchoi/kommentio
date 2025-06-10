@@ -1,0 +1,77 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: |
+          npm run build
+          npm run build:widget
+
+      - name: Prepare GitHub Pages content
+        run: |
+          # Create docs directory for GitHub Pages
+          mkdir -p docs
+          
+          # Copy landing page as main index.html
+          cp landing.html docs/index.html
+          
+          # Copy admin dashboard
+          cp -r admin docs/
+          
+          # Copy built widget files
+          mkdir -p docs/dist
+          cp -r dist/* docs/dist/
+          
+          # Copy public assets
+          if [ -d "public" ]; then
+            cp -r public docs/
+          fi
+          
+          # Copy kommentio.js to root for demos
+          if [ -f "public/kommentio.js" ]; then
+            cp public/kommentio.js docs/
+          fi
+          
+          # Update script paths in index.html
+          sed -i 's|./public/kommentio.js|./kommentio.js|g' docs/index.html
+          sed -i 's|./admin/|./admin/|g' docs/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
