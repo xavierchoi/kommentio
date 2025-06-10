@@ -65,6 +65,28 @@
             data-language="ko"
             data-mock-mode="true"
         ></div>
+
+        <div style="margin-top: 2rem; padding: 1rem; background: #f3f4f6; border-radius: 8px;">
+            <h3>🔧 소셜 로그인 설정 테스트</h3>
+            <p>아래 버튼들로 다양한 소셜 프로바이더 조합을 테스트해보세요:</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+                <button onclick="enableBasicProviders()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    기본 (Google + GitHub)
+                </button>
+                <button onclick="enableAllProviders()" style="padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    전체 활성화
+                </button>
+                <button onclick="enableKoreanProviders()" style="padding: 0.5rem 1rem; background: #fee500; color: black; border: none; border-radius: 4px; cursor: pointer;">
+                    한국 특화 (Kakao + LINE)
+                </button>
+                <button onclick="enableBusinessProviders()" style="padding: 0.5rem 1rem; background: #0077b5; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    비즈니스 (LinkedIn + Apple)
+                </button>
+                <button onclick="disableAllProviders()" style="padding: 0.5rem 1rem; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    모두 비활성화
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- 빌드된 위젯 스크립트 로드 -->
@@ -81,6 +103,82 @@
                 console.error('❌ Kommentio 위젯 로딩 실패');
             }
         });
+
+        // 소셜 프로바이더 설정 함수들 (위젯 로딩 대기 적용)
+        function enableBasicProviders() {
+            waitForKommentio((kommentio) => {
+                kommentio.updateSocialProviders({
+                    google: { enabled: true },
+                    github: { enabled: true },
+                    facebook: { enabled: false },
+                    twitter: { enabled: false },
+                    apple: { enabled: false },
+                    linkedin: { enabled: false },
+                    kakao: { enabled: false },
+                    line: { enabled: false }
+                });
+            });
+        }
+
+        function enableAllProviders() {
+            waitForKommentio((kommentio) => {
+                kommentio.updateSocialProviders({
+                    google: { enabled: true },
+                    github: { enabled: true },
+                    facebook: { enabled: true },
+                    twitter: { enabled: true },
+                    apple: { enabled: true },
+                    linkedin: { enabled: true },
+                    kakao: { enabled: true },
+                    line: { enabled: true }
+                });
+            });
+        }
+
+        function enableKoreanProviders() {
+            waitForKommentio((kommentio) => {
+                kommentio.updateSocialProviders({
+                    google: { enabled: false },
+                    github: { enabled: false },
+                    facebook: { enabled: false },
+                    twitter: { enabled: false },
+                    apple: { enabled: false },
+                    linkedin: { enabled: false },
+                    kakao: { enabled: true },
+                    line: { enabled: true }
+                });
+            });
+        }
+
+        function enableBusinessProviders() {
+            waitForKommentio((kommentio) => {
+                kommentio.updateSocialProviders({
+                    google: { enabled: false },
+                    github: { enabled: false },
+                    facebook: { enabled: false },
+                    twitter: { enabled: false },
+                    apple: { enabled: true },
+                    linkedin: { enabled: true },
+                    kakao: { enabled: false },
+                    line: { enabled: false }
+                });
+            });
+        }
+
+        function disableAllProviders() {
+            waitForKommentio((kommentio) => {
+                kommentio.updateSocialProviders({
+                    google: { enabled: false },
+                    github: { enabled: false },
+                    facebook: { enabled: false },
+                    twitter: { enabled: false },
+                    apple: { enabled: false },
+                    linkedin: { enabled: false },
+                    kakao: { enabled: false },
+                    line: { enabled: false }
+                });
+            });
+        }
     </script>
 </body>
 </html>

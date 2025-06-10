@@ -1,13 +1,25 @@
 // Kommentio Admin Dashboard - Utility Functions
 
 class Utils {
-  // DOM 헬퍼
+  // DOM 헬퍼 (null 안전성 강화)
   static $(selector, context = document) {
-    return context.querySelector(selector);
+    if (!selector || !context) return null;
+    try {
+      return context.querySelector(selector);
+    } catch (error) {
+      console.warn('Utils.$: 잘못된 선택자:', selector, error);
+      return null;
+    }
   }
 
   static $$(selector, context = document) {
-    return context.querySelectorAll(selector);
+    if (!selector || !context) return [];
+    try {
+      return Array.from(context.querySelectorAll(selector));
+    } catch (error) {
+      console.warn('Utils.$$: 잘못된 선택자:', selector, error);
+      return [];
+    }
   }
 
   static createElement(tag, className = '', innerHTML = '') {

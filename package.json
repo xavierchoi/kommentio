@@ -6,11 +6,15 @@
   "description": "Open-source embeddable comment widget - Ad-free alternative to Disqus",
   "scripts": {
     "dev": "node --max-old-space-size=8192 ./node_modules/.bin/vite",
+    "dev:stable": "./scripts/start-dev.sh",
+    "dev:static": "./scripts/serve-static.sh",
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/vite build",
     "build:widget": "node --max-old-space-size=8192 ./node_modules/.bin/vite build --config vite.widget.config.js",
     "lint": "node --max-old-space-size=4096 ./node_modules/.bin/eslint .",
     "preview": "node --max-old-space-size=4096 ./node_modules/.bin/vite preview",
-    "serve": "node --max-old-space-size=4096 ./node_modules/.bin/vite preview --port 3000"
+    "serve": "node --max-old-space-size=4096 ./node_modules/.bin/vite preview --port 3000",
+    "clean": "rm -rf node_modules/.vite dist .vite && npm cache clean --force",
+    "check-ports": "lsof -i :3000,3001,5173 | head -20"
   },
   "dependencies": {},
   "devDependencies": {

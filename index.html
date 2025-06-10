@@ -72,15 +72,17 @@
       <div style="margin-top: 2rem; padding: 1rem; background: #f3f4f6; border-radius: 8px;">
         <h3>🔧 소셜 로그인 설정 테스트</h3>
         <p>아래 버튼들로 다양한 소셜 프로바이더 조합을 테스트해보세요:</p>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; margin-bottom: 1rem;">
+          <button onclick="debugWidget()" style="padding: 0.5rem 1rem; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            🐛 위젯 상태 확인
+          </button>
+        </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
           <button onclick="enableBasicProviders()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
             기본 (Google + GitHub)
           </button>
           <button onclick="enableAllProviders()" style="padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">
             전체 활성화
-          </button>
-          <button onclick="enableKoreanProviders()" style="padding: 0.5rem 1rem; background: #fee500; color: black; border: none; border-radius: 4px; cursor: pointer;">
-            한국 특화 (Kakao + LINE)
           </button>
           <button onclick="enableBusinessProviders()" style="padding: 0.5rem 1rem; background: #0077b5; color: white; border: none; border-radius: 4px; cursor: pointer;">
             비즈니스 (LinkedIn + Apple)
@@ -92,8 +94,44 @@
       </div>
     </div>
 
-    <!-- Kommentio 위젯 스크립트 -->
-    <script type="module" src="/src/kommentio.js"></script>
+    <!-- Kommentio 위젯 스크립트 v0.2.0 FRESH BUILD -->
+    <script src="/kommentio.js?v=020-fresh&t=1749561998&cache=false"></script>
+    
+    <!-- 위젯 로딩 확인 및 디버깅 -->
+    <script>
+      // 위젯 로딩 상태 확인
+      window.addEventListener('load', () => {
+        console.log('🔄 페이지 로드 완료 - v0.2.0 테스트 중...');
+        console.log('window.Kommentio:', window.Kommentio);
+        console.log('window.kommentio:', window.kommentio);
+        
+        // 🚨 CRITICAL VERSION DEBUG
+        if (window.Kommentio) {
+          console.log('🎯 위젯 생성자 발견!');
+          const testInstance = new window.Kommentio();
+          console.log('📦 실제 로드된 버전:', testInstance.version);
+          if (testInstance.version === '0.2.0') {
+            console.log('✅ SUCCESS: v0.2.0 로드 확인!');
+          } else {
+            console.error('❌ FAILED: 예상과 다른 버전:', testInstance.version);
+          }
+        }
+        
+        // 위젯이 로드될 때까지 대기하는 함수
+        function waitForWidget() {
+          if (window.kommentio && window.kommentio.updateSocialProviders) {
+            console.log('✅ Kommentio 위젯 로드 완료!');
+            console.log('✅ updateSocialProviders 함수 사용 가능!');
+            return;
+          }
+          
+          console.log('⏳ 위젯 로딩 중... 재시도합니다.');
+          setTimeout(waitForWidget, 100);
+        }
+        
+        waitForWidget();
+      });
+    </script>
 
     <script>
       let isDark = false;
@@ -121,80 +159,100 @@
         document.querySelector('.theme-toggle').textContent = isDark ? '☀️ 라이트모드' : '🌙 다크모드';
       }
 
-      // 소셜 프로바이더 설정 함수들
-      function enableBasicProviders() {
+      // 디버깅 함수
+      function debugWidget() {
+        console.log('=== 위젯 상태 디버깅 ===');
+        console.log('window.Kommentio:', window.Kommentio);
+        console.log('window.kommentio:', window.kommentio);
+        
         if (window.kommentio) {
-          window.kommentio.updateSocialProviders({
-            google: { enabled: true, label: 'Google', color: '#4285f4', icon: '🔍' },
-            github: { enabled: true, label: 'GitHub', color: '#333', icon: '🐙' },
-            facebook: { enabled: false, label: 'Facebook', color: '#1877f2', icon: '📘' },
-            twitter: { enabled: false, label: 'X.com', color: '#000', icon: '🐦' },
-            apple: { enabled: false, label: 'Apple', color: '#000', icon: '🍎' },
-            linkedin: { enabled: false, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
-            kakao: { enabled: false, label: '카카오톡', color: '#fee500', icon: '💬' },
-            line: { enabled: false, label: 'LINE', color: '#00b900', icon: '💚' }
-          });
+          console.log('위젯 버전:', window.kommentio.version);
+          console.log('Mock 모드:', window.kommentio.mockMode);
+          console.log('updateSocialProviders 함수:', window.kommentio.updateSocialProviders);
+          console.log('현재 소셜 프로바이더 설정:', window.kommentio.options?.socialProviders);
+          
+          alert(`위젯 상태:
+✅ 위젯 로드됨
+📦 버전: ${window.kommentio.version || 'Unknown'}
+🔧 Mock 모드: ${window.kommentio.mockMode ? 'ON' : 'OFF'}
+🔗 updateSocialProviders: ${window.kommentio.updateSocialProviders ? 'Available' : 'Not Available'}
+
+브라우저 콘솔에서 자세한 정보를 확인하세요.`);
+        } else {
+          console.error('❌ 위젯이 로드되지 않았습니다.');
+          alert('❌ 위젯이 로드되지 않았습니다.\n브라우저 콘솔에서 에러를 확인해주세요.');
         }
+      }
+
+      // 소셜 프로바이더 설정 함수들 (위젯 로딩 대기 적용)
+      function enableBasicProviders() {
+        console.log('enableBasicProviders 호출됨');
+        
+        waitForKommentio((kommentio) => {
+          console.log('updateSocialProviders 함수 실행 중...');
+          kommentio.updateSocialProviders({
+            google: { enabled: true },
+            github: { enabled: true },
+            facebook: { enabled: false },
+            twitter: { enabled: false },
+            apple: { enabled: false },
+            linkedin: { enabled: false },
+            kakao: { enabled: false }
+          });
+          console.log('기본 프로바이더 설정 완료');
+        });
       }
 
       function enableAllProviders() {
-        if (window.kommentio) {
-          window.kommentio.updateSocialProviders({
-            google: { enabled: true, label: 'Google', color: '#4285f4', icon: '🔍' },
-            github: { enabled: true, label: 'GitHub', color: '#333', icon: '🐙' },
-            facebook: { enabled: true, label: 'Facebook', color: '#1877f2', icon: '📘' },
-            twitter: { enabled: true, label: 'X.com', color: '#000', icon: '🐦' },
-            apple: { enabled: true, label: 'Apple', color: '#000', icon: '🍎' },
-            linkedin: { enabled: true, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
-            kakao: { enabled: true, label: '카카오톡', color: '#fee500', icon: '💬' },
-            line: { enabled: true, label: 'LINE', color: '#00b900', icon: '💚' }
+        console.log('enableAllProviders 호출됨');
+        
+        waitForKommentio((kommentio) => {
+          kommentio.updateSocialProviders({
+            google: { enabled: true },
+            github: { enabled: true },
+            facebook: { enabled: true },
+            twitter: { enabled: true }, // X(Twitter) 이제 활성화 가능!
+            apple: { enabled: true },
+            linkedin: { enabled: true },
+            kakao: { enabled: true }
           });
-        }
+          console.log('모든 프로바이더 활성화 완료 (X 포함)');
+        });
       }
 
-      function enableKoreanProviders() {
-        if (window.kommentio) {
-          window.kommentio.updateSocialProviders({
-            google: { enabled: false, label: 'Google', color: '#4285f4', icon: '🔍' },
-            github: { enabled: false, label: 'GitHub', color: '#333', icon: '🐙' },
-            facebook: { enabled: false, label: 'Facebook', color: '#1877f2', icon: '📘' },
-            twitter: { enabled: false, label: 'X.com', color: '#000', icon: '🐦' },
-            apple: { enabled: false, label: 'Apple', color: '#000', icon: '🍎' },
-            linkedin: { enabled: false, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
-            kakao: { enabled: true, label: '카카오톡', color: '#fee500', icon: '💬' },
-            line: { enabled: true, label: 'LINE', color: '#00b900', icon: '💚' }
-          });
-        }
-      }
 
       function enableBusinessProviders() {
-        if (window.kommentio) {
-          window.kommentio.updateSocialProviders({
-            google: { enabled: false, label: 'Google', color: '#4285f4', icon: '🔍' },
-            github: { enabled: false, label: 'GitHub', color: '#333', icon: '🐙' },
-            facebook: { enabled: false, label: 'Facebook', color: '#1877f2', icon: '📘' },
-            twitter: { enabled: false, label: 'X.com', color: '#000', icon: '🐦' },
-            apple: { enabled: true, label: 'Apple', color: '#000', icon: '🍎' },
-            linkedin: { enabled: true, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
-            kakao: { enabled: false, label: '카카오톡', color: '#fee500', icon: '💬' },
-            line: { enabled: false, label: 'LINE', color: '#00b900', icon: '💚' }
+        console.log('enableBusinessProviders 호출됨');
+        
+        waitForKommentio((kommentio) => {
+          kommentio.updateSocialProviders({
+            google: { enabled: false },
+            github: { enabled: false },
+            facebook: { enabled: false },
+            twitter: { enabled: false },
+            apple: { enabled: true },
+            linkedin: { enabled: true },
+            kakao: { enabled: false }
           });
-        }
+          console.log('비즈니스 프로바이더 설정 완료');
+        });
       }
 
       function disableAllProviders() {
-        if (window.kommentio) {
-          window.kommentio.updateSocialProviders({
-            google: { enabled: false, label: 'Google', color: '#4285f4', icon: '🔍' },
-            github: { enabled: false, label: 'GitHub', color: '#333', icon: '🐙' },
-            facebook: { enabled: false, label: 'Facebook', color: '#1877f2', icon: '📘' },
-            twitter: { enabled: false, label: 'X.com', color: '#000', icon: '🐦' },
-            apple: { enabled: false, label: 'Apple', color: '#000', icon: '🍎' },
-            linkedin: { enabled: false, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
-            kakao: { enabled: false, label: '카카오톡', color: '#fee500', icon: '💬' },
-            line: { enabled: false, label: 'LINE', color: '#00b900', icon: '💚' }
+        console.log('disableAllProviders 호출됨');
+        
+        waitForKommentio((kommentio) => {
+          kommentio.updateSocialProviders({
+            google: { enabled: false },
+            github: { enabled: false },
+            facebook: { enabled: false },
+            twitter: { enabled: false },
+            apple: { enabled: false },
+            linkedin: { enabled: false },
+            kakao: { enabled: false }
           });
-        }
+          console.log('모든 프로바이더 비활성화 완료');
+        });
       }
     </script>
   </body>

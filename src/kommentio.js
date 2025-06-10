@@ -5,7 +5,7 @@
 
 class Kommentio {
   constructor(options = {}) {
-    this.version = '0.1.1';
+    this.version = '0.2.0';
     this.options = {
       siteId: null,
       theme: 'light', // 'light' | 'dark' | 'auto'
@@ -16,7 +16,7 @@ class Kommentio {
       supabaseKey: null,
       claudeApiKey: null, // 사용자가 제공하는 스팸 필터링용
       
-      // 소셜 로그인 프로바이더 설정 (SVG 아이콘 기반)
+      // 소셜 로그인 프로바이더 설정 (SVG 아이콘 기반) - 배치 순서: Google > Apple > GitHub > X > Facebook > LinkedIn > Kakao
       socialProviders: {
         google: { 
           enabled: true, 
@@ -27,6 +27,15 @@ class Kommentio {
           textColor: '#3c4043',
           hoverColor: '#f8f9fa'
         },
+        apple: { 
+          enabled: true, 
+          label: 'Apple', 
+          color: '#000000', 
+          borderColor: '#000000',
+          iconColor: '#ffffff',
+          textColor: '#ffffff',
+          hoverColor: '#333333'
+        },
         github: { 
           enabled: true, 
           label: 'GitHub', 
@@ -35,15 +44,6 @@ class Kommentio {
           iconColor: '#ffffff',
           textColor: '#ffffff',
           hoverColor: '#32383f'
-        },
-        facebook: { 
-          enabled: true, 
-          label: 'Facebook', 
-          color: '#1877f2', 
-          borderColor: '#1877f2',
-          iconColor: '#ffffff',
-          textColor: '#ffffff',
-          hoverColor: '#166fe5'
         },
         twitter: { 
           enabled: true, 
@@ -54,17 +54,17 @@ class Kommentio {
           textColor: '#ffffff',
           hoverColor: '#272c30'
         },
-        apple: { 
-          enabled: false, 
-          label: 'Apple', 
-          color: '#000000', 
-          borderColor: '#000000',
+        facebook: { 
+          enabled: true, 
+          label: 'Facebook', 
+          color: '#1877f2', 
+          borderColor: '#1877f2',
           iconColor: '#ffffff',
           textColor: '#ffffff',
-          hoverColor: '#1d1d1f'
+          hoverColor: '#166fe5'
         },
         linkedin: { 
-          enabled: false, 
+          enabled: true, 
           label: 'LinkedIn', 
           color: '#0a66c2', 
           borderColor: '#0a66c2',
@@ -74,22 +74,13 @@ class Kommentio {
         },
         kakao: { 
           enabled: true, 
-          label: '카카오톡', 
+          label: 'Kakao', 
           color: '#fee500', 
           borderColor: '#fee500',
           iconColor: '#000000',
           textColor: '#000000',
-          hoverColor: '#fdd835'
+          hoverColor: '#fdd800'
         },
-        line: { 
-          enabled: true, 
-          label: 'LINE', 
-          color: '#00b900', 
-          borderColor: '#00b900',
-          iconColor: '#ffffff',
-          textColor: '#ffffff',
-          hoverColor: '#009900'
-        }
       },
       
       ...options
@@ -125,10 +116,8 @@ class Kommentio {
    */
   getSocialProviderIcon(provider, size = 20) {
     const icons = {
+      // 배치 순서대로 정렬: Google > Apple > GitHub > X > Facebook > LinkedIn > Kakao
       google: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>`,
-      github: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.1 8.1 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>`,
-      facebook: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/></svg>`,
-      twitter: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>`,
       apple: `<svg width="100%" height="100%" viewBox="0 0 56 56" fill="none" style="border-radius: 50%; overflow: hidden;">
         <defs>
           <style>
@@ -181,18 +170,29 @@ class Kommentio {
           </g>
         </g>
       </svg>`,
+      github: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.1 8.1 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>`,
+      twitter: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>`,
+      facebook: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/></svg>`,
       linkedin: `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></svg>`,
-      kakao: `<svg width="${size}" height="${size}" viewBox="0 0 512 512" fill="none" style="transform: scale(2.3);"><path fill="#FFEB3B" d="M289 513C268 513 247 513 226 513C224 512 224 512 223 511C209 508 195 506 182 502C164 497 147 490 131 481C115 472 100 461 87 449C75 437 63 425 53 412C37 392 25 369 16 345C10 328 5 310 3 291C3 290 2 290 1 289C1 268 1 246 1 225C2 224 3 223 3 223C4 217 5 210 6 204C11 177 21 151 35 127C50 102 69 81 91 62C105 50 120 39 136 31C163 16 192 6 223 3C224 3 224 2 225 1C246 1 267 1 288 1C289 2 290 3 291 3C298 4 306 5 313 6C337 12 361 21 383 33C399 42 414 52 427 65C438 75 447 85 457 97C471 113 482 131 491 151C501 174 508 198 511 223C511 224 512 224 513 225C513 246 513 267 513 288C512 289 511 290 511 290C510 297 509 303 508 310C503 337 493 363 479 387C464 412 445 433 423 452C409 464 394 475 378 484C350 498 322 508 291 511C290 511 290 512 289 513ZM412 219C401 188 380 166 353 150C311 126 266 120 219 129C182 135 150 151 125 179C102 205 92 235 99 270C105 299 121 321 143 338C152 345 162 351 172 357C168 371 163 385 159 400C157 404 156 409 156 413C155 418 158 419 162 418C166 416 170 414 173 412C190 400 207 388 224 377C227 375 231 374 233 374C254 376 274 376 295 372C329 365 360 351 384 326C413 296 424 261 412 219Z"/><path fill="#3F2823" d="M412 219C424 261 413 296 384 326C360 351 329 365 295 372C274 376 254 376 233 374C231 374 227 375 224 377C207 388 190 400 173 412C170 414 166 416 162 418C158 419 155 418 156 413C156 409 157 404 159 400C163 385 168 371 172 357C162 351 152 345 143 338C121 321 105 299 99 270C92 235 102 205 125 179C150 151 182 135 219 129C266 120 311 126 353 150C380 166 401 188 412 219ZM374 284C373 281 372 279 371 277C364 267 357 258 350 249C357 242 363 236 370 229C374 225 374 221 370 217C367 213 362 213 358 217C352 223 346 229 340 235C338 237 336 239 333 242C333 234 333 228 333 222C332 215 328 212 323 213C317 213 314 218 314 224C314 238 314 252 314 266C314 272 314 279 315 285C316 292 319 294 324 294C329 293 333 290 333 284C333 278 333 273 333 267C333 265 335 264 336 261C343 271 350 280 357 289C359 292 362 295 367 293C371 292 374 289 374 284ZM246 250C242 241 239 232 236 223C233 216 229 213 223 213C217 213 213 216 210 223C205 238 199 252 193 267C191 272 189 277 188 283C187 289 188 292 194 294C199 295 203 294 205 288C206 286 207 284 208 281C208 279 210 278 213 278C220 278 227 278 234 278C237 278 238 279 239 282C240 284 241 288 242 290C245 294 249 295 254 293C258 292 259 288 258 284C258 281 257 278 256 276C253 267 249 259 246 250ZM177 246C177 241 177 236 177 231C180 231 183 231 185 231C187 231 189 231 192 231C198 230 201 227 201 221C201 216 198 213 192 213C176 213 160 213 144 213C139 213 137 216 136 221C135 227 139 230 146 231C150 231 155 231 159 231C159 235 160 238 160 241C160 254 159 266 159 278C159 281 159 284 160 287C161 292 164 294 168 294C173 294 176 292 177 287C178 284 178 281 178 278C178 267 177 257 177 246ZM266 290C268 291 270 292 272 292C281 293 289 293 298 293C301 293 303 292 305 292C309 291 311 288 311 284C311 281 309 278 306 277C302 276 299 276 296 276C291 275 287 276 283 276C283 273 283 271 283 269C283 254 283 238 282 222C282 216 279 213 273 213C267 213 264 216 264 223C264 241 263 259 263 277C263 281 265 286 266 290Z"/><path fill="#FCE83B" d="M374 284C374 289 371 292 367 293C362 295 359 292 357 289C350 280 343 271 336 261C335 264 333 265 333 267C333 273 333 278 333 284C333 290 329 293 324 294C319 294 316 292 315 285C314 279 314 272 314 266C314 252 314 238 314 224C314 218 317 213 323 213C328 212 332 215 333 222C333 228 333 234 333 242C336 239 338 237 340 235C346 229 352 223 358 217C362 213 367 213 370 217C374 221 374 225 370 229C363 236 357 242 350 249C357 258 364 267 371 277C372 279 373 281 374 284Z"/><path fill="#FDE93B" d="M246 250C249 259 253 267 256 276C257 278 258 281 258 284C259 288 258 292 254 293C249 295 245 294 242 290C241 288 240 284 239 282C238 279 237 278 234 278C227 278 220 278 213 278C210 278 208 279 208 281C207 284 206 286 205 288C203 294 199 295 194 294C188 292 187 289 188 283C189 277 191 272 193 267C199 252 205 238 210 223C213 216 217 213 223 213C229 213 233 216 236 223C239 232 242 241 246 250ZM217 253C216 256 215 259 214 261C220 261 226 261 232 261C229 253 226 245 223 236C221 242 219 247 217 253Z"/><path fill="#FCE83B" d="M177 246C178 257 178 267 178 278C178 281 178 284 177 287C176 292 173 294 168 294C164 294 161 292 160 287C159 284 159 281 159 278C159 266 160 254 160 241C160 238 159 235 159 231C155 231 150 231 146 231C139 230 135 227 136 221C137 216 139 213 144 213C160 213 176 213 192 213C198 213 201 216 201 221C201 227 198 230 192 231C189 231 187 231 185 231C183 231 180 231 177 231C177 236 177 241 177 246Z"/><path fill="#FAE63A" d="M266 290C265 286 263 281 263 277C263 259 264 241 264 223C264 216 267 213 273 213C279 213 282 216 282 222C283 238 283 254 283 269C283 271 283 273 283 276C287 276 291 275 296 276C299 276 302 276 306 277C309 278 311 281 311 284C311 288 309 291 305 292C303 292 301 293 298 293C289 293 281 293 272 292C270 292 268 291 266 290Z"/><path fill="#483124" d="M217 253C219 247 221 242 223 236C226 245 229 253 232 261C226 261 220 261 214 261C215 259 216 256 217 253Z"/></svg>`,
-      line: `<svg width="100%" height="100%" viewBox="0 0 320 320" fill="none">
-        <circle fill="#4cc764" cx="160" cy="160" r="160"/>
-        <path fill="#fff" d="M266.7,150.68c0-47.8-47.92-86.68-106.81-86.68s-106.81,38.89-106.81,86.68c0,42.85,38,78.73,89.33,85.52,3.48.75,8.21,2.29,9.41,5.27,1.08,2.7.7,6.93.35,9.66,0,0-1.25,7.54-1.52,9.14-.47,2.7-2.15,10.56,9.25,5.76,11.4-4.8,61.51-36.22,83.92-62.01h0c15.48-16.98,22.9-34.2,22.9-53.33Z"/>
-        <g>
-          <path fill="#4cc764" d="M231.17,178.28c1.13,0,2.04-.91,2.04-2.04v-7.58c0-1.12-.92-2.04-2.04-2.04h-20.39v-7.87h20.39c1.13,0,2.04-.91,2.04-2.04v-7.57c0-1.12-.92-2.04-2.04-2.04h-20.39v-7.87h20.39c1.13,0,2.04-.91,2.04-2.04v-7.57c0-1.12-.92-2.04-2.04-2.04h-30.01c-1.13,0-2.04.91-2.04,2.04v.04h0v46.54h0v.04c0,1.13.91,2.04,2.04,2.04h30.01Z"/>
-          <path fill="#4cc764" d="M120.17,178.28c1.13,0,2.04-.91,2.04-2.04v-7.58c0-1.12-.92-2.04-2.04-2.04h-20.39v-37c0-1.12-.92-2.04-2.04-2.04h-7.58c-1.13,0-2.04.91-2.04,2.04v46.58h0v.04c0,1.13.91,2.04,2.04,2.04h30.01Z"/>
-          <rect fill="#4cc764" x="128.62" y="127.58" width="11.65" height="50.69" rx="2.04" ry="2.04"/>
-          <path fill="#4cc764" d="M189.8,127.58h-7.58c-1.13,0-2.04.91-2.04,2.04v27.69l-21.33-28.8c-.05-.07-.11-.14-.16-.21,0,0,0,0-.01-.01-.04-.04-.08-.09-.12-.13-.01-.01-.03-.02-.04-.03-.04-.03-.07-.06-.11-.09-.02-.01-.04-.03-.06-.04-.03-.03-.07-.05-.11-.07-.02-.01-.04-.03-.06-.04-.04-.02-.07-.04-.11-.06-.02-.01-.04-.02-.06-.03-.04-.02-.08-.04-.12-.05-.02,0-.04-.02-.07-.02-.04-.01-.08-.03-.12-.04-.02,0-.05-.01-.07-.02-.04,0-.08-.02-.12-.03-.03,0-.06,0-.09-.01-.04,0-.07-.01-.11-.01-.04,0-.07,0-.11,0-.02,0-.05,0-.07,0h-7.53c-1.13,0-2.04.91-2.04,2.04v46.62c0,1.13.91,2.04,2.04,2.04h7.58c1.13,0,2.04-.91,2.04-2.04v-27.68l21.35,28.84c.15.21.33.38.53.51,0,0,.02.01.02.02.04.03.08.05.13.08.02.01.04.02.06.03.03.02.07.03.1.05.03.02.07.03.1.04.02,0,.04.02.06.02.05.02.09.03.14.04,0,0,.02,0,.03,0,.17.04.35.07.53.07h7.53c1.13,0,2.04-.91,2.04-2.04v-46.62c0-1.13-.91-2.04-2.04-2.04Z"/>
+      kakao: `<svg width="100%" height="100%" viewBox="0 0 56 56" fill="none">
+        <defs>
+          <!-- 원형 마스크 정의 -->
+          <mask id="kakao-circle-mask">
+            <circle cx="28" cy="28" r="28" fill="white"/>
+          </mask>
+        </defs>
+        
+        <!-- 원형 마스크 적용된 그룹 -->
+        <g mask="url(#kakao-circle-mask)">
+          <!-- 카카오 브랜드 색상 배경 (커브가 들어간 사각형을 원형으로 마스킹) -->
+          <path fill="#FFE812" d="M56 36c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20V20C0 8.954 8.954 0 20 0h16c11.046 0 20 8.954 20 20v16z"/>
+          
+          <!-- 카카오톡 말풍선 로고 (텍스트 제거) -->
+          <g transform="translate(28, 28) scale(1.3) translate(-16, -16)">
+            <path d="M16 6C9.562 6 4 10.713 4 16.5c0 3.779 2.466 7.247 6.248 9.477-0.193 0.549-1.237 3.534-1.081 3.769 0 0-0.027 0.176 0.134 0.243s0.348 0.015 0.348 0.015c0.327-0.046 4.294-2.781 4.994-3.404C15.295 26.685 15.632 26.8 16 26.8c6.438 0 12-4.712 12-10.3S22.438 6 16 6z" fill="#000"/>
+          </g>
         </g>
-      </svg>`
+      </svg>`,
     };
     
     return icons[provider] || '';
@@ -344,10 +344,10 @@ class Kommentio {
       /* 🎨 새로운 원형 소셜 로그인 시스템 */
       .kommentio-social-login {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
+        grid-template-columns: repeat(7, 1fr);
         gap: 12px;
         margin-bottom: 1rem;
-        max-width: 400px;
+        max-width: 100%;
         justify-content: center;
       }
 
@@ -500,16 +500,6 @@ class Kommentio {
         border: none;
       }
 
-      .kommentio-btn-line {
-        background: #00b900;
-        border: none;
-        color: #ffffff;
-      }
-
-      .kommentio-btn-line:hover {
-        background: #009900;
-        border: none;
-      }
 
       .kommentio-user-info {
         display: flex;
@@ -541,6 +531,7 @@ class Kommentio {
         color: var(--kommentio-text);
         resize: vertical;
         font-family: inherit;
+        box-sizing: border-box;
       }
 
       .kommentio-comments {
@@ -623,10 +614,10 @@ class Kommentio {
         
         /* 태블릿에서 소셜 로그인 최적화 */
         .kommentio-social-login {
-          grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+          grid-template-columns: repeat(7, 1fr);
           gap: 16px;
           justify-content: center;
-          max-width: 450px;
+          max-width: 100%;
         }
         
         .kommentio-btn-social {
@@ -715,20 +706,20 @@ class Kommentio {
           margin: 0.25rem;
         }
         
-        /* 모바일에서 소셜 로그인 2열 그리드 */
+        /* 모바일에서 소셜 로그인 4열 그리드 */
         .kommentio-social-login {
-          grid-template-columns: repeat(2, 1fr);
-          gap: 16px;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
           justify-content: center;
-          max-width: 300px;
+          max-width: 100%;
           margin: 0 auto 1rem auto;
         }
         
         .kommentio-btn-social {
-          width: 56px;
-          height: 56px;
-          min-width: 56px;
-          min-height: 56px;
+          width: 48px;
+          height: 48px;
+          min-width: 48px;
+          min-height: 48px;
           justify-self: center;
         }
         
@@ -1471,8 +1462,7 @@ class Kommentio {
       'twitter': 'twitter',
       'apple': 'apple',
       'linkedin': 'linkedin',
-      'kakao': 'kakao',
-      'line': 'line'
+      'kakao': 'kakao'
     };
 
     return providerMap[provider] || provider;
@@ -1502,11 +1492,6 @@ class Kommentio {
         return {
           ...baseOptions,
           scopes: 'profile_nickname profile_image account_email'
-        };
-      case 'line':
-        return {
-          ...baseOptions,
-          scopes: 'profile openid email'
         };
       default:
         return baseOptions;
@@ -1542,8 +1527,8 @@ class Kommentio {
     }
 
     try {
-      // 한국 소셜 로그인 (카카오, 라인)은 커스텀 구현
-      if (provider === 'kakao' || provider === 'line') {
+      // 한국 소셜 로그인 (카카오)은 커스텀 구현
+      if (provider === 'kakao') {
         await this.handleKoreanSocialLogin(provider);
         return;
       }
@@ -1586,7 +1571,7 @@ class Kommentio {
     try {
       await this.supabase.auth.signOut();
       
-      // 커스텀 로그인 정보도 정리 (카카오, 라인)
+      // 커스텀 로그인 정보도 정리 (카카오)
       localStorage.removeItem('kommentio_custom_user');
       localStorage.removeItem('kommentio_custom_token');
       
@@ -1598,7 +1583,7 @@ class Kommentio {
   }
 
   /**
-   * 한국 소셜 로그인 (카카오, 라인) 커스텀 처리
+   * 한국 소셜 로그인 (카카오) 커스텀 처리
    */
   async handleKoreanSocialLogin(provider) {
     const providerConfig = this.options.socialProviders[provider];
@@ -1606,8 +1591,6 @@ class Kommentio {
     try {
       if (provider === 'kakao') {
         await this.handleKakaoLogin();
-      } else if (provider === 'line') {
-        await this.handleLineLogin();
       }
     } catch (error) {
       console.error(`${provider} login failed:`, error);
@@ -1652,57 +1635,6 @@ class Kommentio {
     });
   }
 
-  /**
-   * 라인 로그인 처리
-   */
-  async handleLineLogin() {
-    const lineConfig = this.getLineConfig();
-    
-    if (!lineConfig.clientId) {
-      this.showNotification('LINE 로그인 설정이 필요합니다. 관리자에게 문의하세요.', 'error');
-      return;
-    }
-
-    // LINE 로그인 URL 생성
-    const lineLoginUrl = this.generateLineLoginUrl(lineConfig);
-    
-    // 팝업으로 LINE 로그인 처리
-    return new Promise((resolve, reject) => {
-      const popup = window.open(lineLoginUrl, 'line-login', 'width=400,height=600');
-      
-      // 메시지 리스너로 로그인 결과 받기
-      const messageListener = async (event) => {
-        if (event.origin !== window.location.origin) return;
-        
-        if (event.data.type === 'LINE_LOGIN_SUCCESS') {
-          window.removeEventListener('message', messageListener);
-          popup.close();
-          
-          try {
-            await this.loginWithLineUser(event.data.userInfo, event.data.accessToken);
-            resolve();
-          } catch (error) {
-            reject(error);
-          }
-        } else if (event.data.type === 'LINE_LOGIN_ERROR') {
-          window.removeEventListener('message', messageListener);
-          popup.close();
-          reject(new Error(event.data.error));
-        }
-      };
-      
-      window.addEventListener('message', messageListener);
-      
-      // 팝업이 닫히면 취소로 처리
-      const checkClosed = setInterval(() => {
-        if (popup.closed) {
-          clearInterval(checkClosed);
-          window.removeEventListener('message', messageListener);
-          reject(new Error('로그인이 취소되었습니다.'));
-        }
-      }, 1000);
-    });
-  }
 
   /**
    * 카카오 SDK 로드
@@ -1726,30 +1658,7 @@ class Kommentio {
     };
   }
 
-  /**
-   * 라인 설정 가져오기
-   */
-  getLineConfig() {
-    return {
-      clientId: this.options.lineClientId || process.env.VITE_LINE_CLIENT_ID,
-      redirectUri: `${window.location.origin}/auth/line/callback`
-    };
-  }
 
-  /**
-   * 라인 로그인 URL 생성
-   */
-  generateLineLoginUrl(config) {
-    const params = new URLSearchParams({
-      response_type: 'code',
-      client_id: config.clientId,
-      redirect_uri: config.redirectUri,
-      state: Math.random().toString(36).substring(7),
-      scope: 'profile openid email'
-    });
-    
-    return `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`;
-  }
 
   /**
    * 카카오 사용자로 Supabase 로그인
@@ -1773,27 +1682,6 @@ class Kommentio {
     this.showNotification('카카오 로그인 완료! 🎉');
   }
 
-  /**
-   * 라인 사용자로 Supabase 로그인
-   */
-  async loginWithLineUser(userInfo, accessToken) {
-    // 사용자 정보 변환
-    const userData = {
-      id: `line_${userInfo.userId}`,
-      email: userInfo.email || `line_${userInfo.userId}@line.local`,
-      user_metadata: {
-        name: userInfo.displayName || 'LINE 사용자',
-        avatar_url: userInfo.pictureUrl,
-        provider: 'line',
-        provider_id: userInfo.userId,
-        full_name: userInfo.displayName
-      }
-    };
-
-    // Supabase에 커스텀 사용자로 로그인
-    await this.loginWithCustomUser(userData, accessToken);
-    this.showNotification('LINE 로그인 완료! 💚');
-  }
 
   /**
    * 커스텀 사용자로 Supabase 로그인
@@ -1840,10 +1728,115 @@ class Kommentio {
    * 답글 작성
    */
   replyTo(commentId) {
-    // 답글 UI 표시 로직
-    console.log('Reply to comment:', commentId);
-    // TODO: 구현 예정
+    // 로그인되지 않은 경우 로그인 요청
+    if (!this.currentUser && !this.options.allowAnonymous) {
+      alert('답글을 작성하려면 로그인해주세요.');
+      return;
+    }
+
+    // 기존 답글 폼이 있으면 제거
+    const existingForm = document.querySelector('.kommentio-reply-form');
+    if (existingForm) {
+      existingForm.remove();
+    }
+
+    // 해당 댓글 찾기
+    const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+    if (!commentElement) {
+      console.error('Comment not found:', commentId);
+      return;
+    }
+
+    // 답글 폼 생성
+    const replyForm = document.createElement('div');
+    replyForm.className = 'kommentio-reply-form';
+    replyForm.style.cssText = `
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--kommentio-bg);
+      border: 1px solid var(--kommentio-border);
+      border-radius: 6px;
+      border-left: 3px solid var(--kommentio-primary);
+    `;
+
+    replyForm.innerHTML = `
+      <div style="margin-bottom: 0.75rem;">
+        <strong style="color: var(--kommentio-primary);">답글 작성</strong>
+        <button 
+          onclick="this.closest('.kommentio-reply-form').remove()" 
+          style="float: right; background: none; border: none; color: var(--kommentio-secondary); cursor: pointer; font-size: 1.2rem;"
+          title="닫기"
+        >×</button>
+      </div>
+      <form onsubmit="kommentio.handleReplySubmit(event, '${commentId}')">
+        <textarea 
+          class="kommentio-textarea" 
+          placeholder="답글을 입력하세요..."
+          style="min-height: 80px; margin-bottom: 0.75rem;"
+          required
+        ></textarea>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <small style="color: var(--kommentio-secondary);">Markdown 문법을 지원합니다.</small>
+          <div style="display: flex; gap: 0.5rem;">
+            <button 
+              type="button" 
+              onclick="this.closest('.kommentio-reply-form').remove()"
+              style="padding: 0.5rem 1rem; border: 1px solid var(--kommentio-border); background: var(--kommentio-bg); color: var(--kommentio-text); border-radius: 4px; cursor: pointer;"
+            >취소</button>
+            <button 
+              type="submit" 
+              style="padding: 0.5rem 1rem; background: var(--kommentio-primary); color: white; border: none; border-radius: 4px; cursor: pointer;"
+            >답글 작성</button>
+          </div>
+        </div>
+      </form>
+    `;
+
+    // 댓글 하단에 답글 폼 추가
+    commentElement.appendChild(replyForm);
+
+    // 답글 폼의 textarea에 포커스
+    const textarea = replyForm.querySelector('textarea');
+    textarea.focus();
+
+    // 답글 폼으로 스크롤
+    replyForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+
+  /**
+   * 답글 작성 핸들러
+   */
+  async handleReplySubmit(event, parentId) {
+    event.preventDefault();
+    const textarea = event.target.querySelector('textarea');
+    const content = textarea.value.trim();
+    
+    if (!content) return;
+
+    try {
+      await this.createComment(content, parentId);
+      
+      // 답글 폼 제거
+      const replyForm = event.target.closest('.kommentio-reply-form');
+      if (replyForm) {
+        replyForm.remove();
+      }
+      
+      this.showNotification('답글이 성공적으로 작성되었습니다! ✅');
+    } catch (error) {
+      console.error('Failed to create reply:', error);
+      alert('답글 작성에 실패했습니다.');
+    }
+  }
+}
+
+// 환경 변수 헬퍼 함수
+function getEnvVar(name) {
+  // Vite 환경에서만 사용 가능
+  if (typeof window !== 'undefined' && window.__VITE_ENV) {
+    return window.__VITE_ENV[name];
+  }
+  return undefined;
 }
 
 // 전역 인스턴스
@@ -1863,8 +1856,8 @@ function autoInit() {
       siteId: target.dataset.siteId,
       theme: target.dataset.theme || 'light',
       language: target.dataset.language || 'ko',
-      supabaseUrl: target.dataset.supabaseUrl,
-      supabaseKey: target.dataset.supabaseKey,
+      supabaseUrl: target.dataset.supabaseUrl || 'https://nwjbtsjeikrwyqltkpqv.supabase.co',
+      supabaseKey: target.dataset.supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ',
       claudeApiKey: target.dataset.claudeApiKey
     };
     
