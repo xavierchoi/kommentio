@@ -474,8 +474,11 @@ body {
 .nav-link.active {
   background: var(--primary-50);
   color: var(--primary-700);
-  border-right: 2px solid var(--primary-700);
   font-weight: 600;
+}
+
+.nav-link.active {
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.15), 0 2px 4px rgba(59, 130, 246, 0.1);
 }
 
 /* 터치 활성화 상태 */
@@ -1165,42 +1168,6 @@ body {
     -webkit-overflow-scrolling: touch !important;
   }
   
-  /* 헤더에 모바일 토글 버튼 추가 */
-  .header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    position: relative !important;
-  }
-  
-  .header::before {
-    content: '' !important;
-    position: absolute !important;
-    left: 16px !important;
-    width: 40px !important;
-    height: 40px !important;
-    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/%3e%3c/svg%3e") no-repeat center !important;
-    background-size: 24px !important;
-    border-radius: 8px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    opacity: 0.7 !important;
-  }
-  
-  .header::before:hover {
-    background-color: var(--gray-100) !important;
-    opacity: 1 !important;
-  }
-  
-  .header::before:active {
-    transform: scale(0.95) !important;
-    background-color: var(--gray-200) !important;
-  }
-  
-  .page-title {
-    margin-left: 60px !important; /* 토글 버튼 공간 확보 */
-    flex: 1 !important;
-  }
   
   /* 사이드바 토글 버튼 - 모바일/태블릿에서만 표시 */
   .sidebar-toggle-container {
@@ -1292,15 +1259,54 @@ body {
   }
 }
 
-/* 데스크톱에서는 토글 버튼 숨김 */
-.sidebar-toggle-container {
-  display: none !important;
+/* 데스크톱에서는 토글 버튼 숨김 - 1025px 이상에서만 적용 */
+@media (min-width: 1025px) {
+  .sidebar-toggle-container {
+    display: none !important;
+  }
 }
 
 /* 모바일/태블릿에서만 토글 버튼 표시 및 오버레이 모드 활성화 */
 @media (max-width: 1024px) {
   .sidebar-toggle-container {
     display: block !important;
+  }
+  
+  /* 헤더에 모바일 토글 버튼 추가 */
+  .header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    position: relative !important;
+  }
+  
+  .header::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 16px !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/%3e%3c/svg%3e") no-repeat center !important;
+    background-size: 24px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    opacity: 0.7 !important;
+  }
+  
+  .header::before:hover {
+    background-color: var(--gray-100) !important;
+    opacity: 1 !important;
+  }
+  
+  .header::before:active {
+    transform: scale(0.95) !important;
+    background-color: var(--gray-200) !important;
+  }
+  
+  .page-title {
+    margin-left: 60px !important; /* 토글 버튼 공간 확보 */
+    flex: 1 !important;
   }
   
   /* 모바일에서 사이드바를 완전한 오버레이 모드로 전환 */
