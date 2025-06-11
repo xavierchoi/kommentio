@@ -18,7 +18,7 @@
     <meta name="twitter:title" content="Kommentio - Ultra-Premium Comment System">
     <meta name="twitter:description" content="Apple급 프리미엄 디자인의 무료 댓글 시스템">
     
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+    <link rel="icon" href="./favicon.ico">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,16 +44,16 @@
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
             
-            /* Neon Gradients */
-            --gradient-neon: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
-            --gradient-cyber: linear-gradient(135deg, #00f5ff 0%, #ff00ff 50%, #ffff00 100%);
-            --gradient-aurora: linear-gradient(135deg, #ff006e 0%, #ffbe0b 25%, #fb5607 50%, #8338ec 75%, #3a86ff 100%);
+            /* New Premium 5-Color Gradient Palette */
+            --gradient-neon: linear-gradient(135deg, #3A36E0 0%, #0064FF 25%, #00A9FF 50%, #00DDCB 75%, #80FFEA 100%);
+            --gradient-cyber: linear-gradient(135deg, #3A36E0 0%, #0064FF 35%, #00DDCB 65%, #80FFEA 100%);
+            --gradient-aurora: linear-gradient(135deg, #0064FF 0%, #00A9FF 30%, #00DDCB 60%, #80FFEA 100%);
             --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
             
             /* Shadows & Glows */
-            --shadow-neon: 0 0 20px rgba(102, 126, 234, 0.5), 0 0 40px rgba(118, 75, 162, 0.3);
-            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            --shadow-cyber: 0 0 30px rgba(0, 245, 255, 0.6);
+            --shadow-neon: 0 0 20px rgba(58, 54, 224, 0.4), 0 0 40px rgba(0, 169, 255, 0.3), 0 0 60px rgba(128, 255, 234, 0.2);
+            --shadow-glass: 0 8px 32px 0 rgba(58, 54, 224, 0.15);
+            --shadow-cyber: 0 0 30px rgba(0, 221, 203, 0.6);
             
             /* Typography */
             --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -86,7 +86,7 @@
         }
 
         ::selection {
-            background: rgba(102, 126, 234, 0.3);
+            background: rgba(0, 221, 203, 0.3);
             color: var(--text-primary);
         }
 
@@ -877,7 +877,77 @@
     <nav class="nav-premium glass">
         <div class="nav-content">
             <a href="#" class="logo-premium">
-                <div class="logo-icon">💬</div>
+                <!-- Light mode logo -->
+                <svg id="logo-light" viewBox="0 0 1024 1024" width="32" height="32" style="border-radius: 8px;">
+                    <rect fill="#FFFFFF" width="1024" height="1024"/>
+                    <g>
+                        <g>
+                            <linearGradient id="vector_light_1" gradientUnits="userSpaceOnUse" x1="162.8185883" y1="538.2720337" x2="861.1813965" y2="538.2720337">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_light_1)" d="M162.8185883,507.987915c0-193.9865723,157.1586761-349.3110046,349.1812744-349.3110352c73.2923889,0,141.1635437,22.2642365,197.7114563,61.5674744c91.3881226,62.3576965,151.4700928,167.7402344,151.4700928,287.7435608c0,104.8197021-46.0237427,198.5820923-119.0075684,262.074585c3.0922852,3.9628296,6.3892212,8.3343506,9.6991577,12.9694214c6.769165,9.4695435,13.9574585,20.5436401,19.5606079,31.7867432c5.2686157,10.5742188,10.6768799,24.2869263,10.6768799,38.2293701c0,23.489563-13.4703369,41.668335-28.9837646,52.1445923c-15.5588379,10.5066528-35.9445801,15.4390259-55.882019,11.1011963c-39.3843994-8.5673828-88.003479-23.9760132-126.215271-37.0028687c-19.2293701-6.5540161-36.0518188-12.5843506-48.0701904-16.9761963c-6.0123901-2.1992798-10.8294678-3.9898071-14.1556091-5.2330322l-1.1564026-0.4358521c-109.4477844-1.3344116-207.344635-52.9452515-269.6506348-133.4544678C190.9372864,664.0772705,162.8185883,589.145752,162.8185883,507.987915z M520.3996582,807.5519409l0.2923584,0.1114502l0.9387207,0.3547363l3.6769409,1.3851318c3.222229,1.2060547,7.9224243,2.9526367,13.8048706,5.1012573c11.7747192,4.3040161,28.2593384,10.2127686,47.0891724,16.6315308c37.9032593,12.9188232,84.4012451,27.5908813,121.0181885,35.5570679c6.3762817,1.3884888,13.7496338-0.2026978,19.3690186-3.999939c5.664917-3.8243408,6.7985229-7.7330933,6.7985229-9.6451416c0-1.5101318-0.9484863-6.3546753-5.2166138-14.9187622c-3.9335327-7.8986206-9.4588013-16.5505371-15.4029541-24.8746948c-5.8825073-8.2330322-11.8234253-15.6484985-16.3189697-21.0302124c-2.2379761-2.6790161-4.0895386-4.8208618-5.362793-6.2701416c-0.6366577-0.7263794-1.1271362-1.2736816-1.4454956-1.6317139l-0.3474731-0.3851318l-0.0714722-0.0777588c-4.8560791-5.3242798-7.2565308-12.5775757-6.5776367-19.8815308c0.678833-7.3039551,4.3688965-13.9423828,10.1149292-18.2024536c73.1461792-54.1784668,119.6994629-140.6199951,119.6994629-237.7877197c0-101.8224487-50.9058228-191.8007812-129.5545044-245.4275208l-0.1851196-0.1270142c-48.557373-33.7722321-107.034729-53.0814667-170.7189636-53.0814667c-167.0510864,0-300.458252,134.6102142-300.458252,298.6359863c0,68.7896729,23.8054047,132.4713745,64.0824585,183.0079346l0.2325745,0.2938843c53.8106689,69.6107178,139.5284119,114.7081299,236.143219,114.7081299C514.8647461,805.9978638,517.710144,806.5249023,520.3996582,807.5519409C520.3964233,807.5519409,520.3996582,807.5519409,520.3996582,807.5519409z"/>
+                            <linearGradient id="vector_light_2" gradientUnits="userSpaceOnUse" x1="673.7598877" y1="507.8265076" x2="763.7354126" y2="507.8265076">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_light_2)" d="M685.8272705,327.7643738c11.6155396-7.0644531,26.5346069-2.998291,33.3265991,9.0812988c28.3989868,50.5088501,44.581543,108.9274292,44.581543,171.1523438c0,62.0769958-16.1663208,120.3972473-44.5945435,170.832489c-6.8050537,12.0740967-21.7305298,16.1213989-33.3363037,9.0437622c-11.605835-7.0742188-15.5004272-22.5977173-8.6954346-34.671875c24.1828613-42.9015503,37.9032593-92.4110718,37.9032593-145.2043762c0-52.9541016-13.743103-102.5784912-37.9162598-145.5708923C670.3041382,350.3475342,674.211731,334.8284607,685.8272705,327.7643738z"/>
+                        </g>
+                        <g>
+                            <linearGradient id="vector_light_3" gradientUnits="userSpaceOnUse" x1="656.4779053" y1="873.744812" x2="746.4534302" y2="873.744812" gradientTransform="matrix(-0.7071068 -0.7071068 -0.7071068 0.7071068 1569.0904541 324.6101379)">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_light_3)" d="M587.5134277,373.0690613c-47.4932251,13.3072205-92.3008118,38.6791077-129.7450256,76.1233215c-37.3304749,37.3305054-62.6372375,82.0408325-75.8733215,129.4766235c-3.7258911,13.3496094-17.456543,21.5724487-30.6653442,18.3681641c-13.2111511-3.2019653-20.9031982-16.6176758-17.1773682-29.9672852c15.5612793-55.7648926,45.3686218-108.4348145,89.2636719-152.3298645c43.9996643-43.9996948,96.7506104-73.8650818,152.546875-89.4990845c13.3442383-3.7388916,26.7687988,3.9352417,29.9869385,17.1439819C609.0681763,355.5934143,600.857605,369.3301392,587.5134277,373.0690613z"/>
+                            <linearGradient id="vector_light_4" gradientUnits="userSpaceOnUse" x1="613.276062" y1="159.8028259" x2="703.2516479" y2="159.8028259" gradientTransform="matrix(-0.7071068 0.7071068 0.7071068 0.7071068 807.713623 -9.237505)">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_light_4)" d="M381.8876648,436.9580383c13.3071899,47.4931946,38.6791077,92.3008118,76.123291,129.7450256c37.3305054,37.3305054,82.040802,62.6372681,129.4766541,75.8733521c13.3495483,3.7258911,21.5724487,17.456543,18.3681641,30.6652832c-3.2019653,13.2111816-16.6176758,20.9032593-29.9672852,17.1774292c-55.7648926-15.5612793-108.434845-45.3686523-152.329895-89.2637329c-43.9996643-43.9996338-73.8650513-96.7505798-89.4990845-152.546875c-3.7388916-13.3442383,3.9352417-26.7687683,17.1439819-29.9868774C364.4120178,415.4032898,378.1487427,423.6138306,381.8876648,436.9580383z"/>
+                            <linearGradient id="vector_light_5" gradientUnits="userSpaceOnUse" x1="841.4553833" y1="507.8265076" x2="931.4309082" y2="507.8265076" gradientTransform="matrix(-1 0 0 1 1257.5441895 0)">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_light_5)" d="M412.752533,362.427124c-24.1731567,42.9924011-37.9162598,92.6167908-37.9162598,145.5708923c0,52.7933044,13.7203674,102.3028259,37.9032593,145.2043762c6.8049622,12.0741577,2.9103699,27.5976562-8.6954346,34.671875c-11.6058044,7.0776367-26.5312805,3.0303345-33.3363037-9.0437622c-28.4282532-50.4352417-44.5945435-108.7554932-44.5945435-170.832489c0-62.2249146,16.1825256-120.6434937,44.581543-171.1523438c6.7919922-12.0795898,21.7110291-16.145752,33.3265686-9.0812988C415.6369019,334.8284607,419.5444946,350.3475342,412.752533,362.427124z"/>
+                        </g>
+                    </g>
+                </svg>
+                
+                <!-- Dark mode logo -->
+                <svg id="logo-dark" viewBox="0 0 1024 1024" width="32" height="32" style="border-radius: 8px; display: none;">
+                    <rect fill="#000000" width="1024" height="1024"/>
+                    <g>
+                        <g>
+                            <linearGradient id="vector_dark_1" gradientUnits="userSpaceOnUse" x1="162.8185883" y1="538.2720337" x2="861.1813965" y2="538.2720337">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_dark_1)" d="M162.8185883,507.987915c0-193.9865723,157.1586761-349.3110046,349.1812744-349.3110352c73.2923889,0,141.1635437,22.2642365,197.7114563,61.5674744c91.3881226,62.3576965,151.4700928,167.7402344,151.4700928,287.7435608c0,104.8197021-46.0237427,198.5820923-119.0075684,262.074585c3.0922852,3.9628296,6.3892212,8.3343506,9.6991577,12.9694214c6.769165,9.4695435,13.9574585,20.5436401,19.5606079,31.7867432c5.2686157,10.5742188,10.6768799,24.2869263,10.6768799,38.2293701c0,23.489563-13.4703369,41.668335-28.9837646,52.1445923c-15.5588379,10.5066528-35.9445801,15.4390259-55.882019,11.1011963c-39.3843994-8.5673828-88.003479-23.9760132-126.215271-37.0028687c-19.2293701-6.5540161-36.0518188-12.5843506-48.0701904-16.9761963c-6.0123901-2.1992798-10.8294678-3.9898071-14.1556091-5.2330322l-1.1564026-0.4358521c-109.4477844-1.3344116-207.344635-52.9452515-269.6506348-133.4544678C190.9372864,664.0772705,162.8185883,589.145752,162.8185883,507.987915z M520.3996582,807.5519409l0.2923584,0.1114502l0.9387207,0.3547363l3.6769409,1.3851318c3.222229,1.2060547,7.9224243,2.9526367,13.8048706,5.1012573c11.7747192,4.3040161,28.2593384,10.2127686,47.0891724,16.6315308c37.9032593,12.9188232,84.4012451,27.5908813,121.0181885,35.5570679c6.3762817,1.3884888,13.7496338-0.2026978,19.3690186-3.999939c5.664917-3.8243408,6.7985229-7.7330933,6.7985229-9.6451416c0-1.5101318-0.9484863-6.3546753-5.2166138-14.9187622c-3.9335327-7.8986206-9.4588013-16.5505371-15.4029541-24.8746948c-5.8825073-8.2330322-11.8234253-15.6484985-16.3189697-21.0302124c-2.2379761-2.6790161-4.0895386-4.8208618-5.362793-6.2701416c-0.6366577-0.7263794-1.1271362-1.2736816-1.4454956-1.6317139l-0.3474731-0.3851318l-0.0714722-0.0777588c-4.8560791-5.3242798-7.2565308-12.5775757-6.5776367-19.8815308c0.678833-7.3039551,4.3688965-13.9423828,10.1149292-18.2024536c73.1461792-54.1784668,119.6994629-140.6199951,119.6994629-237.7877197c0-101.8224487-50.9058228-191.8007812-129.5545044-245.4275208l-0.1851196-0.1270142c-48.557373-33.7722321-107.034729-53.0814667-170.7189636-53.0814667c-167.0510864,0-300.458252,134.6102142-300.458252,298.6359863c0,68.7896729,23.8054047,132.4713745,64.0824585,183.0079346l0.2325745,0.2938843c53.8106689,69.6107178,139.5284119,114.7081299,236.143219,114.7081299C514.8647461,805.9978638,517.710144,806.5249023,520.3996582,807.5519409C520.3964233,807.5519409,520.3996582,807.5519409,520.3996582,807.5519409z"/>
+                            <linearGradient id="vector_dark_2" gradientUnits="userSpaceOnUse" x1="673.7598877" y1="507.8265076" x2="763.7354126" y2="507.8265076">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_dark_2)" d="M685.8272705,327.7643738c11.6155396-7.0644531,26.5346069-2.998291,33.3265991,9.0812988c28.3989868,50.5088501,44.581543,108.9274292,44.581543,171.1523438c0,62.0769958-16.1663208,120.3972473-44.5945435,170.832489c-6.8050537,12.0740967-21.7305298,16.1213989-33.3363037,9.0437622c-11.605835-7.0742188-15.5004272-22.5977173-8.6954346-34.671875c24.1828613-42.9015503,37.9032593-92.4110718,37.9032593-145.2043762c0-52.9541016-13.743103-102.5784912-37.9162598-145.5708923C670.3041382,350.3475342,674.211731,334.8284607,685.8272705,327.7643738z"/>
+                        </g>
+                        <g>
+                            <linearGradient id="vector_dark_3" gradientUnits="userSpaceOnUse" x1="656.4779053" y1="873.744812" x2="746.4534302" y2="873.744812" gradientTransform="matrix(-0.7071068 -0.7071068 -0.7071068 0.7071068 1569.0904541 324.6101379)">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_dark_3)" d="M587.5134277,373.0690613c-47.4932251,13.3072205-92.3008118,38.6791077-129.7450256,76.1233215c-37.3304749,37.3305054-62.6372375,82.0408325-75.8733215,129.4766235c-3.7258911,13.3496094-17.456543,21.5724487-30.6653442,18.3681641c-13.2111511-3.2019653-20.9031982-16.6176758-17.1773682-29.9672852c15.5612793-55.7648926,45.3686218-108.4348145,89.2636719-152.3298645c43.9996643-43.9996948,96.7506104-73.8650818,152.546875-89.4990845c13.3442383-3.7388916,26.7687988,3.9352417,29.9869385,17.1439819C609.0681763,355.5934143,600.857605,369.3301392,587.5134277,373.0690613z"/>
+                            <linearGradient id="vector_dark_4" gradientUnits="userSpaceOnUse" x1="613.276062" y1="159.8028259" x2="703.2516479" y2="159.8028259" gradientTransform="matrix(-0.7071068 0.7071068 0.7071068 0.7071068 807.713623 -9.237505)">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_dark_4)" d="M381.8876648,436.9580383c13.3071899,47.4931946,38.6791077,92.3008118,76.123291,129.7450256c37.3305054,37.3305054,82.040802,62.6372681,129.4766541,75.8733521c13.3495483,3.7258911,21.5724487,17.456543,18.3681641,30.6652832c-3.2019653,13.2111816-16.6176758,20.9032593-29.9672852,17.1774292c-55.7648926-15.5612793-108.434845-45.3686523-152.329895-89.2637329c-43.9996643-43.9996338-73.8650513-96.7505798-89.4990845-152.546875c-3.7388916-13.3442383,3.9352417-26.7687683,17.1439819-29.9868774C364.4120178,415.4032898,378.1487427,423.6138306,381.8876648,436.9580383z"/>
+                            <linearGradient id="vector_dark_5" gradientUnits="userSpaceOnUse" x1="841.4553833" y1="507.8265076" x2="931.4309082" y2="507.8265076" gradientTransform="matrix(-1 0 0 1 1257.5441895 0)">
+                                <stop offset="0" style="stop-color:#0064FF"/>
+                                <stop offset="1" style="stop-color:#00A9FF"/>
+                            </linearGradient>
+                            <path fill="url(#vector_dark_5)" d="M412.752533,362.427124c-24.1731567,42.9924011-37.9162598,92.6167908-37.9162598,145.5708923c0,52.7933044,13.7203674,102.3028259,37.9032593,145.2043762c6.8049622,12.0741577,2.9103699,27.5976562-8.6954346,34.671875c-11.6058044,7.0776367-26.5312805,3.0303345-33.3363037-9.0437622c-28.4282532-50.4352417-44.5945435-108.7554932-44.5945435-170.832489c0-62.2249146,16.1825256-120.6434937,44.581543-171.1523438c6.7919922-12.0795898,21.7110291-16.145752,33.3265686-9.0812988C415.6369019,334.8284607,419.5444946,350.3475342,412.752533,362.427124z"/>
+                        </g>
+                    </g>
+                </svg>
                 <span>Kommentio</span>
             </a>
             <div class="nav-links">
@@ -1060,7 +1130,7 @@
                         <div 
                             data-kommentio
                             data-site-id="premium-demo"
-                            data-theme="dark"
+                            data-theme="auto"
                             data-language="ko"
                         ></div>
                     </div>
@@ -1068,6 +1138,26 @@
             </div>
         </section>
     </main>
+
+    <!-- Footer with Legal Links -->
+    <footer style="padding: 3rem 2rem; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); background: var(--bg-secondary);">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                <a href="./terms-of-service.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; transition: color 0.3s ease;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-secondary)'">
+                    Terms of Service
+                </a>
+                <a href="./privacy-policy.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; transition: color 0.3s ease;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-secondary)'">
+                    Privacy Policy
+                </a>
+                <a href="https://github.com/xavierchoi/kommentio" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; transition: color 0.3s ease;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-secondary)'">
+                    GitHub
+                </a>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.75rem; margin: 0;">
+                © 2025 Kommentio. Open source comment system for the modern web.
+            </p>
+        </div>
+    </footer>
 
     <!-- Kommentio Widget Script -->
     <script src="./kommentio.js"></script>
@@ -1087,8 +1177,8 @@
     </script>
 
     <script>
-        // 🎨 Initialize Premium Features
-        let isDark = true;
+        // 🎨 Initialize Premium Features - 시스템 설정 감지
+        let isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         
         // Create particles (극한 최적화: 20개 → 12개)
         function createParticles() {
@@ -1155,7 +1245,27 @@
                 }
             }
             
-            // 3. 아이콘 전환 (CSS 클래스 기반)
+            // 3. 로고 전환
+            const logoLight = document.getElementById('logo-light');
+            const logoDark = document.getElementById('logo-dark');
+            
+            if (logoLight && logoDark) {
+                if (isDark) {
+                    // 다크 모드: 다크 로고 표시
+                    logoLight.style.display = 'none';
+                    logoDark.style.display = 'block';
+                    console.log('🌙 Dark logo activated');
+                } else {
+                    // 라이트 모드: 라이트 로고 표시
+                    logoLight.style.display = 'block';
+                    logoDark.style.display = 'none';
+                    console.log('☀️ Light logo activated');
+                }
+            } else {
+                console.error('⚠️ Logo elements not found!');
+            }
+            
+            // 4. 아이콘 전환 (CSS 클래스 기반)
             const moonIcon = document.querySelector('.moon-icon');
             const sunIcon = document.querySelector('.sun-icon');
             
@@ -1175,7 +1285,7 @@
                 console.error('⚠️ Theme icons not found!');
             }
             
-            // 4. 성공 로그
+            // 5. 성공 로그
             console.log(`✅ Theme switched successfully to ${theme}`);
         }
 
@@ -1228,6 +1338,11 @@
         function initThemeSystem() {
             console.log('🔧 Initializing theme system...');
             
+            // 시스템 설정에 따른 초기 테마 설정
+            const initialTheme = isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', initialTheme);
+            console.log(`📱 Initial theme set to: ${initialTheme} (system preference)`);
+            
             // 아이콘 요소 확인
             const moonIcon = document.querySelector('.moon-icon');
             const sunIcon = document.querySelector('.sun-icon');
@@ -1243,9 +1358,29 @@
                 return;
             }
             
-            // 초기 상태 설정 (다크모드 기본)
-            moonIcon.classList.add('active');
-            sunIcon.classList.remove('active');
+            // 시스템 설정에 따른 초기 상태 설정
+            if (isDark) {
+                moonIcon.classList.add('active');
+                sunIcon.classList.remove('active');
+            } else {
+                sunIcon.classList.add('active');
+                moonIcon.classList.remove('active');
+            }
+            
+            // 시스템 설정에 따른 로고 초기화
+            const logoLight = document.getElementById('logo-light');
+            const logoDark = document.getElementById('logo-dark');
+            if (logoLight && logoDark) {
+                if (isDark) {
+                    logoLight.style.display = 'none';
+                    logoDark.style.display = 'block';
+                    console.log('🌙 Dark logo set as default (system preference)');
+                } else {
+                    logoLight.style.display = 'block';
+                    logoDark.style.display = 'none';
+                    console.log('☀️ Light logo set as default (system preference)');
+                }
+            }
             
             // 키보드 접근성 추가
             themeButton.addEventListener('keydown', (e) => {
@@ -1258,11 +1393,68 @@
             console.log('✅ Theme system initialized successfully');
             console.log(`📱 Current theme: ${isDark ? 'dark' : 'light'}`);
             
+            // 시스템 테마 변경 감지
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            mediaQuery.addListener(handleSystemThemeChange);
+            
             // 5초 후 시스템 상태 체크
             setTimeout(validateThemeSystem, 5000);
             
             // 성능 모니터링 시작
             initPerformanceMonitoring();
+        }
+        
+        // 시스템 테마 변경 핸들러
+        function handleSystemThemeChange(e) {
+            const systemPrefersDark = e.matches;
+            console.log(`🖥️ System theme changed to: ${systemPrefersDark ? 'dark' : 'light'}`);
+            
+            // 현재 설정과 다르면 자동으로 변경
+            if (isDark !== systemPrefersDark) {
+                isDark = systemPrefersDark;
+                const theme = isDark ? 'dark' : 'light';
+                
+                // 문서 테마 업데이트
+                document.documentElement.setAttribute('data-theme', theme);
+                
+                // 로고 전환
+                const logoLight = document.getElementById('logo-light');
+                const logoDark = document.getElementById('logo-dark');
+                if (logoLight && logoDark) {
+                    if (isDark) {
+                        logoLight.style.display = 'none';
+                        logoDark.style.display = 'block';
+                    } else {
+                        logoLight.style.display = 'block';
+                        logoDark.style.display = 'none';
+                    }
+                }
+                
+                // 아이콘 전환
+                const moonIcon = document.querySelector('.moon-icon');
+                const sunIcon = document.querySelector('.sun-icon');
+                if (moonIcon && sunIcon) {
+                    if (isDark) {
+                        moonIcon.classList.add('active');
+                        sunIcon.classList.remove('active');
+                    } else {
+                        sunIcon.classList.add('active');
+                        moonIcon.classList.remove('active');
+                    }
+                }
+                
+                // Kommentio 위젯 테마 업데이트
+                const kommentioWidget = document.querySelector('[data-kommentio]');
+                if (kommentioWidget) {
+                    kommentioWidget.setAttribute('data-theme', theme);
+                    if (window.kommentio) {
+                        window.kommentio.options.theme = theme;
+                        window.kommentio.container.setAttribute('data-theme', theme);
+                    }
+                }
+                
+                console.log(`✅ Auto-switched to ${theme} mode following system preference`);
+            }
         }
         
         // 성능 모니터링 시스템
@@ -1448,7 +1640,14 @@
         }
 
         // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', initPremiumExperience);
+        document.addEventListener('DOMContentLoaded', () => {
+            // 시스템 설정에 따른 초기 테마 설정
+            const initialTheme = isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', initialTheme);
+            console.log(`🖥️ System preference detected: ${initialTheme} mode`);
+            
+            initPremiumExperience();
+        });
 
         // 극한 최적화된 마우스 추적 시스템
         let rafId = null;
