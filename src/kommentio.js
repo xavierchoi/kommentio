@@ -1167,22 +1167,8 @@ class Kommentio {
       // Mock 모드에서는 실시간 업데이트 시뮬레이션
       this.simulateRealtimeUpdates();
     } else if (this.supabase) {
-      // 실제 Supabase Realtime 구독
-      this.supabase
-        .channel('comments')
-        .on('postgres_changes', 
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'comments',
-            filter: `site_id=eq.${this.options.siteId}`
-          }, 
-          (payload) => {
-            console.log('Real-time update:', payload);
-            this.loadComments();
-          }
-        )
-        .subscribe();
+      // 실제 Supabase Realtime 구독 (개선된 버전)
+      this.setupRealtimeSubscription();
     }
   }
 
@@ -1302,6 +1288,156 @@ class Kommentio {
         }
       }, 300);
     }, 3000);
+  }
+
+  /**
+   * 실시간 구독 설정 (개선된 버전)
+   */
+  setupRealtimeSubscription() {
+    try {
+      console.log('🔄 실시간 구독 설정 중...');
+      
+      // 채널 이름을 사이트별로 고유하게 생성
+      const channelName = `comments-${this.options.siteId}`;
+      
+      this.realtimeChannel = this.supabase
+        .channel(channelName)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public', 
+          table: 'comments',
+          filter: `site_id=eq.${this.options.siteId}`
+        }, (payload) => {
+          console.log('💬 댓글 실시간 이벤트:', payload);
+          this.handleRealtimeCommentEvent(payload);
+        })
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'comment_likes',
+          filter: `comment_id=in.(${this.getAllCommentIds().join(',')})`
+        }, (payload) => {
+          console.log('❤️ 좋아요 실시간 이벤트:', payload);
+          this.handleRealtimeLikeEvent(payload);
+        })
+        .subscribe((status) => {
+          console.log(`📡 실시간 구독 상태: ${status}`);
+          
+          if (status === 'SUBSCRIBED') {
+            this.showNotification('🔄 실시간 업데이트가 활성화되었습니다!');
+          } else if (status === 'CHANNEL_ERROR') {
+            console.error('❌ 실시간 구독 오류');
+            this.showNotification('⚠️ 실시간 업데이트 연결에 문제가 있습니다.');
+          }
+        });
+        
+    } catch (error) {
+      console.error('❌ 실시간 구독 설정 실패:', error);
+    }
+  }
+
+  /**
+   * 댓글 실시간 이벤트 처리
+   */
+  handleRealtimeCommentEvent(payload) {
+    const { eventType, new: newRecord, old: oldRecord } = payload;
+    
+    switch (eventType) {
+      case 'INSERT':
+        // 새 댓글 추가
+        if (newRecord && newRecord.site_id === this.options.siteId) {
+          this.showNotification(`💬 새 댓글: ${newRecord.author_name}`);
+          this.loadComments(); // 댓글 목록 새로고침
+        }
+        break;
+        
+      case 'UPDATE':
+        // 댓글 수정
+        if (newRecord && newRecord.site_id === this.options.siteId) {
+          if (oldRecord.is_deleted === false && newRecord.is_deleted === true) {
+            this.showNotification('🗑️ 댓글이 삭제되었습니다.');
+          } else {
+            this.showNotification('✏️ 댓글이 수정되었습니다.');
+          }
+          this.loadComments();
+        }
+        break;
+        
+      case 'DELETE':
+        // 댓글 완전 삭제 (하드 삭제)
+        this.showNotification('🗑️ 댓글이 삭제되었습니다.');
+        this.loadComments();
+        break;
+    }
+  }
+
+  /**
+   * 좋아요 실시간 이벤트 처리
+   */
+  handleRealtimeLikeEvent(payload) {
+    const { eventType, new: newRecord } = payload;
+    
+    if (eventType === 'INSERT' && newRecord) {
+      this.showNotification('❤️ 새로운 좋아요!');
+      // 좋아요 수만 업데이트 (전체 새로고침 없이)
+      this.updateCommentLikeCount(newRecord.comment_id);
+    } else if (eventType === 'DELETE') {
+      // 좋아요 취소
+      this.updateCommentLikeCount(payload.old.comment_id);
+    }
+  }
+
+  /**
+   * 모든 댓글 ID 목록 가져오기 (좋아요 구독용)
+   */
+  getAllCommentIds() {
+    const extractIds = (comments) => {
+      let ids = [];
+      for (const comment of comments) {
+        ids.push(comment.id);
+        if (comment.children && comment.children.length > 0) {
+          ids = ids.concat(extractIds(comment.children));
+        }
+      }
+      return ids;
+    };
+    
+    return this.comments ? extractIds(this.comments) : [];
+  }
+
+  /**
+   * 특정 댓글의 좋아요 수 업데이트
+   */
+  async updateCommentLikeCount(commentId) {
+    try {
+      const { data, error } = await this.supabase
+        .from('comments')
+        .select('likes_count')
+        .eq('id', commentId)
+        .single();
+        
+      if (error) throw error;
+      
+      // DOM에서 해당 댓글의 좋아요 수 업데이트
+      const likeButton = this.container.querySelector(`[data-comment-id="${commentId}"] .kommentio-btn-like`);
+      if (likeButton) {
+        likeButton.textContent = `👍 ${data.likes_count || 0}`;
+      }
+      
+    } catch (error) {
+      console.error('좋아요 수 업데이트 실패:', error);
+    }
+  }
+
+  /**
+   * 실시간 구독 해제
+   */
+  unsubscribeRealtime() {
+    if (this.realtimeChannel) {
+      this.supabase.removeChannel(this.realtimeChannel);
+      this.realtimeChannel = null;
+      console.log('📡 실시간 구독이 해제되었습니다.');
+    }
   }
 
   /**

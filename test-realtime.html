@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Realtime 테스트 - Kommentio v0.2.1</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .success { background: #10b981; color: white; }
+        .warning { background: #f59e0b; color: white; }
+        .error { background: #ef4444; color: white; }
+        .info { background: #3b82f6; color: white; }
+        
+        .test-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .test-button {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .test-button:hover {
+            background: #15803d;
+        }
+        
+        .test-button.danger {
+            background: #dc2626;
+        }
+        
+        .test-button.danger:hover {
+            background: #b91c1c;
+        }
+        
+        .test-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .log-container {
+            background: #f3f4f6;
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+        
+        .realtime-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc2626;
+        }
+        
+        .status-indicator.connected {
+            background: #16a34a;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .comment-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .comment-meta {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .new-comment {
+            animation: slideIn 0.5s ease-out;
+            border-left: 4px solid #16a34a;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status info">
+            ⚡ Supabase Realtime 연동 검증 테스트 - Kommentio v0.2.1
+        </div>
+
+        <!-- 실시간 연결 상태 -->
+        <div class="test-section">
+            <div class="realtime-status">
+                <div id="status-indicator" class="status-indicator"></div>
+                <h3>📡 실시간 연결 상태</h3>
+            </div>
+            <div id="connection-status" class="status warning">연결 확인 중...</div>
+            <button class="test-button" onclick="connectRealtime()">실시간 연결</button>
+            <button class="test-button danger" onclick="disconnectRealtime()">연결 해제</button>
+            <button class="test-button" onclick="checkConnection()">상태 확인</button>
+        </div>
+
+        <div class="grid-2">
+            <!-- 실시간 이벤트 모니터링 -->
+            <div class="test-section">
+                <h3>🔔 실시간 이벤트 모니터링</h3>
+                <p>데이터베이스 변경사항을 실시간으로 감지합니다.</p>
+                <button class="test-button" onclick="clearEventLog()">로그 지우기</button>
+                <button class="test-button" onclick="toggleAutoScroll()">자동 스크롤: <span id="auto-scroll-status">ON</span></button>
+                <div id="event-log" class="log-container"></div>
+            </div>
+
+            <!-- 수동 테스트 도구 -->
+            <div class="test-section">
+                <h3>🛠️ 수동 테스트 도구</h3>
+                <p>데이터베이스에 직접 변경을 가해서 실시간 이벤트를 테스트합니다.</p>
+                
+                <div style="margin-bottom: 1rem;">
+                    <input type="text" id="test-comment-content" placeholder="테스트 댓글 내용" 
+                           style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; margin-bottom: 0.5rem;">
+                </div>
+                
+                <button class="test-button" onclick="insertTestComment()">댓글 추가</button>
+                <button class="test-button" onclick="updateRandomComment()">댓글 수정</button>
+                <button class="test-button" onclick="deleteRandomComment()">댓글 삭제</button>
+                <button class="test-button" onclick="addRandomLike()">좋아요 추가</button>
+                
+                <div id="manual-test-log" class="log-container"></div>
+            </div>
+        </div>
+
+        <!-- 실시간 댓글 목록 -->
+        <div class="test-section">
+            <h3>💬 실시간 댓글 목록</h3>
+            <p>실시간으로 업데이트되는 댓글들을 확인할 수 있습니다.</p>
+            <button class="test-button" onclick="refreshComments()">댓글 새로고침</button>
+            <button class="test-button" onclick="clearCommentsList()">목록 지우기</button>
+            
+            <div id="comments-count" style="margin: 1rem 0; font-weight: 500;">댓글 수: 0개</div>
+            <div id="comments-list"></div>
+        </div>
+
+        <!-- Kommentio 위젯 실시간 테스트 -->
+        <div class="test-section">
+            <h3>📝 Kommentio 위젯 실시간 테스트</h3>
+            <p>실제 위젯에서 실시간 기능이 작동하는지 확인합니다.</p>
+            
+            <!-- 실제 위젯 -->
+            <div 
+                data-kommentio
+                data-site-id="kommentio-test-site"
+                data-theme="light"
+                data-language="ko"
+                data-supabase-url="https://nwjbtsjeikrwyqltkpqv.supabase.co"
+                data-supabase-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ"
+                data-page-url="https://kommentio.com/realtime-test"
+            ></div>
+        </div>
+    </div>
+
+    <!-- Supabase SDK 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Kommentio 위젯 로드 -->
+    <script src="./src/kommentio.js"></script>
+
+    <script>
+        let supabaseClient = null;
+        let realtimeChannel = null;
+        let isAutoScroll = true;
+        let siteId = null;
+        let eventCount = 0;
+
+        // 로그 출력 함수
+        function addLog(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logClass = type === 'error' ? 'color: #ef4444;' : 
+                            type === 'success' ? 'color: #10b981;' : 
+                            type === 'warning' ? 'color: #f59e0b;' : 
+                            type === 'realtime' ? 'color: #8b5cf6; font-weight: bold;' : 'color: #374151;';
+            
+            container.innerHTML += `<div style="${logClass}">[${timestamp}] ${message}</div>`;
+            
+            if (isAutoScroll) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        // Supabase 클라이언트 초기화
+        function initSupabase() {
+            if (!supabaseClient) {
+                supabaseClient = window.supabase.createClient(
+                    'https://nwjbtsjeikrwyqltkpqv.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ'
+                );
+                
+                // 사이트 ID 가져오기
+                getSiteId();
+            }
+            return supabaseClient;
+        }
+
+        // 사이트 ID 조회
+        async function getSiteId() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('sites')
+                    .select('id')
+                    .eq('domain', 'localhost:5173')
+                    .single();
+                    
+                if (error) throw error;
+                
+                siteId = data.id;
+                addLog('event-log', `✅ 사이트 ID 조회 완료: ${siteId}`, 'success');
+            } catch (error) {
+                addLog('event-log', `❌ 사이트 ID 조회 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 실시간 연결
+        async function connectRealtime() {
+            try {
+                initSupabase();
+                
+                if (realtimeChannel) {
+                    addLog('event-log', '⚠️ 이미 연결되어 있습니다. 기존 연결을 해제합니다.', 'warning');
+                    await disconnectRealtime();
+                }
+                
+                addLog('event-log', '🔄 실시간 연결 시작...', 'info');
+                
+                // 댓글 테이블 실시간 구독
+                realtimeChannel = supabaseClient
+                    .channel('realtime-test-channel')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'comments'
+                    }, (payload) => {
+                        eventCount++;
+                        addLog('event-log', `🔔 댓글 이벤트 #${eventCount}: ${payload.eventType}`, 'realtime');
+                        addLog('event-log', `📄 데이터: ${JSON.stringify(payload.new || payload.old, null, 2)}`, 'info');
+                        
+                        // 댓글 목록 새로고침
+                        refreshComments();
+                    })
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'comment_likes'
+                    }, (payload) => {
+                        eventCount++;
+                        addLog('event-log', `❤️ 좋아요 이벤트 #${eventCount}: ${payload.eventType}`, 'realtime');
+                        addLog('event-log', `📄 데이터: ${JSON.stringify(payload.new || payload.old, null, 2)}`, 'info');
+                        
+                        // 댓글 목록 새로고침
+                        refreshComments();
+                    })
+                    .subscribe((status) => {
+                        addLog('event-log', `📡 구독 상태: ${status}`, status === 'SUBSCRIBED' ? 'success' : 'warning');
+                        
+                        if (status === 'SUBSCRIBED') {
+                            document.getElementById('status-indicator').classList.add('connected');
+                            document.getElementById('connection-status').className = 'status success';
+                            document.getElementById('connection-status').textContent = '✅ 실시간 연결 활성화됨';
+                        }
+                    });
+                    
+            } catch (error) {
+                addLog('event-log', `❌ 실시간 연결 실패: ${error.message}`, 'error');
+                document.getElementById('connection-status').className = 'status error';
+                document.getElementById('connection-status').textContent = '❌ 실시간 연결 실패';
+            }
+        }
+
+        // 실시간 연결 해제
+        async function disconnectRealtime() {
+            if (realtimeChannel) {
+                supabaseClient.removeChannel(realtimeChannel);
+                realtimeChannel = null;
+                
+                document.getElementById('status-indicator').classList.remove('connected');
+                document.getElementById('connection-status').className = 'status warning';
+                document.getElementById('connection-status').textContent = '⚠️ 실시간 연결 해제됨';
+                
+                addLog('event-log', '📡 실시간 연결이 해제되었습니다.', 'warning');
+            }
+        }
+
+        // 연결 상태 확인
+        async function checkConnection() {
+            const isConnected = realtimeChannel && realtimeChannel.state === 'joined';
+            const statusText = isConnected ? '✅ 연결됨' : '❌ 연결 안됨';
+            const statusType = isConnected ? 'success' : 'error';
+            
+            addLog('event-log', `🔍 연결 상태: ${statusText}`, statusType);
+            
+            if (realtimeChannel) {
+                addLog('event-log', `📊 채널 상태: ${realtimeChannel.state}`, 'info');
+                addLog('event-log', `🆔 채널 ID: ${realtimeChannel.topic}`, 'info');
+            }
+        }
+
+        // 테스트 댓글 삽입
+        async function insertTestComment() {
+            try {
+                if (!siteId) {
+                    addLog('manual-test-log', '❌ 사이트 ID가 없습니다. 먼저 실시간 연결을 하세요.', 'error');
+                    return;
+                }
+                
+                const content = document.getElementById('test-comment-content').value || 
+                               `실시간 테스트 댓글 - ${new Date().toLocaleTimeString()}`;
+                
+                const { data, error } = await supabaseClient
+                    .from('comments')
+                    .insert({
+                        site_id: siteId,
+                        page_url: 'https://kommentio.com/realtime-test',
+                        content: content,
+                        author_name: '실시간 테스터',
+                        author_email: 'realtime@kommentio.com',
+                        depth: 0
+                    })
+                    .select()
+                    .single();
+                    
+                if (error) throw error;
+                
+                addLog('manual-test-log', `✅ 댓글 추가 완료: ${data.id}`, 'success');
+                document.getElementById('test-comment-content').value = '';
+                
+            } catch (error) {
+                addLog('manual-test-log', `❌ 댓글 추가 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 랜덤 댓글 수정
+        async function updateRandomComment() {
+            try {
+                if (!siteId) return;
+                
+                // 랜덤 댓글 선택
+                const { data: comments, error: selectError } = await supabaseClient
+                    .from('comments')
+                    .select('id')
+                    .eq('site_id', siteId)
+                    .eq('is_deleted', false)
+                    .limit(5);
+                    
+                if (selectError) throw selectError;
+                
+                if (comments.length === 0) {
+                    addLog('manual-test-log', '❌ 수정할 댓글이 없습니다.', 'warning');
+                    return;
+                }
+                
+                const randomComment = comments[Math.floor(Math.random() * comments.length)];
+                
+                const { data, error } = await supabaseClient
+                    .from('comments')
+                    .update({
+                        content: `수정된 댓글 - ${new Date().toLocaleTimeString()}`,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', randomComment.id)
+                    .select()
+                    .single();
+                    
+                if (error) throw error;
+                
+                addLog('manual-test-log', `✅ 댓글 수정 완료: ${data.id}`, 'success');
+                
+            } catch (error) {
+                addLog('manual-test-log', `❌ 댓글 수정 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 랜덤 댓글 삭제 (soft delete)
+        async function deleteRandomComment() {
+            try {
+                if (!siteId) return;
+                
+                const { data: comments, error: selectError } = await supabaseClient
+                    .from('comments')
+                    .select('id')
+                    .eq('site_id', siteId)
+                    .eq('is_deleted', false)
+                    .limit(5);
+                    
+                if (selectError) throw selectError;
+                
+                if (comments.length === 0) {
+                    addLog('manual-test-log', '❌ 삭제할 댓글이 없습니다.', 'warning');
+                    return;
+                }
+                
+                const randomComment = comments[Math.floor(Math.random() * comments.length)];
+                
+                const { data, error } = await supabaseClient
+                    .from('comments')
+                    .update({ is_deleted: true })
+                    .eq('id', randomComment.id)
+                    .select()
+                    .single();
+                    
+                if (error) throw error;
+                
+                addLog('manual-test-log', `✅ 댓글 삭제 완료: ${data.id}`, 'success');
+                
+            } catch (error) {
+                addLog('manual-test-log', `❌ 댓글 삭제 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 랜덤 좋아요 추가
+        async function addRandomLike() {
+            try {
+                if (!siteId) return;
+                
+                const { data: comments, error: selectError } = await supabaseClient
+                    .from('comments')
+                    .select('id')
+                    .eq('site_id', siteId)
+                    .eq('is_deleted', false)
+                    .limit(5);
+                    
+                if (selectError) throw selectError;
+                
+                if (comments.length === 0) {
+                    addLog('manual-test-log', '❌ 좋아요할 댓글이 없습니다.', 'warning');
+                    return;
+                }
+                
+                const randomComment = comments[Math.floor(Math.random() * comments.length)];
+                const randomIp = `192.168.1.${Math.floor(Math.random() * 255)}`;
+                
+                const { data, error } = await supabaseClient
+                    .from('comment_likes')
+                    .insert({
+                        comment_id: randomComment.id,
+                        user_ip: randomIp
+                    })
+                    .select()
+                    .single();
+                    
+                if (error) throw error;
+                
+                addLog('manual-test-log', `❤️ 좋아요 추가 완료: ${data.id}`, 'success');
+                
+            } catch (error) {
+                addLog('manual-test-log', `❌ 좋아요 추가 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 댓글 목록 새로고침
+        async function refreshComments() {
+            try {
+                if (!siteId) return;
+                
+                const { data: comments, error } = await supabaseClient
+                    .from('comments')
+                    .select(`
+                        *,
+                        comment_likes!inner(count)
+                    `)
+                    .eq('site_id', siteId)
+                    .eq('is_deleted', false)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+                    
+                if (error) throw error;
+                
+                const commentsContainer = document.getElementById('comments-list');
+                commentsContainer.innerHTML = '';
+                
+                comments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment-item new-comment';
+                    commentDiv.innerHTML = `
+                        <div class="comment-meta">
+                            ${comment.author_name} • ${new Date(comment.created_at).toLocaleString()} • 👍 ${comment.likes_count || 0}
+                        </div>
+                        <div>${comment.content}</div>
+                    `;
+                    commentsContainer.appendChild(commentDiv);
+                    
+                    // 새 댓글 효과 제거
+                    setTimeout(() => {
+                        commentDiv.classList.remove('new-comment');
+                    }, 500);
+                });
+                
+                document.getElementById('comments-count').textContent = `댓글 수: ${comments.length}개`;
+                
+            } catch (error) {
+                console.error('댓글 새로고침 실패:', error);
+            }
+        }
+
+        // 로그 지우기
+        function clearEventLog() {
+            document.getElementById('event-log').innerHTML = '';
+            eventCount = 0;
+        }
+
+        // 댓글 목록 지우기
+        function clearCommentsList() {
+            document.getElementById('comments-list').innerHTML = '';
+            document.getElementById('comments-count').textContent = '댓글 수: 0개';
+        }
+
+        // 자동 스크롤 토글
+        function toggleAutoScroll() {
+            isAutoScroll = !isAutoScroll;
+            document.getElementById('auto-scroll-status').textContent = isAutoScroll ? 'ON' : 'OFF';
+        }
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                connectRealtime();
+                refreshComments();
+            }, 1000);
+        });
+
+        // 페이지 언로드 시 정리
+        window.addEventListener('beforeunload', () => {
+            disconnectRealtime();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kommentio - Supabase 실제 연동 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .success { background: #10b981; color: white; }
+        .warning { background: #f59e0b; color: white; }
+        .error { background: #ef4444; color: white; }
+        .info { background: #3b82f6; color: white; }
+        
+        .test-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .test-button:hover {
+            background: #2563eb;
+        }
+        
+        .test-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .log-container {
+            background: #f3f4f6;
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+        }
+        
+        .demo-article {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status success">
+            🚀 Kommentio v0.2.1 - Supabase 실제 연동 테스트
+        </div>
+
+        <!-- 연결 상태 표시 -->
+        <div class="test-section">
+            <h3>📡 Supabase 연결 상태</h3>
+            <div id="connection-status" class="status warning">연결 확인 중...</div>
+            <button class="test-button" onclick="testSupabaseConnection()">연결 테스트</button>
+            <button class="test-button" onclick="checkDatabaseSchema()">스키마 확인</button>
+        </div>
+
+        <!-- 데이터베이스 테스트 -->
+        <div class="test-section">
+            <h3>🗄️ 데이터베이스 CRUD 테스트</h3>
+            <button class="test-button" onclick="testCreateSite()">사이트 생성</button>
+            <button class="test-button" onclick="testCreateComment()">댓글 생성</button>
+            <button class="test-button" onclick="testReadComments()">댓글 조회</button>
+            <button class="test-button" onclick="testUpdateComment()">댓글 수정</button>
+            <button class="test-button" onclick="testDeleteComment()">댓글 삭제</button>
+            <div id="crud-log" class="log-container" style="margin-top: 1rem;"></div>
+        </div>
+
+        <!-- 실시간 테스트 -->
+        <div class="test-section">
+            <h3>⚡ 실시간 업데이트 테스트</h3>
+            <button class="test-button" onclick="testRealtimeConnection()">실시간 구독</button>
+            <button class="test-button" onclick="simulateRealtimeUpdate()">실시간 업데이트 시뮬레이션</button>
+            <button class="test-button" onclick="stopRealtimeConnection()">구독 해제</button>
+            <div id="realtime-log" class="log-container" style="margin-top: 1rem;"></div>
+        </div>
+
+        <!-- 인증 테스트 -->
+        <div class="test-section">
+            <h3>🔐 인증 시스템 테스트</h3>
+            <button class="test-button" onclick="testAnonymousAuth()">익명 인증</button>
+            <button class="test-button" onclick="testSocialLogin('google')">Google 로그인</button>
+            <button class="test-button" onclick="testSocialLogin('github')">GitHub 로그인</button>
+            <button class="test-button" onclick="testLogout()">로그아웃</button>
+            <div id="auth-log" class="log-container" style="margin-top: 1rem;"></div>
+        </div>
+
+        <!-- 실제 위젯 테스트 -->
+        <article class="demo-article">
+            <h2>📝 실제 위젯 테스트 (Supabase 연동)</h2>
+            <p>아래 댓글 위젯은 실제 Supabase 데이터베이스에 연결되어 있습니다.</p>
+            <p><strong>테스트 내용:</strong></p>
+            <ul>
+                <li>실제 데이터베이스에 댓글 저장</li>
+                <li>실시간 댓글 업데이트</li>
+                <li>소셜 로그인 연동</li>
+                <li>AI 스팸 필터링 (Claude API)</li>
+            </ul>
+        </article>
+
+        <!-- Kommentio 위젯 (실제 Supabase 연동) -->
+        <div 
+            data-kommentio
+            data-site-id="kommentio-test-site"
+            data-theme="light"
+            data-language="ko"
+            data-supabase-url="https://nwjbtsjeikrwyqltkpqv.supabase.co"
+            data-supabase-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ"
+            data-page-url="https://kommentio.com/test-page"
+        ></div>
+    </div>
+
+    <!-- 위젯 스크립트 로드 -->
+    <script src="./src/kommentio.js"></script>
+
+    <script>
+        let supabaseClient = null;
+        let realtimeChannel = null;
+        let testSiteId = null;
+        let testCommentId = null;
+
+        // 로그 출력 함수
+        function addLog(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logClass = type === 'error' ? 'color: #ef4444;' : 
+                            type === 'success' ? 'color: #10b981;' : 
+                            type === 'warning' ? 'color: #f59e0b;' : 'color: #374151;';
+            
+            container.innerHTML += `<div style="${logClass}">[${timestamp}] ${message}</div>`;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Supabase 연결 테스트
+        async function testSupabaseConnection() {
+            try {
+                // Supabase SDK 로드
+                if (!window.supabase) {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+                    document.head.appendChild(script);
+                    await new Promise(resolve => script.onload = resolve);
+                }
+
+                // Supabase 클라이언트 생성
+                supabaseClient = window.supabase.createClient(
+                    'https://nwjbtsjeikrwyqltkpqv.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ'
+                );
+
+                // 연결 테스트
+                const { data, error } = await supabaseClient.from('sites').select('count').limit(1);
+                
+                if (error) {
+                    throw error;
+                }
+
+                document.getElementById('connection-status').className = 'status success';
+                document.getElementById('connection-status').textContent = '✅ Supabase 연결 성공!';
+                
+                addLog('connection-status', 'Supabase 연결 성공', 'success');
+            } catch (error) {
+                document.getElementById('connection-status').className = 'status error';
+                document.getElementById('connection-status').textContent = '❌ Supabase 연결 실패: ' + error.message;
+                
+                addLog('connection-status', `연결 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 데이터베이스 스키마 확인
+        async function checkDatabaseSchema() {
+            try {
+                const tables = ['sites', 'comments', 'comment_likes', 'spam_reports', 'site_moderators'];
+                
+                for (const table of tables) {
+                    const { data, error } = await supabaseClient.from(table).select('*').limit(1);
+                    if (error) {
+                        addLog('connection-status', `❌ 테이블 ${table} 확인 실패: ${error.message}`, 'error');
+                        return;
+                    }
+                    addLog('connection-status', `✅ 테이블 ${table} 확인 완료`, 'success');
+                }
+                
+                addLog('connection-status', '🎉 모든 테이블 스키마 확인 완료!', 'success');
+            } catch (error) {
+                addLog('connection-status', `스키마 확인 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 사이트 생성 테스트
+        async function testCreateSite() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('sites')
+                    .insert({
+                        name: 'Kommentio 테스트 사이트',
+                        domain: 'localhost:3000',
+                        description: 'Supabase 실제 연동 테스트용 사이트',
+                        settings: {
+                            allow_anonymous: true,
+                            moderation_enabled: false,
+                            max_comment_length: 2000,
+                            theme: 'light',
+                            language: 'ko'
+                        }
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                testSiteId = data.id;
+                addLog('crud-log', `✅ 사이트 생성 성공! ID: ${data.id}`, 'success');
+                addLog('crud-log', `📄 사이트 정보: ${JSON.stringify(data, null, 2)}`, 'info');
+            } catch (error) {
+                addLog('crud-log', `❌ 사이트 생성 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 댓글 생성 테스트
+        async function testCreateComment() {
+            if (!testSiteId) {
+                addLog('crud-log', '⚠️ 먼저 사이트를 생성하세요', 'warning');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('comments')
+                    .insert({
+                        site_id: testSiteId,
+                        page_url: window.location.href,
+                        content: '안녕하세요! 이것은 Supabase 실제 연동 테스트 댓글입니다. 🚀',
+                        author_name: '테스트 사용자',
+                        author_email: 'test@kommentio.com',
+                        depth: 0
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                testCommentId = data.id;
+                addLog('crud-log', `✅ 댓글 생성 성공! ID: ${data.id}`, 'success');
+                addLog('crud-log', `💬 댓글 내용: "${data.content}"`, 'info');
+            } catch (error) {
+                addLog('crud-log', `❌ 댓글 생성 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 댓글 조회 테스트
+        async function testReadComments() {
+            if (!testSiteId) {
+                addLog('crud-log', '⚠️ 먼저 사이트를 생성하세요', 'warning');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('comments')
+                    .select('*')
+                    .eq('site_id', testSiteId)
+                    .eq('is_deleted', false)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                addLog('crud-log', `✅ 댓글 조회 성공! 총 ${data.length}개 댓글 발견`, 'success');
+                data.forEach((comment, index) => {
+                    addLog('crud-log', `📝 댓글 ${index + 1}: "${comment.content}" (${comment.author_name})`, 'info');
+                });
+            } catch (error) {
+                addLog('crud-log', `❌ 댓글 조회 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 댓글 수정 테스트
+        async function testUpdateComment() {
+            if (!testCommentId) {
+                addLog('crud-log', '⚠️ 먼저 댓글을 생성하세요', 'warning');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('comments')
+                    .update({
+                        content: '이 댓글은 수정되었습니다! ✨ (Supabase 실제 연동 테스트)',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', testCommentId)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                addLog('crud-log', `✅ 댓글 수정 성공!`, 'success');
+                addLog('crud-log', `📝 수정된 내용: "${data.content}"`, 'info');
+            } catch (error) {
+                addLog('crud-log', `❌ 댓글 수정 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 댓글 삭제 테스트
+        async function testDeleteComment() {
+            if (!testCommentId) {
+                addLog('crud-log', '⚠️ 먼저 댓글을 생성하세요', 'warning');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('comments')
+                    .update({ is_deleted: true })
+                    .eq('id', testCommentId);
+
+                if (error) throw error;
+
+                addLog('crud-log', `✅ 댓글 삭제 성공! (soft delete)`, 'success');
+                testCommentId = null;
+            } catch (error) {
+                addLog('crud-log', `❌ 댓글 삭제 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 실시간 연결 테스트
+        async function testRealtimeConnection() {
+            try {
+                realtimeChannel = supabaseClient
+                    .channel('comments-realtime-test')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'comments'
+                    }, (payload) => {
+                        addLog('realtime-log', `🔄 실시간 이벤트: ${payload.eventType}`, 'success');
+                        addLog('realtime-log', `📄 데이터: ${JSON.stringify(payload.new || payload.old, null, 2)}`, 'info');
+                    })
+                    .subscribe((status) => {
+                        addLog('realtime-log', `📡 구독 상태: ${status}`, status === 'SUBSCRIBED' ? 'success' : 'warning');
+                    });
+            } catch (error) {
+                addLog('realtime-log', `❌ 실시간 연결 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 실시간 업데이트 시뮬레이션
+        async function simulateRealtimeUpdate() {
+            if (!testSiteId) {
+                addLog('realtime-log', '⚠️ 먼저 사이트를 생성하세요', 'warning');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('comments')
+                    .insert({
+                        site_id: testSiteId,
+                        page_url: window.location.href,
+                        content: `실시간 테스트 댓글 - ${new Date().toLocaleTimeString()} 🔔`,
+                        author_name: '실시간 테스터',
+                        author_email: 'realtime@kommentio.com',
+                        depth: 0
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                addLog('realtime-log', `✅ 실시간 댓글 생성 완료! 실시간 이벤트를 확인하세요.`, 'success');
+            } catch (error) {
+                addLog('realtime-log', `❌ 실시간 테스트 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 실시간 연결 해제
+        function stopRealtimeConnection() {
+            if (realtimeChannel) {
+                supabaseClient.removeChannel(realtimeChannel);
+                realtimeChannel = null;
+                addLog('realtime-log', '📡 실시간 구독이 해제되었습니다.', 'warning');
+            }
+        }
+
+        // 익명 인증 테스트
+        async function testAnonymousAuth() {
+            try {
+                const { data, error } = await supabaseClient.auth.signInAnonymously();
+                
+                if (error) throw error;
+
+                addLog('auth-log', `✅ 익명 인증 성공!`, 'success');
+                addLog('auth-log', `👤 사용자 ID: ${data.user.id}`, 'info');
+            } catch (error) {
+                addLog('auth-log', `❌ 익명 인증 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 소셜 로그인 테스트
+        async function testSocialLogin(provider) {
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: provider,
+                    options: {
+                        redirectTo: window.location.href
+                    }
+                });
+                
+                if (error) throw error;
+
+                addLog('auth-log', `🔄 ${provider} 로그인 리디렉션 중...`, 'info');
+            } catch (error) {
+                addLog('auth-log', `❌ ${provider} 로그인 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 로그아웃 테스트
+        async function testLogout() {
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                
+                if (error) throw error;
+
+                addLog('auth-log', `✅ 로그아웃 성공!`, 'success');
+            } catch (error) {
+                addLog('auth-log', `❌ 로그아웃 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 페이지 로드 시 자동 연결 테스트
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testSupabaseConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

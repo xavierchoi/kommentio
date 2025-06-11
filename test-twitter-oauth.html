@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X(Twitter) OAuth 테스트 - Kommentio v0.2.1</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .success { background: #10b981; color: white; }
+        .warning { background: #f59e0b; color: white; }
+        .error { background: #ef4444; color: white; }
+        .info { background: #3b82f6; color: white; }
+        
+        .test-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .test-button {
+            background: #1d9bf0;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .test-button:hover {
+            background: #1a8cd8;
+        }
+        
+        .test-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .log-container {
+            background: #f3f4f6;
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+        
+        .oauth-config {
+            background: #fffbeb;
+            border: 1px solid #fbbf24;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .social-login-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .social-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .twitter-button {
+            background: #000000;
+            color: white;
+            border-color: #000000;
+        }
+        
+        .twitter-button:hover {
+            background: #333333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status info">
+            🐦 X(Twitter) OAuth 실제 연동 테스트 - Kommentio v0.2.1
+        </div>
+
+        <!-- OAuth 설정 상태 -->
+        <div class="test-section">
+            <h3>🔧 X(Twitter) OAuth 설정 상태</h3>
+            <div class="oauth-config">
+                <h4>⚙️ 필수 설정 확인</h4>
+                <ul>
+                    <li>✅ X Developer 계정: 획득 완료</li>
+                    <li>🔄 X 앱 생성: 확인 필요</li>
+                    <li>🔄 OAuth 2.0 설정: 확인 필요</li>
+                    <li>🔄 Supabase 프로바이더 설정: 확인 필요</li>
+                    <li>🔄 콜백 URL 설정: 확인 필요</li>
+                </ul>
+            </div>
+            <div id="oauth-status" class="status warning">OAuth 설정 확인 중...</div>
+            <button class="test-button" onclick="checkOAuthConfig()">설정 상태 확인</button>
+            <button class="test-button" onclick="openSupabaseAuth()">Supabase 인증 설정 열기</button>
+            <button class="test-button" onclick="openTwitterDev()">X Developer Portal 열기</button>
+        </div>
+
+        <!-- X 로그인 테스트 -->
+        <div class="test-section">
+            <h3>🔐 X(Twitter) 로그인 테스트</h3>
+            <div class="social-login-demo">
+                <button class="social-button twitter-button" onclick="testTwitterLogin()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/>
+                    </svg>
+                    X로 로그인
+                </button>
+            </div>
+            <div id="login-log" class="log-container"></div>
+        </div>
+
+        <!-- 인증 상태 확인 -->
+        <div class="test-section">
+            <h3>👤 사용자 인증 상태</h3>
+            <button class="test-button" onclick="checkAuthState()">현재 인증 상태 확인</button>
+            <button class="test-button" onclick="getUserProfile()">사용자 프로필 조회</button>
+            <button class="test-button" onclick="testLogout()">로그아웃</button>
+            <div id="auth-log" class="log-container"></div>
+        </div>
+
+        <!-- OAuth 플로우 디버깅 -->
+        <div class="test-section">
+            <h3>🔍 OAuth 플로우 디버깅</h3>
+            <button class="test-button" onclick="checkSupabaseConfig()">Supabase 설정 확인</button>
+            <button class="test-button" onclick="testOAuthRedirect()">OAuth 리디렉션 테스트</button>
+            <button class="test-button" onclick="parseUrlParams()">URL 파라미터 분석</button>
+            <div id="debug-log" class="log-container"></div>
+        </div>
+
+        <!-- 실제 위젯 테스트 -->
+        <div class="test-section">
+            <h3>📝 Kommentio 위젯에서 X 로그인 테스트</h3>
+            <p>실제 댓글 위젯에서 X(Twitter) 로그인이 작동하는지 확인합니다.</p>
+            
+            <!-- Kommentio 위젯 -->
+            <div 
+                data-kommentio
+                data-site-id="kommentio-test-site"
+                data-theme="light"
+                data-language="ko"
+                data-supabase-url="https://nwjbtsjeikrwyqltkpqv.supabase.co"
+                data-supabase-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ"
+                data-page-url="https://kommentio.com/twitter-oauth-test"
+            ></div>
+        </div>
+    </div>
+
+    <!-- Supabase SDK 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Kommentio 위젯 로드 -->
+    <script src="./src/kommentio.js"></script>
+
+    <script>
+        let supabaseClient = null;
+        
+        // 로그 출력 함수
+        function addLog(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logClass = type === 'error' ? 'color: #ef4444;' : 
+                            type === 'success' ? 'color: #10b981;' : 
+                            type === 'warning' ? 'color: #f59e0b;' : 'color: #374151;';
+            
+            container.innerHTML += `<div style="${logClass}">[${timestamp}] ${message}</div>`;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Supabase 클라이언트 초기화
+        function initSupabase() {
+            if (!supabaseClient) {
+                supabaseClient = window.supabase.createClient(
+                    'https://nwjbtsjeikrwyqltkpqv.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ'
+                );
+            }
+            return supabaseClient;
+        }
+
+        // OAuth 설정 확인
+        async function checkOAuthConfig() {
+            try {
+                initSupabase();
+                
+                addLog('debug-log', '🔄 OAuth 설정 확인 중...', 'info');
+                
+                // Supabase 인증 설정 확인
+                const { data, error } = await supabaseClient.auth.getSession();
+                
+                if (error) {
+                    addLog('debug-log', `❌ Supabase 인증 오류: ${error.message}`, 'error');
+                    document.getElementById('oauth-status').className = 'status error';
+                    document.getElementById('oauth-status').textContent = '❌ OAuth 설정 오류 발견';
+                    return;
+                }
+                
+                addLog('debug-log', '✅ Supabase 기본 인증 설정 정상', 'success');
+                
+                // Twitter 프로바이더 설정 확인 (간접적으로)
+                try {
+                    // 실제 OAuth 요청을 시도해서 설정 상태 확인
+                    addLog('debug-log', '🔍 Twitter OAuth 프로바이더 설정 확인 중...', 'info');
+                    
+                    document.getElementById('oauth-status').className = 'status warning';
+                    document.getElementById('oauth-status').textContent = '⚠️ Twitter OAuth 설정 수동 확인 필요';
+                    
+                    addLog('debug-log', '📋 다음 단계를 수행하세요:', 'warning');
+                    addLog('debug-log', '1. Supabase 대시보드 > Authentication > Providers', 'info');
+                    addLog('debug-log', '2. Twitter 프로바이더 활성화 확인', 'info');
+                    addLog('debug-log', '3. Client ID/Secret 설정 확인', 'info');
+                    addLog('debug-log', '4. Callback URL 설정 확인', 'info');
+                    
+                } catch (providerError) {
+                    addLog('debug-log', `❌ Twitter 프로바이더 확인 실패: ${providerError.message}`, 'error');
+                }
+                
+            } catch (error) {
+                addLog('debug-log', `❌ OAuth 설정 확인 실패: ${error.message}`, 'error');
+                document.getElementById('oauth-status').className = 'status error';
+                document.getElementById('oauth-status').textContent = '❌ OAuth 설정 확인 실패';
+            }
+        }
+
+        // X(Twitter) 로그인 테스트
+        async function testTwitterLogin() {
+            try {
+                initSupabase();
+                
+                addLog('login-log', '🔄 X(Twitter) 로그인 시도 중...', 'info');
+                
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'twitter',
+                    options: {
+                        redirectTo: window.location.href
+                    }
+                });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                addLog('login-log', '🔄 X(Twitter) OAuth 리디렉션 중...', 'info');
+                addLog('login-log', '📱 X 인증 페이지로 이동합니다.', 'info');
+                
+            } catch (error) {
+                addLog('login-log', `❌ X 로그인 실패: ${error.message}`, 'error');
+                
+                if (error.message.includes('Provider not found')) {
+                    addLog('login-log', '⚠️ Supabase에서 Twitter 프로바이더가 활성화되지 않았습니다.', 'warning');
+                    addLog('login-log', '📋 Supabase 대시보드에서 Twitter 프로바이더를 활성화하세요.', 'info');
+                } else if (error.message.includes('OAuth')) {
+                    addLog('login-log', '⚠️ Twitter OAuth 앱 설정을 확인하세요.', 'warning');
+                    addLog('login-log', '📋 X Developer Portal에서 앱 설정을 검토하세요.', 'info');
+                }
+            }
+        }
+
+        // 현재 인증 상태 확인
+        async function checkAuthState() {
+            try {
+                initSupabase();
+                
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                if (session) {
+                    addLog('auth-log', '✅ 사용자 로그인 상태입니다.', 'success');
+                    addLog('auth-log', `👤 사용자 ID: ${session.user.id}`, 'info');
+                    addLog('auth-log', `📧 이메일: ${session.user.email || 'N/A'}`, 'info');
+                    addLog('auth-log', `🔗 프로바이더: ${session.user.app_metadata?.provider || 'unknown'}`, 'info');
+                } else {
+                    addLog('auth-log', '❌ 로그인되지 않은 상태입니다.', 'warning');
+                }
+            } catch (error) {
+                addLog('auth-log', `❌ 인증 상태 확인 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 사용자 프로필 조회
+        async function getUserProfile() {
+            try {
+                initSupabase();
+                
+                const { data: { user }, error } = await supabaseClient.auth.getUser();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                if (user) {
+                    addLog('auth-log', '✅ 사용자 프로필 조회 성공', 'success');
+                    addLog('auth-log', `📄 프로필: ${JSON.stringify(user, null, 2)}`, 'info');
+                } else {
+                    addLog('auth-log', '❌ 로그인된 사용자가 없습니다.', 'warning');
+                }
+            } catch (error) {
+                addLog('auth-log', `❌ 프로필 조회 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // 로그아웃 테스트
+        async function testLogout() {
+            try {
+                initSupabase();
+                
+                const { error } = await supabaseClient.auth.signOut();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                addLog('auth-log', '✅ 로그아웃 성공', 'success');
+            } catch (error) {
+                addLog('auth-log', `❌ 로그아웃 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // Supabase 설정 확인
+        async function checkSupabaseConfig() {
+            try {
+                initSupabase();
+                
+                addLog('debug-log', '🔍 Supabase 프로젝트 설정 확인', 'info');
+                addLog('debug-log', `🌐 URL: https://nwjbtsjeikrwyqltkpqv.supabase.co`, 'info');
+                addLog('debug-log', `🔑 Anon Key: ${supabaseClient.supabaseKey.substring(0, 20)}...`, 'info');
+                
+                // 기본 연결 테스트
+                const { data, error } = await supabaseClient
+                    .from('sites')
+                    .select('count')
+                    .limit(1);
+                    
+                if (error) {
+                    addLog('debug-log', `❌ Supabase 연결 실패: ${error.message}`, 'error');
+                } else {
+                    addLog('debug-log', '✅ Supabase 기본 연결 성공', 'success');
+                }
+                
+            } catch (error) {
+                addLog('debug-log', `❌ 설정 확인 실패: ${error.message}`, 'error');
+            }
+        }
+
+        // OAuth 리디렉션 테스트
+        function testOAuthRedirect() {
+            const callbackUrl = 'https://nwjbtsjeikrwyqltkpqv.supabase.co/auth/v1/callback';
+            addLog('debug-log', `🔗 OAuth 콜백 URL: ${callbackUrl}`, 'info');
+            addLog('debug-log', '📋 이 URL이 X Developer Portal에 설정되어 있는지 확인하세요.', 'info');
+            
+            // 현재 URL도 표시
+            addLog('debug-log', `🌐 현재 페이지 URL: ${window.location.href}`, 'info');
+            addLog('debug-log', `🔄 리디렉션 대상 URL: ${window.location.href}`, 'info');
+        }
+
+        // URL 파라미터 분석
+        function parseUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlHash = new URLSearchParams(window.location.hash.replace('#', ''));
+            
+            addLog('debug-log', '🔍 URL 파라미터 분석:', 'info');
+            
+            // Query parameters
+            if (urlParams.toString()) {
+                addLog('debug-log', `❓ Query: ${urlParams.toString()}`, 'info');
+            } else {
+                addLog('debug-log', '❓ Query: 없음', 'info');
+            }
+            
+            // Hash parameters
+            if (urlHash.toString()) {
+                addLog('debug-log', `# Hash: ${urlHash.toString()}`, 'info');
+            } else {
+                addLog('debug-log', '# Hash: 없음', 'info');
+            }
+            
+            // OAuth 관련 파라미터 확인
+            const oauthParams = ['access_token', 'refresh_token', 'expires_in', 'token_type', 'error', 'error_description'];
+            oauthParams.forEach(param => {
+                const value = urlParams.get(param) || urlHash.get(param);
+                if (value) {
+                    addLog('debug-log', `🔑 ${param}: ${value}`, 'success');
+                }
+            });
+        }
+
+        // 외부 링크 열기 함수들
+        function openSupabaseAuth() {
+            window.open('https://supabase.com/dashboard/project/nwjbtsjeikrwyqltkpqv/auth/providers', '_blank');
+        }
+
+        function openTwitterDev() {
+            window.open('https://developer.twitter.com/en/portal/dashboard', '_blank');
+        }
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', () => {
+            // URL 파라미터 자동 분석 (OAuth 콜백 감지)
+            if (window.location.search || window.location.hash) {
+                setTimeout(() => {
+                    parseUrlParams();
+                    checkAuthState();
+                }, 1000);
+            }
+        });
+
+        // OAuth 인증 상태 변화 감지
+        window.addEventListener('load', () => {
+            initSupabase();
+            
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                addLog('auth-log', `🔔 인증 상태 변화: ${event}`, 'info');
+                
+                if (event === 'SIGNED_IN') {
+                    addLog('auth-log', '✅ 로그인 성공!', 'success');
+                    if (session?.user?.app_metadata?.provider === 'twitter') {
+                        addLog('auth-log', '🐦 X(Twitter) 로그인 완료!', 'success');
+                        document.getElementById('oauth-status').className = 'status success';
+                        document.getElementById('oauth-status').textContent = '✅ X OAuth 연동 성공!';
+                    }
+                } else if (event === 'SIGNED_OUT') {
+                    addLog('auth-log', '👋 로그아웃됨', 'warning');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
