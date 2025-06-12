@@ -108,6 +108,9 @@ class Kommentio {
       this.render();
       this.attachEventListeners();
       
+      // OAuth 콜백 완료 후 추가 처리
+      await this.handleOAuthCallback();
+      
       console.log(`Kommentio v${this.version} initialized`);
     } catch (error) {
       console.error('Kommentio initialization failed:', error);
@@ -135,6 +138,74 @@ class Kommentio {
         window.history.replaceState(null, '', baseUrl);
         console.log('✅ URL 정리 완료:', baseUrl);
       }, 5000);
+    }
+  }
+
+  /**
+   * OAuth 콜백 처리 (인증 완료 후 UI 업데이트 보장)
+   */
+  async handleOAuthCallback() {
+    // OAuth 토큰이 URL에 있는지 확인
+    const hasOAuthToken = window.location.hash.includes('access_token=') || 
+                         window.location.hash.includes('error=');
+    
+    if (!hasOAuthToken) {
+      console.log('📍 OAuth 콜백이 아님. 일반 초기화 진행.');
+      return;
+    }
+    
+    console.log('🔄 OAuth 콜백 감지됨. 인증 상태 확인 중...');
+    
+    // Supabase가 OAuth 토큰을 처리할 시간을 줌
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    try {
+      // 현재 세션 재확인
+      const { data: { session }, error } = await this.supabase.auth.getSession();
+      
+      if (error) {
+        console.error('❌ OAuth 세션 확인 실패:', error);
+        this.showNotification('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요. ⚠️');
+        return;
+      }
+      
+      if (session?.user) {
+        console.log('✅ OAuth 로그인 성공 확인됨:', session.user);
+        this.currentUser = session.user;
+        
+        // 즉시 UI 업데이트
+        this.render();
+        
+        // 성공 알림
+        const providerName = session.user.app_metadata?.provider || '소셜';
+        const userName = session.user.user_metadata?.name || 
+                        session.user.user_metadata?.full_name || 
+                        session.user.email;
+        
+        this.showNotification(`🎉 ${providerName} 로그인 완료! ${userName}님 환영합니다!`);
+        
+        // 댓글 목록 새로고침 (로그인 상태로)
+        await this.loadComments();
+        
+      } else {
+        console.log('❌ OAuth 토큰은 있지만 세션이 없음. 에러 확인 필요.');
+        
+        // URL에서 에러 정보 추출
+        const urlParams = new URLSearchParams(window.location.hash.substring(1));
+        const errorCode = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+        
+        if (errorCode) {
+          console.error('OAuth 에러:', errorCode, errorDescription);
+          this.showNotification(`로그인 실패: ${errorDescription || errorCode} ❌`);
+        } else {
+          this.showNotification('로그인을 완료하지 못했습니다. 다시 시도해주세요. ⚠️');
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ OAuth 콜백 처리 중 오류:', error);
+      this.showNotification('로그인 처리 중 문제가 발생했습니다. 페이지를 새로고침해주세요. 🔄');
     }
   }
 
@@ -268,7 +339,7 @@ class Kommentio {
       }
       
       // 인증 상태 변경 리스너 등록
-      this.supabase.auth.onAuthStateChange((event, session) => {
+      this.supabase.auth.onAuthStateChange(async (event, session) => {
         console.log('🔄 인증 상태 변경:', event, session);
         console.log('📍 현재 URL:', window.location.href);
         console.log('🔑 세션 정보:', session);
@@ -277,14 +348,34 @@ class Kommentio {
           this.currentUser = session.user;
           console.log('✅ 로그인 완료:', session.user);
           console.log('👤 사용자 메타데이터:', session.user.user_metadata);
-          this.render(); // UI 즉시 업데이트
-          this.showNotification(`${session.user.user_metadata?.name || session.user.email} 님 환영합니다! 🎉`);
+          
+          // UI 즉시 업데이트
+          this.render();
+          
+          // 환영 메시지
+          const providerName = session.user.app_metadata?.provider || '';
+          const userName = session.user.user_metadata?.name || 
+                          session.user.user_metadata?.full_name ||
+                          session.user.email;
+          
+          this.showNotification(`🎉 ${providerName ? providerName + ' ' : ''}로그인 완료! ${userName}님 환영합니다!`);
+          
+          // 댓글 목록 새로고침 (로그인 사용자 관점으로)
+          await this.loadComments();
+          
         } else if (event === 'SIGNED_OUT') {
           this.currentUser = null;
           console.log('🚪 로그아웃 완료');
           this.render(); // UI 즉시 업데이트
+          this.showNotification('로그아웃되었습니다. 👋');
+          
         } else if (event === 'TOKEN_REFRESHED') {
           console.log('🔄 토큰 갱신됨:', session);
+          // 토큰 갱신 시에도 사용자 정보 업데이트
+          if (session?.user) {
+            this.currentUser = session.user;
+          }
+          
         } else {
           console.log('❓ 기타 인증 이벤트:', event, session);
         }
@@ -1665,8 +1756,12 @@ class Kommentio {
    * 프로바이더별 추가 옵션 설정
    */
   getProviderOptions(provider) {
+    // Fragment 제거된 깨끗한 URL 사용 (OAuth 충돌 방지)
+    const cleanRedirectUrl = window.location.href.split('#')[0];
+    console.log('🔗 OAuth redirectTo URL:', cleanRedirectUrl);
+    
     const baseOptions = {
-      redirectTo: window.location.href
+      redirectTo: cleanRedirectUrl
     };
 
     // 프로바이더별 특별 설정
@@ -1747,6 +1842,19 @@ class Kommentio {
         return;
       }
 
+      // 카카오 OAuth 특별 처리 (GitHub Pages에서 문제 발생 시)
+      if (provider === 'kakao') {
+        console.log('🥕 카카오 OAuth 시도 중... (GitHub Pages 환경)');
+        
+        // GitHub Pages에서 카카오 OAuth가 안 되는 경우 디버깅 정보 수집
+        console.log('🔍 카카오 OAuth 디버깅:', {
+          currentUrl: window.location.href,
+          domain: window.location.hostname,
+          protocol: window.location.protocol,
+          redirectUrl: this.getProviderOptions('kakao').redirectTo
+        });
+      }
+
       // 더 이상 지원하지 않는 프로바이더들
       const unsupportedProviders = []; // 모든 프로바이더 지원 시도
       if (unsupportedProviders.includes(provider)) {
@@ -1782,6 +1890,33 @@ class Kommentio {
       
     } catch (error) {
       console.error('Login failed:', error);
+      console.error('Error details:', {
+        message: error.message,
+        provider: provider,
+        url: window.location.href,
+        stack: error.stack
+      });
+      
+      // 카카오 전용 에러 처리
+      if (provider === 'kakao') {
+        console.error('🥕 카카오 OAuth 실패 상세 정보:', {
+          errorMessage: error.message,
+          errorCode: error.code,
+          supabaseUrl: this.options.supabaseUrl,
+          redirectUrl: this.getProviderOptions('kakao').redirectTo,
+          domain: window.location.hostname
+        });
+        
+        // 카카오 개발자 콘솔 확인 가이드
+        console.log('📋 카카오 OAuth 실패 시 확인사항:');
+        console.log('1. 카카오 개발자 콘솔 > 플랫폼 > Web 도메인:', 'https://xavierchoi.github.io');
+        console.log('2. Redirect URI:', this.getProviderOptions('kakao').redirectTo);
+        console.log('3. Supabase 카카오 Provider 설정 확인');
+        console.log('4. Client ID, Client Secret 재확인');
+        
+        this.showNotification('카카오 로그인에 실패했습니다. 콘솔에서 디버깅 정보를 확인해주세요. 🥕');
+        return;
+      }
       
       // 프로바이더별 에러 메시지
       let errorMessage = '로그인에 실패했습니다.';
@@ -1825,8 +1960,14 @@ class Kommentio {
       localStorage.removeItem('kommentio_custom_user');
       localStorage.removeItem('kommentio_custom_token');
       
+      // URL Fragment 완전 제거 (OAuth 잔여물 정리)
+      const cleanUrl = window.location.href.split('#')[0];
+      window.history.replaceState(null, '', cleanUrl);
+      console.log('🧹 로그아웃 후 URL 정리 완료:', cleanUrl);
+      
       this.currentUser = null;
       this.render();
+      this.showNotification('로그아웃되었습니다. 👋');
     } catch (error) {
       console.error('Logout failed:', error);
     }
