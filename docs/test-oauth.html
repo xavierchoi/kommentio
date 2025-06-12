@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kommentio OAuth 테스트 - 실제 소셜 로그인</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .demo-article {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+        .success {
+            background: #10b981;
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .warning {
+            background: #f59e0b;
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success">
+            🔐 실제 OAuth 테스트 페이지 - Supabase 연동 모드
+        </div>
+
+        <article class="demo-article">
+            <h1>🚀 Kommentio 실제 OAuth 테스트</h1>
+            <p>이 페이지는 실제 Supabase OAuth 설정으로 소셜 로그인을 테스트합니다.</p>
+            <p><strong>테스트 가능한 프로바이더:</strong></p>
+            <ul>
+                <li>✅ Google OAuth</li>
+                <li>✅ GitHub OAuth</li>
+                <li>✅ Facebook OAuth</li>
+                <li>✅ Twitter/X OAuth</li>
+                <li>✅ Kakao OAuth</li>
+                <li>🔥 Apple OAuth (새로 설정 완료!)</li>
+                <li>⏳ LinkedIn OAuth (Mock 모드)</li>
+            </ul>
+        </article>
+
+        <div class="warning">
+            ⚠️ Apple OAuth는 HTTPS가 필요하므로 GitHub Pages에서만 테스트 가능합니다.
+        </div>
+
+        <!-- Kommentio 위젯 임베드 (실제 OAuth 모드) -->
+        <div 
+            data-kommentio
+            data-site-id="a97fec6f-683b-450e-85f0-eb54f947ce25"
+            data-theme="light"
+            data-language="ko"
+            data-supabase-url="https://nwjbtsjeikrwyqltkpqv.supabase.co"
+            data-supabase-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYyMzI4NjEsImV4cCI6MjA1MTgwODg2MX0.JUoOdGVGJGAz3bHTrXkpBAhNAPjI9x-D3vOaLNrnq6c"
+        ></div>
+
+        <div style="margin-top: 2rem; padding: 1rem; background: #f3f4f6; border-radius: 8px;">
+            <h3>🔧 실제 OAuth 테스트 방법</h3>
+            <ol>
+                <li><strong>"전체 활성화"</strong> 버튼을 클릭하여 모든 소셜 프로바이더 활성화</li>
+                <li><strong>Apple 로그인</strong> 버튼을 클릭하여 실제 Apple OAuth 테스트</li>
+                <li>다른 소셜 프로바이더들도 실제 OAuth로 테스트 가능</li>
+                <li>로그인 성공 시 댓글을 작성해보세요!</li>
+            </ol>
+            
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+                <button onclick="enableAllProviders()" style="padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    전체 활성화 (Apple 포함)
+                </button>
+                <button onclick="enableAppleOnly()" style="padding: 0.5rem 1rem; background: #000; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Apple만 테스트
+                </button>
+                <button onclick="enableBasicProviders()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    기본 (Google + GitHub)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 실제 위젯 소스 로드 -->
+    <script src="./kommentio.js"></script>
+
+    <script>
+        // 위젯 로딩 확인
+        window.addEventListener('load', () => {
+            if (window.Kommentio) {
+                console.log('✅ Kommentio 위젯이 성공적으로 로드되었습니다!');
+                console.log('실제 OAuth 모드로 작동 중...');
+            } else {
+                console.error('❌ Kommentio 위젯 로딩 실패');
+            }
+        });
+
+        // 위젯 로딩 대기 함수
+        function waitForKommentio(callback) {
+            if (window.kommentio) {
+                callback(window.kommentio);
+            } else {
+                setTimeout(() => waitForKommentio(callback), 100);
+            }
+        }
+
+        // 소셜 프로바이더 설정 함수들
+        function enableAllProviders() {
+            waitForKommentio((kommentio) => {
+                kommentio.updateSocialProviders({
+                    google: { enabled: true },
+                    github: { enabled: true },
+                    facebook: { enabled: true },
+                    twitter: { enabled: true },
+                    apple: { enabled: true },
+                    linkedin: { enabled: true },
+                    kakao: { enabled: true }
+                });
+                console.log('🚀 모든 프로바이더 활성화 (Apple OAuth 포함!)');
+            });
+        }
+
+        function enableAppleOnly() {
+            waitForKommentio((kommentio) => {
+                kommentio.updateSocialProviders({
+                    google: { enabled: false },
+                    github: { enabled: false },
+                    facebook: { enabled: false },
+                    twitter: { enabled: false },
+                    apple: { enabled: true },
+                    linkedin: { enabled: false },
+                    kakao: { enabled: false }
+                });
+                console.log('🍎 Apple OAuth만 활성화하여 테스트!');
+            });
+        }
+
+        function enableBasicProviders() {
+            waitForKommentio((kommentio) => {
+                kommentio.updateSocialProviders({
+                    google: { enabled: true },
+                    github: { enabled: true },
+                    facebook: { enabled: false },
+                    twitter: { enabled: false },
+                    apple: { enabled: false },
+                    linkedin: { enabled: false },
+                    kakao: { enabled: false }
+                });
+                console.log('✅ 기본 프로바이더 (Google + GitHub) 활성화');
+            });
+        }
+    </script>
+</body>
+</html>
