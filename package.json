@@ -16,7 +16,9 @@
     "clean": "rm -rf node_modules/.vite dist .vite && npm cache clean --force",
     "check-ports": "lsof -i :3000,3001,5173 | head -20"
   },
-  "dependencies": {},
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2"
+  },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
     "@supabase/supabase-js": "^2.39.0",

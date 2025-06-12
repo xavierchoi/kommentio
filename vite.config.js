@@ -12,10 +12,11 @@ export default defineConfig({
     }
   },
   server: {
-    host: '127.0.0.1', // macOS 호환성을 위한 localhost 설정
+    host: true, // 외부 네트워크에서 접근 가능
     port: 5173,
     strictPort: false, // 포트가 사용 중이면 다른 포트 시도
     open: true,
+    allowedHosts: ['0b49-128-134-230-184.ngrok-free.app'], // ngrok 호스트 허용
     hmr: {
       overlay: true,
       port: 24678 // HMR 전용 포트 설정
