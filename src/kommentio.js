@@ -1088,7 +1088,7 @@ class Kommentio {
           required
         ></textarea>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
-          <small class="kommentio-text-secondary">Markdown 문법을 지원합니다.</small>
+          <small class="kommentio-text-secondary">Markdown 문법을 지원합니다. • Ctrl+Enter로 빠른 등록</small>
           <button type="submit" class="kommentio-btn kommentio-btn-primary">댓글 작성</button>
         </div>
       </form>
@@ -1303,6 +1303,15 @@ class Kommentio {
       if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('kommentio-btn-social')) {
         e.preventDefault();
         e.target.click();
+      }
+      
+      // Ctrl+Enter (Windows/Linux) 또는 Cmd+Enter (macOS)로 댓글 제출
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && e.target.classList.contains('kommentio-textarea')) {
+        e.preventDefault();
+        const form = e.target.closest('form');
+        if (form) {
+          form.dispatchEvent(new Event('submit', { bubbles: true }));
+        }
       }
       
       // Escape 키로 포커스 제거
@@ -1598,12 +1607,34 @@ class Kommentio {
     
     if (!content) return;
 
+    // 제출 버튼 비활성화 및 로딩 상태 표시
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '작성 중...';
+
     try {
-      await this.createComment(content);
+      const result = await this.createComment(content);
       textarea.value = '';
+      
+      // 댓글 작성 성공 시 seamless 새로고침
+      await this.loadComments();
+      
+      // 스팸 여부에 따른 알림 표시
+      if (result && result.isSpam) {
+        this.showNotification('스팸으로 감지된 댓글입니다. 관리자 승인 후 게시됩니다. ⚠️');
+      } else {
+        this.showNotification('댓글이 성공적으로 작성되었습니다! ✅');
+      }
+      
     } catch (error) {
       console.error('Failed to create comment:', error);
-      alert('댓글 작성에 실패했습니다.');
+      this.showNotification('댓글 작성에 실패했습니다. 다시 시도해주세요. ❌');
+    } finally {
+      // 버튼 상태 복원
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      textarea.focus(); // 포커스 다시 설정
     }
   }
 
@@ -1692,10 +1723,8 @@ class Kommentio {
       this.comments = this.buildCommentTree(this.mockComments);
       this.renderComments();
       
-      if (mockSpamCheck) {
-        this.showNotification('스팸으로 감지된 댓글입니다. 관리자 승인 후 게시됩니다. ⚠️');
-      }
-      return;
+      // Mock 모드에서도 반환값 제공 (알림은 호출하는 곳에서 처리)
+      return { isSpam: mockSpamCheck };
     }
 
     // 실제 모드에서는 Claude API로 스팸 검사
@@ -1727,12 +1756,8 @@ class Kommentio {
 
     if (error) throw error;
 
-    // 스팸으로 감지된 경우 알림
-    if (spamData.is_spam) {
-      this.showNotification('스팸으로 감지된 댓글입니다. 관리자 승인 후 게시됩니다. ⚠️');
-    } else {
-      this.showNotification('댓글이 성공적으로 게시되었습니다! ✅');
-    }
+    // 스팸 감지 정보 반환 (알림은 호출하는 곳에서 처리)
+    return { isSpam: spamData.is_spam };
   }
 
   /**
@@ -1821,10 +1846,10 @@ class Kommentio {
       //   return;
       // }
 
-      // LinkedIn는 설정 이슈로 Mock 모드 유지 (임시)
-      const mockProviders = ['linkedin']; 
-      if (mockProviders.includes(provider)) {
-        console.warn(`${provider} 프로바이더는 검증/설정 이슈로 Mock 모드로 처리합니다.`);
+      // 아직 설정되지 않은 프로바이더들 (필요 시 Mock 모드로 처리)
+      const notConfiguredProviders = []; // LinkedIn 제거 - 실제 OAuth 시도
+      if (notConfiguredProviders.includes(provider)) {
+        console.warn(`${provider} 프로바이더는 설정 미완료로 Mock 모드로 처리합니다.`);
         
         // Mock 사용자 생성
         this.currentUser = {
@@ -1837,7 +1862,7 @@ class Kommentio {
           }
         };
         
-        this.showNotification(`${providerConfig.label} 로그인 완료! (검증 이슈로 Mock 모드) 🎭`);
+        this.showNotification(`${providerConfig.label} 로그인 완료! (설정 미완료로 Mock 모드) 🎉`);
         this.render();
         return;
       }
@@ -2191,7 +2216,7 @@ class Kommentio {
           required
         ></textarea>
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <small style="color: var(--kommentio-secondary);">Markdown 문법을 지원합니다.</small>
+          <small style="color: var(--kommentio-secondary);">Markdown 문법을 지원합니다. • Ctrl+Enter로 빠른 등록</small>
           <div style="display: flex; gap: 0.5rem;">
             <button 
               type="button" 
@@ -2228,8 +2253,14 @@ class Kommentio {
     
     if (!content) return;
 
+    // 제출 버튼 비활성화 및 로딩 상태 표시
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '작성 중...';
+
     try {
-      await this.createComment(content, parentId);
+      const result = await this.createComment(content, parentId);
       
       // 답글 폼 제거
       const replyForm = event.target.closest('.kommentio-reply-form');
@@ -2237,10 +2268,25 @@ class Kommentio {
         replyForm.remove();
       }
       
-      this.showNotification('답글이 성공적으로 작성되었습니다! ✅');
+      // 답글 작성 성공 시 seamless 새로고침
+      await this.loadComments();
+      
+      // 스팸 여부에 따른 알림 표시
+      if (result && result.isSpam) {
+        this.showNotification('스팸으로 감지된 답글입니다. 관리자 승인 후 게시됩니다. ⚠️');
+      } else {
+        this.showNotification('답글이 성공적으로 작성되었습니다! ✅');
+      }
+      
     } catch (error) {
       console.error('Failed to create reply:', error);
-      alert('답글 작성에 실패했습니다.');
+      this.showNotification('답글 작성에 실패했습니다. 다시 시도해주세요. ❌');
+    } finally {
+      // 버튼 상태 복원 (폼이 제거되기 전에)
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
     }
   }
 }
