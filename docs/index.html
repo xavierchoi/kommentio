@@ -264,13 +264,15 @@
         /* 스크롤 다운 시 숨김 상태 */
         .nav-premium.nav-hidden {
             transform: translateX(-50%) translateY(-120px);
-            opacity: 0.3;
+            opacity: 0;
+            pointer-events: none;
         }
         
         /* 스크롤 업 시 표시 상태 + 강조 효과 */
         .nav-premium.nav-visible {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
+            pointer-events: auto;
             box-shadow: 
                 var(--shadow-glass),
                 0 0 20px rgba(102, 126, 234, 0.1);
@@ -799,13 +801,15 @@
             /* 모바일에서 스크롤 숨김 상태 */
             .nav-premium.nav-hidden {
                 transform: translateY(-100px);
-                opacity: 0.2;
+                opacity: 0;
+                pointer-events: none;
             }
             
             /* 모바일에서 스크롤 표시 상태 */
             .nav-premium.nav-visible {
                 transform: translateY(0);
                 opacity: 1;
+                pointer-events: auto;
             }
             
             .feature-card-3d {
