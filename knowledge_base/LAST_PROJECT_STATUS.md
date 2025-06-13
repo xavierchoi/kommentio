@@ -1,4 +1,4 @@
-# 🚀 Kommentio 프로젝트 상태 보고서 v0.2.6 Knowledge Base 체계화 완성! 📚
+# 🚀 Kommentio 프로젝트 상태 보고서 v0.2.7 도메인 마이그레이션 완성! 🌐
 
 ## 📊 PRD 대비 달성도: 100% ⭐
 

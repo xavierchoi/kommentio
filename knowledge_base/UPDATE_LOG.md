@@ -1,5 +1,58 @@
 # 📋 Kommentio 업데이트 로그
 
+## v0.2.7 (2025-06-13) - 빌드 종료: 도메인 마이그레이션 완성! 🌐
+
+### 🎯 주요 업데이트 - v0.2.7 빌드 완료!
+- **빌드 종료**: v0.2.7로 kommentio.tech 공식 도메인 마이그레이션 완성
+- **OAuth 프로바이더 업데이트**: 전체 7개 소셜 로그인 도메인 설정 가이드 완성
+- **문서 시스템 완전 개편**: 모든 URL을 kommentio.tech 기준으로 통일
+- **Widget Integration 가이드**: 새 도메인 기준 사용법 전면 재작성
+- **다음 목표**: v0.2.8에서 kommentio.tech 배포 후 OAuth 실제 테스트 예정
+
+### 🌐 v0.2.7 주요 완성 사항 - 도메인 마이그레이션 시스템
+1. **kommentio.tech 공식 도메인 설정** ✅
+   - GitHub Pages에서 kommentio.tech 커스텀 도메인으로 완전 전환
+   - CLAUDE.md에 공식 도메인 설정 내역 기록
+   - 백업 시스템으로 GitHub Pages URL 유지
+
+2. **전체 문서 URL 업데이트** ✅
+   - knowledge_base/README.md: 모든 데모 링크를 kommentio.tech로 업데이트
+   - knowledge_base/LAST_PROJECT_STATUS.md: 활성 배포 링크 업데이트
+   - knowledge_base/UPDATE_LOG.md: 라이브 데모 URL 교체
+   - src/kommentio.js: Kakao OAuth 디버깅 도메인 업데이트
+
+3. **Widget Integration 가이드 완전 개편** ✅
+   - 기본 임베드 코드를 kommentio.tech 기준으로 완전 재작성
+   - A/B 테스팅을 위한 도메인 비교 섹션 추가
+   - Fallback 시스템 구축 (kommentio.tech → GitHub Pages)
+   - 마이그레이션 전략 및 백업 계획 수립
+
+4. **OAuth 프로바이더 도메인 업데이트 가이드** ✅
+   - 7개 소셜 프로바이더별 상세 설정 가이드 작성
+   - Supabase, Google, GitHub, Facebook, X(Twitter), Apple, Kakao, LinkedIn
+   - 각 프로바이더별 도메인 추가 방법 및 주의사항 명시
+   - 우선순위 기반 업데이트 순서 정의
+
+5. **체계적 마이그레이션 전략** ✅
+   - 기존 GitHub Pages 도메인 백업 유지 전략
+   - 점진적 도메인 전환을 위한 A/B 테스팅 준비
+   - OAuth 프로바이더별 업데이트 우선순위 설정
+   - 실제 테스트 및 검증 계획 수립
+
+### 🌟 v0.2.7의 혁신 포인트
+- **공식 도메인**: kommentio.tech를 통한 브랜드 아이덴티티 확립
+- **완전한 마이그레이션**: 모든 시스템이 새 도메인 기준으로 통일
+- **안전한 전환**: 백업 시스템과 점진적 전환 전략으로 안정성 보장
+- **OAuth 통합**: 7개 소셜 프로바이더 모두 새 도메인 지원 준비
+
+### 🎊 v0.2.7 달성 성과
+- **브랜드 통일성**: kommentio.tech 중심의 완전한 브랜딩 시스템 구축
+- **OAuth 준비성**: 7개 소셜 프로바이더 도메인 업데이트 가이드 완성
+- **문서 완성도**: 새 도메인 기준 모든 문서 및 가이드 업데이트
+- **안정성 보장**: 백업 시스템과 점진적 전환으로 서비스 연속성 확보
+
+---
+
 ## v0.2.6 (2025-06-13) - 빌드 종료: Knowledge Base 체계화 완성! 📚
 
 ### 🎯 주요 업데이트 - v0.2.6 빌드 완료!
