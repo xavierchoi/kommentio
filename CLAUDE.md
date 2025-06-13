@@ -17,6 +17,29 @@ If the user's prompt starts with “EP:”, then the user wants to enhance the p
 
 During developing with user, if you learn very important thing which need to remember and remind everytime, please add the contents which contains what's your mistakes and what you learn from the mistakes in CLAUDE.md file.
 
+## 🚨 Critical Development Principles
+
+### Anti-Hardcoding Policy
+**ABSOLUTELY AVOID HARDCODING** - Always use configurable options, environment variables, or null defaults.
+
+**Examples of FORBIDDEN hardcoding:**
+- ❌ `supabaseUrl: 'https://specific-project.supabase.co'`
+- ❌ `apiKey: 'sk-1234567890abcdef'`
+- ❌ `databaseUrl: 'postgres://user:pass@host:5432/db'`
+
+**Correct patterns:**
+- ✅ `supabaseUrl: target.dataset.supabaseUrl || null`
+- ✅ `apiKey: process.env.VITE_API_KEY || null`
+- ✅ `databaseUrl: config.databaseUrl || null`
+
+**Why this matters:**
+- Hardcoded values break Mock mode and development environments
+- Causes 400/401 API errors when services are unavailable
+- Makes code non-portable across different environments
+- Violates security best practices by exposing credentials
+
+**When in doubt:** Always default to `null` and let the application gracefully fall back to Mock mode or show appropriate configuration messages.
+
 ## Knowledge Base Reading Triggers
 
 ### Project Status & Updates  

@@ -2348,8 +2348,8 @@ function autoInit() {
       siteId: target.dataset.siteId,
       theme: target.dataset.theme || 'light',
       language: target.dataset.language || 'ko',
-      supabaseUrl: target.dataset.supabaseUrl || 'https://nwjbtsjeikrwyqltkpqv.supabase.co',
-      supabaseKey: target.dataset.supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ',
+      supabaseUrl: target.dataset.supabaseUrl || null,
+      supabaseKey: target.dataset.supabaseKey || null,
       claudeApiKey: target.dataset.claudeApiKey
     };
     
