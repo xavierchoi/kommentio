@@ -15,6 +15,78 @@ If the user's prompt starts with “EP:”, then the user wants to enhance the p
 
 During developing with user, if you learn very important thing which need to remember and remind everytime, please add the contents which contains what's your mistakes and what you learn from the mistakes in CLAUDE.md file.
 
+## Git Commit Message Standards for AI-Assisted Development
+
+### Commit Message Template
+```
+[AI] <type>: <description>
+
+<detailed description of changes>
+<performance impact if applicable>
+<testing notes if applicable>
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+### Commit Types
+- **feat**: New feature implementation
+- **fix**: Bug fixes and error resolution
+- **perf**: Performance optimizations
+- **style**: UI/UX improvements and styling
+- **refactor**: Code restructuring without functionality change
+- **docs**: Documentation updates
+- **test**: Testing additions or modifications
+- **build**: Build system or dependency changes
+
+### AI-Specific Commit Standards
+1. **Always use [AI] prefix** for Claude Code assisted commits
+2. **Include specific file changes** in description
+3. **Document performance impact** for optimization commits
+4. **Reference line numbers** for targeted fixes
+5. **Include testing verification** when applicable
+
+### Examples
+```bash
+# Performance optimization
+[AI] perf: optimize particle system for 50% better FPS
+
+- Reduced particle count from 12→6 for better performance
+- Slowed animation speeds: 20s→35s cycle, 30s→60s background
+- Added FPS monitoring with 5-second intervals
+- Mobile devices get 45s cycle + 0.2 opacity optimization
+
+Files: docs/index.html:1184-1203, 1462-1530
+Performance: 50% CPU usage reduction, stable 60fps on low-end devices
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+```bash
+# UI fix
+[AI] fix: resolve navigation overlap at 1333x819 resolution
+
+- Fixed nav.nav-premium covering div.hero-badge issue
+- Adjusted .hero-premium padding-top: 2rem→120px desktop, 100px mobile
+- Ensures perfect visual separation across all screen sizes
+
+Files: docs/index.html:383, 779
+Testing: Verified on 1333x819, 1920x1080, mobile viewports
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+### Commit Workflow
+1. **Before committing**: Run `git status` and `git diff` to review changes
+2. **Check recent commits**: `git log --oneline -5` to match style
+3. **Use template**: Follow AI commit message template exactly
+4. **Include Co-Authored-By**: Always credit Claude collaboration
+
 
 ## Project Overview
 
