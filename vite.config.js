@@ -12,17 +12,18 @@ export default defineConfig({
     }
   },
   server: {
-    host: true, // 외부 네트워크에서 접근 가능
-    port: 5173,
+    host: '0.0.0.0', // 모든 인터페이스에서 접근 가능
+    port: 3000, // 기본 포트를 3000으로 변경
     strictPort: false, // 포트가 사용 중이면 다른 포트 시도
-    open: true,
+    open: false, // 자동 브라우저 열기 비활성화
     allowedHosts: ['0b49-128-134-230-184.ngrok-free.app'], // ngrok 호스트 허용
     hmr: {
       overlay: true,
       port: 24678 // HMR 전용 포트 설정
     },
     fs: {
-      strict: true
+      strict: false, // 파일 시스템 접근 제한 해제
+      allow: ['..'] // 상위 디렉토리 접근 허용
     },
     watch: {
       usePolling: false, // 파일 시스템 이벤트 사용 (macOS 최적화)
