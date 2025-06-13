@@ -41,32 +41,18 @@ jobs:
 
       - name: Prepare GitHub Pages content
         run: |
-          # Create docs directory for GitHub Pages
-          mkdir -p docs
+          # docs directory already exists with all necessary files
+          # Just copy the built landing page over existing index.html
+          cp dist/docs/index.html docs/index.html
           
-          # Copy landing page as main index.html
-          cp landing.html docs/index.html
+          # Copy built widget files to docs
+          mkdir -p docs/widget
+          cp -r dist/widget/* docs/widget/
           
-          # Copy admin dashboard
-          cp -r admin docs/
-          
-          # Copy built widget files
-          mkdir -p docs/dist
-          cp -r dist/* docs/dist/
-          
-          # Copy public assets
-          if [ -d "public" ]; then
-            cp -r public docs/
+          # Copy the built kommentio.js for direct access
+          if [ -f "dist/widget/kommentio.iife.js" ]; then
+            cp dist/widget/kommentio.iife.js docs/kommentio.js
           fi
-          
-          # Copy kommentio.js to root for demos
-          if [ -f "public/kommentio.js" ]; then
-            cp public/kommentio.js docs/
-          fi
-          
-          # Update script paths in index.html
-          sed -i 's|./public/kommentio.js|./kommentio.js|g' docs/index.html
-          sed -i 's|./admin/|./admin/|g' docs/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
