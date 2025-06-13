@@ -33,6 +33,26 @@ During developing with user, if you learn very important thing which need to rem
 **Trigger**: When user asks about installation, usage, features, or general documentation
 **Read**: `knowledge_base/README.md` - Complete user guide, features, and setup instructions
 
+## 🚀 로컬 서버 구동 표준 (v0.2.7+)
+
+**중요**: 앞으로 로컬 서버 구동 시 다음 명령어를 사용하세요:
+
+### ✅ 배포 환경과 100% 동일한 로컬 테스트 (권장)
+```bash
+npm run dev:prod
+# → GitHub Actions와 동일한 빌드 + 정적 서빙
+# → http://localhost:3000 (kommentio.tech와 완전히 동일한 환경!)
+```
+
+### 🔧 일반 개발 (빠른 HMR이 필요한 경우)
+```bash
+npm run dev
+# → 개발 서버 (Hot Module Replacement)
+# → http://localhost:3000 (개발용)
+```
+
+**개발-배포 환경 동일성 보장을 위해 `npm run dev:prod` 사용을 강력히 권장합니다!**
+
 ## Critical File Location Reminder
 **IMPORTANT**: CLAUDE.md must ALWAYS remain in the project root directory. All other documentation is organized in knowledge_base/ folder for better structure.
 

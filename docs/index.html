@@ -18,7 +18,7 @@
     <meta name="twitter:title" content="Kommentio - Ultra-Premium Comment System">
     <meta name="twitter:description" content="Apple급 프리미엄 디자인의 무료 댓글 시스템">
     
-    <link rel="icon" href="./favicon.ico">
+    <link rel="icon" href="/assets/favicon-CvwY7gig.ico">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -84,6 +84,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        ::-moz-selection {
+            background: rgba(0, 221, 203, 0.3);
+            color: var(--text-primary);
         }
 
         ::selection {
@@ -359,7 +364,8 @@
             border: none;
             border-radius: 50%;
             background: var(--bg-glass);
-            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+                    backdrop-filter: blur(20px);
             color: var(--text-primary);
             cursor: pointer;
             display: flex;
@@ -436,7 +442,8 @@
             gap: 8px;
             padding: 8px 20px;
             background: var(--bg-glass);
-            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+                    backdrop-filter: blur(20px);
             border: 1px solid rgba(102, 126, 234, 0.3);
             border-radius: 30px;
             margin-bottom: 2rem;
@@ -514,7 +521,8 @@
             transition: all 0.3s var(--ease-premium);
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+                    backdrop-filter: blur(20px);
         }
 
         .btn-primary {
@@ -625,7 +633,8 @@
 
         .feature-card-3d {
             background: var(--bg-glass);
-            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+                    backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 2.5rem;
@@ -722,7 +731,8 @@
 
         .demo-window {
             background: var(--bg-glass-strong);
-            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+                    backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             overflow: hidden;
@@ -779,7 +789,8 @@
                 right: 10px;
                 transform: none;
                 border-radius: 20px;
-                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                        backdrop-filter: blur(10px);
             }
             
             /* 모바일에서 스크롤 숨김 상태 */
@@ -795,7 +806,8 @@
             }
             
             .feature-card-3d {
-                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                        backdrop-filter: blur(8px);
                 will-change: auto;
                 transition: transform 0.2s ease-out;
             }
