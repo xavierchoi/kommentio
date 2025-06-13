@@ -1,17 +1,51 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-Before you start any session, you must read some markdown files to understand last updates and reminds:
-To remind what this project's Goal: comment_system_prd.md
-To learn about what this project's competitors and research of their specifics: competitor_research.md
-To check last status of this project: LAST_PROJECT_STATUS.md
-To read or add update log: UPDATE_LOG.md
+Before you start any session, you must read some markdown files to understand last updates and reminds. All project documentation is now organized in the knowledge_base/ folder (except this CLAUDE.md file):
 
-If user says '빌드를 종료합니다.", ask user to commit and push current build. If user agree with that, you must update(e.g. latest todo list) LAST_PROJECT_STATUS.md and add update log in UPDATE_LOG.md. please name the current version of build as possible as minor number(e.g. v0.1.0 to v0.1.1). After this, ask user to commit and push this project again.
+## 📚 Knowledge Base Reading Triggers
 
-If user says '코드 테스트를 실시합니다. CODE_TEST.md를 읽고 테스트를 시작하세요.", read CODE_TEST.md file and follow the prompts in the file to run code tests.
+### 🎯 Project Foundation & Goals
+**Trigger**: When user asks about project purpose, goals, competitors, or requirements
+**Read**: `knowledge_base/comment_system_prd.md` - Complete Product Requirements Document
+**Read**: `knowledge_base/competitor_research.md` - Competitor analysis and research
 
-If the user's prompt starts with “EP:”, then the user wants to enhance the prompt. Read the PROMPT_ENHANCER.md file and follow the guidelines to enhance the user's prompt. Show the user the enhancement and get their permission to run it before taking action on the enhanced prompt. The enhanced prompts will follow the language of the original prompt (e.g., Korean prompt input will output Korean prompt enhancements, English prompt input will output English prompt enhancements, etc.)
+### 📊 Project Status & Updates  
+**Trigger**: When user asks about current status, recent changes, or version history
+**Read**: `knowledge_base/LAST_PROJECT_STATUS.md` - Current project state and achievements
+**Read**: `knowledge_base/UPDATE_LOG.md` - Detailed version history and changelog
+
+### 🧪 Testing & Quality Assurance
+**Trigger**: When user mentions testing, QA, debugging, or code verification
+**Read**: `knowledge_base/CODE_TEST.md` - Comprehensive testing methodology and procedures
+
+### 🔐 OAuth & Authentication Setup
+**Trigger**: When user asks about social login, OAuth setup, or authentication issues
+**Read**: `knowledge_base/twitter-oauth-setup-guide.md` - X(Twitter) OAuth implementation guide  
+**Read**: `knowledge_base/APPLE_OAUTH_SETUP_GUIDE.md` - Apple OAuth setup and Mock mode strategy
+
+### ✨ Prompt Enhancement & AI Optimization
+**Trigger**: When user prompt starts with "EP:" or mentions prompt improvement
+**Read**: `knowledge_base/PROMPT_ENHANCER.md` - AI prompt enhancement guidelines and patterns
+
+### 📖 General Documentation & User Guide
+**Trigger**: When user asks about installation, usage, features, or general documentation
+**Read**: `knowledge_base/README.md` - Complete user guide, features, and setup instructions
+
+## 🚨 Critical File Location Reminder
+**IMPORTANT**: CLAUDE.md must ALWAYS remain in the project root directory. All other documentation is organized in knowledge_base/ folder for better structure.
+
+## 🔧 Special Command Triggers
+
+### Build Completion Command
+If user says '빌드를 종료합니다.", ask user to commit and push current build. If user agree with that, you must update(e.g. latest todo list) `knowledge_base/LAST_PROJECT_STATUS.md` and add update log in `knowledge_base/UPDATE_LOG.md`. please name the current version of build as possible as minor number(e.g. v0.1.0 to v0.1.1). After this, ask user to commit and push this project again.
+
+### Code Testing Command  
+If user says '코드 테스트를 실시합니다. CODE_TEST.md를 읽고 테스트를 시작하세요.", read `knowledge_base/CODE_TEST.md` file and follow the prompts in the file to run code tests.
+
+### Prompt Enhancement Command
+
+If the user's prompt starts with “EP:”, then the user wants to enhance the prompt. Read the `knowledge_base/PROMPT_ENHANCER.md` file and follow the guidelines to enhance the user's prompt. Show the user the enhancement and get their permission to run it before taking action on the enhanced prompt. The enhanced prompts will follow the language of the original prompt (e.g., Korean prompt input will output Korean prompt enhancements, English prompt input will output English prompt enhancements, etc.)
 
 During developing with user, if you learn very important thing which need to remember and remind everytime, please add the contents which contains what's your mistakes and what you learn from the mistakes in CLAUDE.md file.
 
