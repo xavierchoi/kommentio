@@ -3,39 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 Before you start any session, you must read some markdown files to understand last updates and reminds. All project documentation is now organized in the knowledge_base/ folder (except this CLAUDE.md file):
 
-## 📚 Knowledge Base Reading Triggers
-
-### 🎯 Project Foundation & Goals
-**Trigger**: When user asks about project purpose, goals, competitors, or requirements
-**Read**: `knowledge_base/comment_system_prd.md` - Complete Product Requirements Document
-**Read**: `knowledge_base/competitor_research.md` - Competitor analysis and research
-
-### 📊 Project Status & Updates  
-**Trigger**: When user asks about current status, recent changes, or version history
-**Read**: `knowledge_base/LAST_PROJECT_STATUS.md` - Current project state and achievements
-**Read**: `knowledge_base/UPDATE_LOG.md` - Detailed version history and changelog
-
-### 🧪 Testing & Quality Assurance
-**Trigger**: When user mentions testing, QA, debugging, or code verification
-**Read**: `knowledge_base/CODE_TEST.md` - Comprehensive testing methodology and procedures
-
-### 🔐 OAuth & Authentication Setup
-**Trigger**: When user asks about social login, OAuth setup, or authentication issues
-**Read**: `knowledge_base/twitter-oauth-setup-guide.md` - X(Twitter) OAuth implementation guide  
-**Read**: `knowledge_base/APPLE_OAUTH_SETUP_GUIDE.md` - Apple OAuth setup and Mock mode strategy
-
-### ✨ Prompt Enhancement & AI Optimization
-**Trigger**: When user prompt starts with "EP:" or mentions prompt improvement
-**Read**: `knowledge_base/PROMPT_ENHANCER.md` - AI prompt enhancement guidelines and patterns
-
-### 📖 General Documentation & User Guide
-**Trigger**: When user asks about installation, usage, features, or general documentation
-**Read**: `knowledge_base/README.md` - Complete user guide, features, and setup instructions
-
-## 🚨 Critical File Location Reminder
-**IMPORTANT**: CLAUDE.md must ALWAYS remain in the project root directory. All other documentation is organized in knowledge_base/ folder for better structure.
-
-## 🔧 Special Command Triggers
+## Special Command Triggers
 
 ### Build Completion Command
 If user says '빌드를 종료합니다.", ask user to commit and push current build. If user agree with that, you must update(e.g. latest todo list) `knowledge_base/LAST_PROJECT_STATUS.md` and add update log in `knowledge_base/UPDATE_LOG.md`. please name the current version of build as possible as minor number(e.g. v0.1.0 to v0.1.1). After this, ask user to commit and push this project again.
@@ -48,6 +16,25 @@ If user says '코드 테스트를 실시합니다. CODE_TEST.md를 읽고 테스
 If the user's prompt starts with “EP:”, then the user wants to enhance the prompt. Read the `knowledge_base/PROMPT_ENHANCER.md` file and follow the guidelines to enhance the user's prompt. Show the user the enhancement and get their permission to run it before taking action on the enhanced prompt. The enhanced prompts will follow the language of the original prompt (e.g., Korean prompt input will output Korean prompt enhancements, English prompt input will output English prompt enhancements, etc.)
 
 During developing with user, if you learn very important thing which need to remember and remind everytime, please add the contents which contains what's your mistakes and what you learn from the mistakes in CLAUDE.md file.
+
+## Knowledge Base Reading Triggers
+
+### Project Status & Updates  
+**Trigger**: When user asks about current status, recent changes, version history, or what to do in current chat session
+**Read**: `knowledge_base/LAST_PROJECT_STATUS.md` - Current project state and achievements
+**Read**: `knowledge_base/UPDATE_LOG.md` - Detailed version history and changelog
+
+### OAuth & Authentication Setup
+**Trigger**: When user asks about social login, OAuth setup, or authentication issues
+**Read**: `knowledge_base/twitter-oauth-setup-guide.md` - X(Twitter) OAuth implementation guide  
+**Read**: `knowledge_base/APPLE_OAUTH_SETUP_GUIDE.md` - Apple OAuth setup and Mock mode strategy
+
+### General Documentation & User Guide
+**Trigger**: When user asks about installation, usage, features, or general documentation
+**Read**: `knowledge_base/README.md` - Complete user guide, features, and setup instructions
+
+## Critical File Location Reminder
+**IMPORTANT**: CLAUDE.md must ALWAYS remain in the project root directory. All other documentation is organized in knowledge_base/ folder for better structure.
 
 ## Git Commit Message Standards for AI-Assisted Development
 
@@ -125,6 +112,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ## Project Overview
 
 Kommentio is a **completed** open-source comment widget system - a free, ad-free alternative to Disqus. The project successfully implements all PRD requirements as a Vanilla JavaScript embeddable widget.
+
+### 🌐 Official Domain & Deployment
+- **Primary Domain**: https://kommentio.tech (커스텀 도메인)
+- **GitHub Pages**: https://xavierchoi.github.io/kommentio (백업 도메인)
+- **Repository**: https://github.com/xavierchoi/kommentio
+
+**IMPORTANT**: kommentio.tech가 공식 메인 도메인입니다. 모든 공식 문서, 링크, 레퍼런스에서 이 도메인을 사용해야 합니다.
 
 ## Development Commands
 
@@ -230,7 +224,7 @@ kommentio/
 ### Basic Embed
 ```html
 <div data-kommentio></div>
-<script src="kommentio.js"></script>
+<script src="https://kommentio.tech/kommentio.js"></script>
 ```
 
 ### Advanced Configuration
@@ -261,9 +255,15 @@ await adminAPI.markAsSpam(commentId);
 
 ## Production Deployment
 
+### 🌐 Official Domain Configuration
+- **Primary Domain**: https://kommentio.tech
+- **Widget CDN**: https://kommentio.tech/kommentio.js
+- **Demo Page**: https://kommentio.tech/
+- **Admin Dashboard**: https://kommentio.tech/admin-dashboard/
+
 ### CDN Setup
-1. Upload `dist/widget/kommentio.iife.js` to CDN
-2. Update embed script src to CDN URL
+1. **Primary**: Upload `dist/widget/kommentio.iife.js` to kommentio.tech
+2. **Backup**: GitHub Pages https://xavierchoi.github.io/kommentio/kommentio.js
 3. Configure CORS for your domains
 
 ### Supabase Setup
@@ -1158,6 +1158,42 @@ jobs:
 ```
 
 This performance monitoring framework provides real-time insights, automated optimization, and comprehensive testing to ensure Kommentio maintains excellent performance across all environments and devices.
+
+## 🌐 Domain Migration & Deployment Strategy
+
+### Official Domain Transition
+**Date**: 2025-06-13  
+**From**: GitHub Pages (xavierchoi.github.io/kommentio)  
+**To**: kommentio.tech (커스텀 도메인)
+
+### Critical Domain Information
+1. **Primary Domain**: https://kommentio.tech
+   - 메인 랜딩 페이지
+   - 위젯 CDN 호스팅
+   - 관리 대시보드 접속
+   - 모든 공식 문서 레퍼런스
+
+2. **Backup Domain**: https://xavierchoi.github.io/kommentio
+   - GitHub Pages 자동 배포
+   - 개발/테스트 환경
+   - Fallback 옵션
+
+### Documentation Update Requirements
+**IMPORTANT**: 모든 문서, 가이드, 예제 코드에서 kommentio.tech 도메인을 기본값으로 사용해야 합니다.
+
+- ✅ CLAUDE.md 업데이트 완료
+- ✅ README.md 업데이트 완료 (모든 활성 링크)
+- ✅ knowledge_base/*.md 파일들 도메인 레퍼런스 업데이트 완료
+- ✅ 코드 내 하드코딩된 URL 변경 완료
+
+### Widget Integration Update
+```html
+<!-- OLD -->
+<script src="https://xavierchoi.github.io/kommentio/kommentio.js"></script>
+
+<!-- NEW (Official) -->
+<script src="https://kommentio.tech/kommentio.js"></script>
+```
 
 ## Future Enhancements (Phase 2)
 - Korean social login (Kakao, Line)

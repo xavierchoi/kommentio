@@ -6,8 +6,8 @@
 [![Version](https://img.shields.io/badge/version-v0.2.02-success.svg)](./UPDATE_LOG.md)
 [![Bundle Size](https://img.shields.io/badge/bundle%20size-16KB-brightgreen.svg)](#performance)
 [![Gzipped](https://img.shields.io/badge/gzipped-5.59KB-brightgreen.svg)](#performance)
-[![Demo](https://img.shields.io/badge/🌐_Live_Demo-blue.svg)](https://xavierchoi.github.io/kommentio/premium.html)
-[![Dashboard](https://img.shields.io/badge/🎛️_Admin_Dashboard-orange.svg)](https://xavierchoi.github.io/kommentio/admin/)
+[![Demo](https://img.shields.io/badge/🌐_Live_Demo-blue.svg)](https://kommentio.tech)
+[![Dashboard](https://img.shields.io/badge/🎛️_Admin_Dashboard-orange.svg)](https://kommentio.tech/admin-dashboard/)
 
 > **어디에나 어울리는 디자인 + AI 스팸 필터링 + 실시간 관리 대시보드**
 
@@ -44,13 +44,13 @@
 ## 🌐 라이브 데모
 
 ### 🎯 **Premium Landing Page** (권장)
-**https://xavierchoi.github.io/kommentio/premium.html**
+**https://kommentio.tech**
 - Ultra-Premium 디자인 시스템 체험
 - 모든 기능 Interactive Demo
 - 7개 소셜 로그인 테스트
 
 ### 🎛️ **Admin Dashboard**
-**https://xavierchoi.github.io/kommentio/admin-dashboard/
+**https://kommentio.tech/admin-dashboard/**
 - 완전한 관리 대시보드 체험
 - Mock 데이터로 실제 사용법 확인
 
@@ -81,7 +81,7 @@
     
     <!-- 🔥 Kommentio 위젯 (단 2줄!) -->
     <div data-kommentio data-site-id="my-blog"></div>
-    <script src="https://cdn.jsdelivr.net/gh/xavierchoi/kommentio@main/public/kommentio.js"></script>
+    <script src="https://kommentio.tech/kommentio.js"></script>
 </body>
 </html>
 ```
@@ -95,7 +95,7 @@
   data-theme="dark"
   data-language="ko"
 ></div>
-<script src="https://cdn.jsdelivr.net/gh/xavierchoi/kommentio@main/public/kommentio.js"></script>
+<script src="https://kommentio.tech/kommentio.js"></script>
 ```
 
 ### 3️⃣ **소셜 로그인 커스터마이징**
@@ -335,6 +335,6 @@ copies of the Software...
 
 **Disqus를 뛰어넘는 진정한 오픈소스 솔루션**
 
-[🌐 Live Demo](https://xavierchoi.github.io/kommentio/premium.html) • [📊 Dashboard](https://xavierchoi.github.io/kommentio/admin/) • [📚 Documentation](./docs/) • [💬 Community](https://github.com/xavierchoi/kommentio/discussions)
+[🌐 Live Demo](https://kommentio.tech) • [📊 Dashboard](https://kommentio.tech/admin-dashboard/) • [📚 Documentation](./docs/) • [💬 Community](https://github.com/xavierchoi/kommentio/discussions)
 
 </div>

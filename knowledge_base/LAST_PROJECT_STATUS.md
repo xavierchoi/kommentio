@@ -504,8 +504,9 @@ npm run build:widget
    - GitHub 사용자 데이터 수신 최적화
    - Supabase OAuth Provider 설정 완전 마스터
 
-5. ✅ **프로덕션 배포 준비** - GitHub Pages 실제 테스트 환경!
-   - GitHub Pages (https://xavierchoi.github.io/kommentio/) 활용
+5. ✅ **프로덕션 배포 준비** - kommentio.tech 공식 도메인 출시!
+   - 공식 도메인 (https://kommentio.tech) 출시 및 활용
+   - GitHub Pages (https://xavierchoi.github.io/kommentio/) 백업 도메인 유지
    - 실제 HTTPS 도메인으로 Apple OAuth 테스트 가능
    - 모든 OAuth 프로바이더 실제 환경 검증 준비
 
@@ -535,9 +536,9 @@ npm run build:widget
    - `createComment()` 메서드 스팸 감지 결과 반환으로 통합
    - Git 설정 수정으로 올바른 authorship 보장
 
-5. ✅ **GitHub Pages 배포** - 즉시 테스트 가능한 환경 완성!
-   - 빌드된 위젯 (48.34 kB, 14.42 kB gzipped) docs 폴더 배포
-   - 모든 새 기능이 https://xavierchoi.github.io/kommentio/ 에서 즉시 체험 가능
+5. ✅ **kommentio.tech 공식 배포** - 즉시 테스트 가능한 환경 완성!
+   - 빌드된 위젯 (48.34 kB, 14.42 kB gzipped) 공식 도메인 배포
+   - 모든 새 기능이 https://kommentio.tech 에서 즉시 체험 가능
    - 실제 사용자 환경에서 UX 개선사항 검증 가능
 
 ### 🌟 v0.2.4의 차별화 포인트

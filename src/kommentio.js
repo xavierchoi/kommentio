@@ -1964,7 +1964,7 @@ class Kommentio {
         
         // 카카오 개발자 콘솔 확인 가이드
         console.log('📋 카카오 OAuth 실패 시 확인사항:');
-        console.log('1. 카카오 개발자 콘솔 > 플랫폼 > Web 도메인:', 'https://xavierchoi.github.io');
+        console.log('1. 카카오 개발자 콘솔 > 플랫폼 > Web 도메인:', 'https://kommentio.tech');
         console.log('2. Redirect URI:', this.getProviderOptions('kakao').redirectTo);
         console.log('3. Supabase 카카오 Provider 설정 확인');
         console.log('4. Client ID, Client Secret 재확인');

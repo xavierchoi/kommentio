@@ -477,7 +477,7 @@
 - **커뮤니티 주목**: 오픈소스 프로젝트 중 최고 수준 디자인 + 기술력
 
 ### 🌐 배포 완료
-- **GitHub Pages**: https://xavierchoi.github.io/kommentio/premium.html
+- **공식 도메인**: https://kommentio.tech
 - **즉시 체험 가능**: 모든 기능 실시간 동작
 - **모바일 최적화**: 모든 디바이스에서 완벽한 경험
 
@@ -990,7 +990,7 @@
 
 ## 🔗 관련 링크
 
-- **🌍 라이브 데모**: https://xavierchoi.github.io/kommentio
+- **🌍 라이브 데모**: https://kommentio.tech
 - **📚 GitHub**: https://github.com/xavierchoi/kommentio
 - **💬 토론**: https://github.com/xavierchoi/kommentio/discussions
 - **🐛 이슈 리포트**: https://github.com/xavierchoi/kommentio/issues

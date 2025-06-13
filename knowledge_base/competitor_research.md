@@ -1,223 +1,519 @@
-# 웹사이트/블로그용 외부 댓글 시스템 오픈소스 소프트웨어 시장 조사 분석
+<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" class="logo" width="120"/>
 
-웹사이트와 블로그에 댓글 기능을 구현하기 위한 외부 댓글 시스템은 정적 사이트 생성기의 인기와 함께 중요한 개발 도구로 자리잡고 있습니다. 기존의 Disqus 독점 구조에서 벗어나 다양한 오픈소스 대안들이 등장하면서 시장 경쟁이 활발해지고 있는 상황입니다. 본 연구에서는 현재 가장 대중적으로 사용되는 7개의 댓글 시스템을 분석하여 각각의 특징과 장단점을 파악하고, 시장 기회와 개발 방향성을 제시하고자 합니다.
+# Market Research Report on External Comment Systems for Websites/Blogs
 
-## 시장 개요 및 주요 플레이어 분석
+## 1. Research Overview
 
-### Disqus - 시장 지배적 위치의 상용 서비스
+This research aims to analyze major open-source software for external comment systems for websites/blogs and identify market opportunities for developing and commercializing alternative software[^1]. The comment system market is expected to grow from USD 1.5 billion in 2024 to USD 3.8 billion by 2033, with a compound annual growth rate (CAGR) of 10.5%[^2]. This research provides detailed analysis of 7 major systems: Disqus, Utterances, Giscus, Remark42, Commento/Comentario, Cusdis, and Waline[^3][^1].
 
-Disqus는 전세계적으로 가장 널리 사용되는 댓글 플랫폼으로, CNN, Fox News, Time Magazine 등 대형 미디어에서 활용하고 있습니다[^1_2]. 무료 버전에서 광고를 표시하는 프리미엄 모델을 통해 수익을 창출하며, 사실상의 업계 표준으로 인식되고 있습니다.
+## 2. Market Status and Trends
 
-**주요 특징:**
+The comment system market is experiencing rapid growth due to increasing online media content, growing demand for real-time user engagement, and rising importance of customer feedback[^1][^2]. In particular, demand for open-source alternatives is increasing due to growing concerns about privacy protection and rising preference for self-hosting[^4][^5].
 
-- 소셜 네트워크 통합 로그인 (이메일, Facebook, Twitter, Google 등)
-- 실시간 댓글 표시 및 이메일 알림 기능
-- YouTube, Flickr와의 미디어 통합 지원
-- 모바일 최적화된 인터페이스
-- 강력한 관리자 도구 및 스팸 필터링
+## 3. Detailed Analysis of Major Comment Systems
 
-**장점:**
+### 3.1 Disqus
 
-- 가장 광범위한 사용자 베이스와 인지도
-- 안정적인 서비스 운영과 지속적인 업데이트
-- 다양한 플랫폼과의 호환성
-- 사용자 친화적인 인터페이스
+**Basic Information**
 
-**단점:**
+- A commercial service in a market-dominant position, the most widely used comment platform worldwide[^6][^7].
 
-- 무료 버전에서 강제 광고 표시로 인한 사용자 경험 저하[^1_1]
-- 제3자 서버 의존으로 인한 페이지 로딩 속도 저하[^1_3]
-- 데이터 소유권 및 프라이버시 우려
-- 커스터마이징 제한과 종속성 문제
+**Detailed Feature Analysis**
 
 
-### GitHub 기반 댓글 시스템들
+| Criteria | Details |
+| :-- | :-- |
+| **Pricing** | Free (with ads) / Plus $12/month (50K daily pageviews), Pro $115/month (150K daily pageviews), Business custom pricing[^6][^8] |
+| **File Size** | Approximately 150-200KB (optimized with asynchronous loading)[^9] |
+| **Social Logins** | 5 (Google, Facebook, X(Twitter), Apple, Microsoft)[^10] |
+| **AI Spam Filtering** | Yes (Advanced automatic anti-spam filter based on Akismet)[^11] |
+| **Dashboard Mobile Support** | Yes (Fully responsive design and dedicated mobile app)[^6] |
+| **Data Ownership** | Disqus (WordPress sync backup supported)[^6] |
+| **Real-time Updates** | Yes (Real-time comment system)[^6] |
+| **Open Source** | No (Commercial service)[^6] |
 
-#### Utterances - GitHub Issues 활용
+**Advantages**
 
-Utterances는 GitHub Issues를 활용한 댓글 시스템으로, 개발자 커뮤니티에서 높은 인기를 얻고 있습니다[^1_1][^1_6]. 2018년경부터 본격적으로 사용되기 시작하여 GitHub 중심의 개발 환경에서 자연스럽게 통합됩니다.
+- Has the widest user base and recognition[^6]
+- Provides stable service operation and continuous updates[^7]
+- Offers comprehensive analytics dashboard and moderation panel[^6]
 
-**주요 특징:**
+**Disadvantages**
 
-- GitHub Issues를 댓글 저장소로 활용
-- 마크다운 문법 완벽 지원
-- GitHub 계정 기반 인증
-- 무료 호스팅 서비스 제공
+- User experience degradation due to forced ads in free version[^12]
+- Page loading speed issues due to third-party server dependency[^13]
+- Continuous concerns about data ownership and privacy[^12]
 
-**장점:**
 
-- 완전 무료 서비스로 광고 없음
-- 개발자들에게 친숙한 GitHub 환경
-- 마크다운 지원으로 코드 블록 작성 용이
-- 매우 가벼운 로딩 속도
+### 3.2 Utterances
 
-**단점:**
+**Basic Information**
 
-- GitHub 계정 필수로 일반 사용자 접근성 제한
-- 비개발자 대상 사이트에는 부적합
-- GitHub 서비스 의존성
+- A comment system utilizing GitHub Issues, gaining high popularity in the developer community since around 2018[^14][^15].
 
+**Detailed Feature Analysis**
 
-#### Giscus - GitHub Discussions 활용
 
-Giscus는 Utterances에서 영감을 받아 GitHub Discussions를 활용하는 차세대 댓글 시스템입니다[^1_12][^1_16]. 2021년부터 본격적인 개발이 시작되어 Utterances의 한계를 보완하고자 개발되었습니다.
+| Criteria | Details |
+| :-- | :-- |
+| **Pricing** | Completely free[^14] |
+| **File Size** | Approximately 5-10KB (Very lightweight based on GitHub Issues)[^14][^15] |
+| **Social Logins** | 1 (GitHub only)[^14] |
+| **AI Spam Filtering** | No (Relies on GitHub's basic spam management)[^16] |
+| **Dashboard Mobile Support** | Yes (Utilizes GitHub Issues interface)[^17] |
+| **Data Ownership** | User (Stored in GitHub Issues)[^14] |
+| **Real-time Updates** | Limited (GitHub Issues update method)[^16] |
+| **Open Source** | Yes[^14] |
 
-**주요 특징:**
+**Advantages**
 
-- GitHub Discussions 기반 댓글 저장
-- 다국어 지원 (한국어 포함)
-- 커스텀 테마 지원
-- 반응(이모지) 기능 제공
-- 셀프 호스팅 옵션
+- Completely free service with no ads[^14]
+- Provides very fast loading speed[^14]
+- Easy code block writing with markdown support[^16]
 
-**장점:**
+**Disadvantages**
 
-- Discussions의 풍부한 기능 활용 (카테고리, 반응 등)
-- 오픈소스로 완전 무료[^1_19]
-- 데이터베이스 불필요로 인한 간편한 설치
-- 활발한 개발 커뮤니티
+- Limited general user accessibility due to mandatory GitHub account[^14]
+- Unsuitable for non-developer targeted sites[^16]
+- Lacks automated spam filtering features[^16]
 
-**단점:**
 
-- 여전히 GitHub 계정 의존성
-- 공개 저장소 필수 요구사항[^1_16]
-- 상대적으로 새로운 프로젝트로 안정성 검증 부족
+### 3.3 Giscus
 
+**Basic Information**
 
-### 자체 호스팅 중심 솔루션들
+- A next-generation comment system utilizing GitHub Discussions, with full-scale development starting from 2021[^18][^19].
 
-#### Remark42 - 종합적 자체 호스팅 솔루션
+**Detailed Feature Analysis**
 
-Remark42는 Go 언어로 개발된 프라이버시 중심의 자체 호스팅 댓글 엔진입니다[^1_8][^1_14]. 2018년경부터 개발되어 현재 안정적인 버전을 제공하고 있습니다.
 
-**주요 특징:**
+| Criteria | Details |
+| :-- | :-- |
+| **Pricing** | Completely free[^18] |
+| **File Size** | Approximately 15-25KB (Lightweight based on GitHub Discussions)[^20] |
+| **Social Logins** | 1 (GitHub only)[^18] |
+| **AI Spam Filtering** | No (Utilizes GitHub's basic management tools)[^18] |
+| **Dashboard Mobile Support** | Yes (GitHub Discussions interface)[^19] |
+| **Data Ownership** | User (Stored in GitHub Discussions)[^18] |
+| **Real-time Updates** | Yes (GitHub Discussions real-time features)[^18] |
+| **Open Source** | Yes[^18] |
 
-- 다양한 소셜 로그인 지원 (Google, Facebook, GitHub, Twitter 등)
-- 익명 댓글 지원 옵션
-- 마크다운 지원 및 이미지 업로드
-- Disqus/WordPress 데이터 가져오기 기능
-- Docker를 통한 간편한 배포
+**Advantages**
 
-**장점:**
+- Can utilize rich features of Discussions (categories, reactions, etc.)[^21]
+- Supports multi-language and custom themes[^18]
+- Easy installation without need for database[^20]
 
-- 완전한 데이터 소유권 및 프라이버시 보호[^1_8]
-- 풍부한 기능과 관리자 도구
-- 단일 파일 데이터베이스로 백업 용이
-- 다중 사이트 지원
+**Disadvantages**
 
-**단점:**
+- Still has GitHub account dependency issues[^18]
+- Restrictive public repository requirement[^19]
+- Relatively new project with insufficient stability verification[^18]
 
-- 서버 관리 및 유지보수 부담
-- 초기 설정의 기술적 복잡성
-- 스팸 관리의 개별적 책임
 
+### 3.4 Remark42
 
-#### Commento/Comentario - 경량 자체 호스팅
+**Basic Information**
 
-Commento는 Disqus의 대안으로 개발된 자체 호스팅 댓글 시스템이며, Comentario는 그 후속 프로젝트입니다[^1_5][^1_18]. 2019년경부터 개발되기 시작하여 현재 활발히 유지되고 있습니다.
+- A privacy-focused self-hosted comment engine developed in Go language[^22][^23].
 
-**주요 특징:**
+**Detailed Feature Analysis**
 
-- PostgreSQL/SQLite 데이터베이스 지원
-- 소셜 로그인 및 익명 댓글 지원
-- 관리자 대시보드 제공
-- Docker 배포 지원
-- OpenID Connect 통합
 
-**장점:**
+| Criteria | Details |
+| :-- | :-- |
+| **Pricing** | Completely free (self-hosted)[^22] |
+| **File Size** | Approximately 50-80KB (lightweight UI)[^24] |
+| **Social Logins** | 8 (Google, Facebook, Microsoft, GitHub, Apple, Yandex, Patreon, Telegram)[^22] |
+| **AI Spam Filtering** | Yes (Built-in spam filtering system)[^22] |
+| **Dashboard Mobile Support** | Yes (White/dark theme support)[^23] |
+| **Data Ownership** | User (Complete self-ownership)[^22] |
+| **Real-time Updates** | Yes (Real-time comments and notification system)[^22] |
+| **Open Source** | Yes[^22] |
 
-- 직관적인 사용자 인터페이스[^1_18]
-- 활발한 개발 및 유지보수
-- 확장성 있는 데이터베이스 구조
-- SEO 친화적 구조
+**Advantages**
 
-**단점:**
+- Provides the most diverse social login options[^22]
+- Enables complete data ownership and privacy protection[^22]
+- Offers rich features and administrator tools[^23]
 
-- 데이터베이스 관리 필요
-- 상대적으로 높은 리소스 요구사항
-- 복잡한 초기 설정 과정[^1_3]
+**Disadvantages**
 
+- Server management and maintenance burden[^24]
+- Technical complexity in initial setup[^24]
+- Individual responsibility for spam management required[^25]
 
-### 서버리스/클라우드 기반 솔루션들
 
-#### Cusdis - 프라이버시 중심 경량 솔루션
+### 3.5 Commento/Comentario
 
-Cusdis는 프라이버시를 중시하는 경량 댓글 시스템으로, Disqus의 직접적인 대안을 목표로 개발되었습니다[^1_20]. 2021년부터 개발되어 빠르게 성장하고 있는 프로젝트입니다.
+**Basic Information**
 
-**주요 특징:**
+- A self-hosted comment system developed as an alternative to Disqus, with Comentario being its successor project[^26][^27].
 
-- 5KB 미만의 경량 JavaScript SDK
-- 이메일 알림 및 빠른 승인 기능
-- 웹훅 지원으로 외부 도구 연동
-- 다크모드 및 다국어 지원
-- 클라우드/셀프호스팅 선택 가능
+**Detailed Feature Analysis**
 
-**장점:**
 
-- 매우 빠른 로딩 속도와 가벼운 구조[^1_20]
-- 사용자 추적 없는 프라이버시 보호
-- 간편한 통합 과정
-- 무료 클라우드 옵션 제공
+| Criteria | Details |
+| :-- | :-- |
+| **Pricing** | $10/month or $99/year (up to 50K daily pageviews)[^26] |
+| **File Size** | Approximately 11KB (JavaScript and CSS)[^4] |
+| **Social Logins** | OAuth social login support (exact number unclear)[^28] |
+| **AI Spam Filtering** | Yes (Akismet integration possible)[^29] |
+| **Dashboard Mobile Support** | Yes (Moderation tools and email management)[^28] |
+| **Data Ownership** | User (No tracking)[^26] |
+| **Real-time Updates** | Yes (Real-time comment updates)[^28] |
+| **Open Source** | Yes (Comentario)[^27] |
 
-**단점:**
+**Advantages**
 
-- 상대적으로 제한적인 기능
-- 작은 커뮤니티 규모
-- 소셜 로그인 옵션 부족
+- Provides intuitive user interface[^28]
+- Active development and maintenance[^27]
+- Privacy-focused design with no user tracking[^4]
 
+**Disadvantages**
 
-#### Waline - 서버리스 아시아 중심 솔루션
+- Requires database management[^30]
+- Development has slowed and is essentially discontinued[^27]
+- Relatively high resource requirements[^30]
 
-Waline은 중국을 중심으로 개발된 서버리스 댓글 시스템으로, 다양한 배포 플랫폼을 지원합니다[^1_11]. 2022년경부터 본격적인 인기를 얻기 시작했습니다.
 
-**주요 특징:**
+### 3.6 Cusdis
 
-- Vercel, Railway, Docker 등 다중 배포 옵션
-- LeanCloud, MongoDB, PostgreSQL 등 다양한 데이터베이스 지원
-- 관리자 대시보드 제공
-- 소셜 계정 로그인 및 알림 기능
-- 스팸 차단 및 보안 기능
+**Basic Information**
 
-**장점:**
+- A lightweight comment system emphasizing privacy, developed as a direct alternative to Disqus[^31][^32].
 
-- 다양한 배포 및 데이터베이스 옵션[^1_11]
-- 깔끔한 UI 디자인
-- 아시아권 사용자 환경 최적화
-- 무료 클라우드 서비스 지원
+**Detailed Feature Analysis**
 
-**단점:**
 
-- 상대적으로 복잡한 초기 설정[^1_11]
-- 영어권에서의 제한적인 문서화
-- 커뮤니티 규모의 한계
+| Criteria | Details |
+| :-- | :-- |
+| **Pricing** | Free (cloud) / Pro $12/year (unlimited)[^31] |
+| **File Size** | Ultra-lightweight SDK under 5KB (gzipped)[^31] |
+| **Social Logins** | 0 (Email-based only)[^31] |
+| **AI Spam Filtering** | Limited (Basic spam management)[^32] |
+| **Dashboard Mobile Support** | Yes (Simple approval and management interface)[^31] |
+| **Data Ownership** | User (Privacy-focused, no tracking)[^31] |
+| **Real-time Updates** | Yes (Fast approval system)[^31] |
+| **Open Source** | Yes[^31] |
 
+**Advantages**
 
-## 시장 동향 및 기회 분석
+- Provides very fast loading speed and the lightest structure[^31]
+- Enables complete privacy protection without user tracking[^32]
+- Offers easy integration process and free cloud option[^31]
 
-### 현재 시장 상황
+**Disadvantages**
 
-댓글 시스템 시장은 Disqus의 독점적 위치에서 점차 다변화되고 있는 추세입니다. 특히 프라이버시 보호에 대한 관심 증가와 자체 호스팅 선호도 상승으로 인해 오픈소스 대안들의 수요가 증가하고 있습니다[^1_8][^1_14]. 정적 사이트 생성기의 인기와 함께 댓글 시스템의 중요성도 함께 증가하고 있습니다.
+- Provides relatively limited features[^33]
+- No social login options at all[^31]
+- Limited support due to small community size[^32]
 
-### 사용자 요구사항 분석
 
-검색 결과를 통해 파악된 주요 사용자 요구사항은 다음과 같습니다:
+### 3.7 Waline
 
-1. **프라이버시 보호**: 사용자 추적 및 광고 없는 서비스 요구 증가
-2. **자체 호스팅**: 데이터 소유권과 독립성에 대한 요구
-3. **성능**: 빠른 로딩 속도와 경량화된 솔루션 선호
-4. **사용자 경험**: 직관적이고 접근성 높은 인터페이스
-5. **기능성**: 마크다운 지원, 소셜 로그인, 관리 도구 등
+**Basic Information**
 
-### 시장 기회 및 개발 방향성
+- A serverless comment system developed primarily in China, supporting various deployment platforms[^34][^35].
 
-현재 시장 분석을 통해 도출된 잠재적 개발 기회는 다음과 같습니다:
+**Detailed Feature Analysis**
 
-**하이브리드 접근법**: GitHub 기반 시스템들은 개발자에게만 제한적이고, 자체 호스팅 솔루션들은 기술적 진입장벽이 높습니다. 두 방식의 장점을 결합한 하이브리드 접근법이 시장 공백을 메울 수 있습니다.
 
-**향상된 사용자 경험**: 기존 솔루션들은 설정 복잡성이나 기능 제한 등의 문제를 가지고 있어, 더 직관적이고 포괄적인 사용자 경험을 제공하는 솔루션에 대한 수요가 있습니다.
+| Criteria | Details |
+| :-- | :-- |
+| **Pricing** | Free (serverless deployment)[^34] |
+| **File Size** | 53KB (gzipped, full client size)[^34][^36] |
+| **Social Logins** | Various (Twitter, Facebook, GitHub, etc. supported)[^37] |
+| **AI Spam Filtering** | Yes (Includes spam blocking and security features)[^34] |
+| **Dashboard Mobile Support** | Yes (Admin dashboard provided)[^34] |
+| **Data Ownership** | User (User control with various database options)[^34] |
+| **Real-time Updates** | Yes (Real-time comments and notifications)[^34] |
+| **Open Source** | Yes[^35] |
 
-**지역화 및 특화 기능**: 한국어를 비롯한 비영어권 사용자를 위한 특화 기능과 로컬 소셜 플랫폼 연동 등의 지역화된 서비스에 대한 요구가 있습니다[^1_4].
+**Advantages**
 
-## 결론
+- Provides various deployment and database options[^37]
+- Offers clean UI design and comprehensive features[^34]
+- Free cloud service support available[^38]
 
-웹사이트 댓글 시스템 시장은 Disqus 중심에서 다양한 오픈소스 대안들이 경쟁하는 구조로 변화하고 있습니다. 각 솔루션은 고유한 강점과 한계를 가지고 있으며, 사용자의 기술적 수준과 요구사항에 따라 선택되고 있습니다. 프라이버시 보호, 성능 최적화, 사용자 경험 개선에 중점을 둔 새로운 솔루션 개발이 시장에서 성공할 가능성이 높으며, 특히 기술적 복잡성을 줄이면서도 풍부한 기능을 제공하는 균형잡힌 접근법이 경쟁 우위를 제공할 수 있을 것으로 분석됩니다.
+**Disadvantages**
+
+- Relatively complex initial setup required[^37]
+- Limited documentation in English[^37]
+- Community size limitations outside Asian regions[^37]
+
+
+## 4. Comprehensive Comparative Analysis
+
+### 4.1 Performance and Technical Characteristics Comparison
+
+| System | File Size | Loading Speed | Technical Complexity |
+| :-- | :-- | :-- | :-- |
+| Cusdis | <5KB | Highest | Lowest |
+| Utterances | 5-10KB | Very Fast | Low |
+| Giscus | 15-25KB | Fast | Low |
+| Commento | ~11KB | Fast | Medium |
+| Remark42 | 50-80KB | Average | High |
+| Waline | 53KB | Average | Medium |
+| Disqus | 150-200KB | Slow | Low |
+
+### 4.2 Features and Usability Comparison
+
+| System | Social Logins | AI Spam Filter | Real-time Updates | Mobile Support |
+| :-- | :-- | :-- | :-- | :-- |
+| Remark42 | 8 | ✅ | ✅ | ✅ |
+| Disqus | 5 | ✅ | ✅ | ✅ |
+| Waline | Multiple | ✅ | ✅ | ✅ |
+| Commento | Multiple | ✅ | ✅ | ✅ |
+| Giscus | 1 | ❌ | ✅ | ✅ |
+| Utterances | 1 | ❌ | Limited | ✅ |
+| Cusdis | 0 | Limited | ✅ | ✅ |
+
+### 4.3 Business Model and Data Ownership Comparison
+
+| System | Pricing Model | Data Ownership | Open Source | Commercial Support |
+| :-- | :-- | :-- | :-- | :-- |
+| Disqus | Premium | Limited | ❌ | ✅ |
+| Commento | Subscription | Complete | ✅ | ✅ |
+| Cusdis | Premium | Complete | ✅ | Limited |
+| Remark42 | Free | Complete | ✅ | ❌ |
+| Utterances | Free | Complete | ✅ | ❌ |
+| Giscus | Free | Complete | ✅ | ❌ |
+| Waline | Free | Complete | ✅ | ❌ |
+
+## 5. Market Opportunities and Development Direction
+
+### 5.1 Market Gap Analysis
+
+The major gaps identified in the current comment system market are as follows[^1][^2]:
+
+1. **Eliminating Technical Entry Barriers**: GitHub-based systems are limited to developers only, and self-hosting solutions have high technical entry barriers[^14][^24].
+2. **Balanced Functionality**: There is a lack of solutions that simultaneously provide lightness and rich functionality[^31][^22].
+3. **Localization Specialization**: There is demand for specialized features for non-English users including Korean, and local social platform integration services[^37].
+
+### 5.2 Successful Alternative Software Development Strategy
+
+**Key Competitive Advantage Elements**
+
+1. **Hybrid Approach**: Provide flexible deployment options combining advantages of cloud and self-hosting[^34][^31]
+2. **Enhanced User Experience**: Optimized file size in the 5-15KB range and intuitive setup process[^31][^9]
+3. **Comprehensive Features**: Support all of AI spam filtering, various social logins, and real-time updates[^22][^34]
+
+**Differentiation Points**
+
+- Full Korean language support and integration with domestic social platforms like Naver and Kakao[^37]
+- Balance of optimized performance in the 15-25KB range and rich features[^20][^36]
+- Dual strategy of enterprise SaaS and personal open-source versions[^26][^31]
+
+
+## 6. Conclusion and Recommendations
+
+The comment system market is showing continuous growth, with increasing demand particularly for privacy protection and performance optimization[^2][^1]. Current major players in the market each have unique strengths and limitations, creating market opportunities for new solutions that combine their advantages and address their shortcomings.
+
+For successful alternative software development, a strategy focusing on lightness (10-20KB), rich functionality (AI spam filtering, various social logins), user-friendliness (easy setup, intuitive UI), and localization specialization (Korean language support, domestic platform integration) is necessary[^31][^22][^34]. In particular, a balanced approach that reduces technical complexity while providing enterprise-grade features is analyzed to secure competitive advantage in the market[^1][^2].
+
+<div style="text-align: center">⁂</div>
+
+[^1]: https://www.theinsightpartners.com/research/commenting-systems-market-size-and-share
+
+[^2]: https://www.linkedin.com/pulse/commenting-systems-market-significance-strategic-cikkf/
+
+[^3]: https://deployn.de/en/blog/self-hosted-comment-systems/
+
+[^4]: https://reclaimthenet.org/commento-comment-tool-disqus-alternative-privacy
+
+[^5]: https://discourse.gohugo.io/t/any-advice-for-comment-system-different-from-disqus/42313
+
+[^6]: https://about.disqus.com/disqus-101/getting-started-with-disqus
+
+[^7]: https://reigntheme.com/best-wordpress-comment-plugins/
+
+[^8]: https://www.saasworthy.com/product/disqus-platform/pricing
+
+[^9]: https://servebolt.com/articles/wordpress-comment-plugins/
+
+[^10]: https://blog.disqus.com/two-new-social-login-options-apple-microsoft
+
+[^11]: https://help.disqus.com/en/articles/1717074-dealing-with-spam
+
+[^12]: https://blog.atlanticwebworks.com/blog/which-commenting-platform-is-the-best
+
+[^13]: https://kinsta.com/blog/wordpress-comments/
+
+[^14]: https://utteranc.es
+
+[^15]: https://florimond.dev/en/posts/2020/07/utterances-comments-personal-sites-github
+
+[^16]: https://asmeurer.com/blog/posts/switching-to-utterances-comments/
+
+[^17]: https://jupyterbook.org/interactive/comments/utterances.html
+
+[^18]: https://github.com/giscus/giscus
+
+[^19]: https://giscus.app
+
+[^20]: https://gourav.io/blog/add-comments-to-site
+
+[^21]: https://dev.to/ayoub_khial/add-reactivity-to-your-nextjs-blog-using-giscus-146l
+
+[^22]: https://remark42.com
+
+[^23]: https://leviwheatcroft.github.io/selfhosted-awesome-unlist/remark42.html
+
+[^24]: https://geekscircuit.com/self-hosted/
+
+[^25]: https://stackoverflow.com/questions/57193009/how-to-login-as-admin-without-social-login-on-remark42-commenting-system
+
+[^26]: https://commento.io/pricing
+
+[^27]: https://www.reddit.com/r/selfhosted/comments/upgum5/commento_a_self_hosted_comment_system_for_websites/
+
+[^28]: https://commento.io
+
+[^29]: https://retired.re-ynd.com/2021/commento-in-jekyll/
+
+[^30]: https://lab.uberspace.de/guide_commento/
+
+[^31]: https://cusdis.com
+
+[^32]: https://euro-stack.com/solutions/cusdis
+
+[^33]: https://www.lilbigthings.com/post/the-best-commenting-tools-for-webflow-features-pricing-pros-cons-and-recommendations
+
+[^34]: https://waline.js.org/en/
+
+[^35]: https://github.com/walinejs/waline
+
+[^36]: https://waline.js.org/en/reference/client/file.html
+
+[^37]: https://discourse.gohugo.io/t/waline-another-comment-system-for-static-site/37896
+
+[^38]: https://kylelin1998.com/en/post/4cbe13de-510b-4c13-9d92-a08d09a2b28e/
+
+[^39]: https://alternativeto.net/software/disqus/?p=5
+
+[^40]: https://arena.im/arena-comparisons/commento-io-vs-arena-comment-system/
+
+[^41]: https://hyvor.com/blog/disqus-alternatives
+
+[^42]: https://medevel.com/17-commenting-systems-open-source/
+
+[^43]: https://www.wix.com/app-market/web-solution/comments-widget
+
+[^44]: https://www.commoninja.com/blog/top-comments-widgets-plugins
+
+[^45]: https://www.hongkiat.com/blog/3rdparty-comment-discuss-systems-reviewed/
+
+[^46]: https://github.com/andrewljohnson/CommentWidget
+
+[^47]: https://www.freshtechtips.com/2022/02/comment-software-for-blogs.html
+
+[^48]: https://disqus.com/pricing/
+
+[^49]: https://arena.im/arena-comparisons/disqus-vs-arena-comment-system-comparison/
+
+[^50]: https://visualping.io/pages/disqus-pricing-alerts-4896143
+
+[^51]: https://blog.disqus.com/disqus-polls-are-here-and-available-to-all-publishers
+
+[^52]: https://stackoverflow.com/questions/38177858/filesize-of-javascript-is-different-by-its-location-local-or-server
+
+[^53]: https://stackoverflow.com/questions/20624141/how-long-javascript-file-can-be-in-practice
+
+[^54]: https://franklinjl.org/extras/utterances/
+
+[^55]: https://datascientistforai.github.io/DataScienceStudy/interactive/comments/utterances.html
+
+[^56]: https://github.com/topics/filesize?l=javascript
+
+[^57]: https://www.codewalnut.com/tutorials/how-to-comment-on-a-github-issue
+
+[^58]: https://docs.github.com/en/enterprise-server@3.12/authentication/keeping-your-account-and-data-secure/about-authentication-to-github
+
+[^59]: https://stackoverflow.com/questions/1606842/how-can-i-get-a-files-upload-size-using-simple-javascript
+
+[^60]: https://gist.github.com/kjk/00f373cc0a4f34903ce747b4462a6ed8
+
+[^61]: https://www.patrickthurmond.com/blog/2023/12/11/commenting-is-available-now-thanks-to-giscus
+
+[^62]: https://byanko55.github.io/comment system.html
+
+[^63]: https://dev.to/coderatul/embed-github-discussion-anywhere--2l42
+
+[^64]: https://github.com/marketplace/actions/compute-js-bundle-size
+
+[^65]: https://velog.io/@hyunju-song/소셜로그인기능구현2Github-Social-Login-구현
+
+[^66]: https://coder.social/giscus/giscus
+
+[^67]: https://github.com/umputun/remark42
+
+[^68]: https://www.hleroy.com/2023/11/adding-a-remark42-comment-system-to-my-statically-generated-blog/
+
+[^69]: https://www.jetbrains.com/help/rider/Configuring_File_Size_Limit.html
+
+[^70]: https://www.g2.com/products/remarkbox/pricing
+
+[^71]: https://github.com/plasmobit/remark
+
+[^72]: https://remark42.com/docs/getting-started/installation/
+
+[^73]: https://github.com/adtac/commento
+
+[^74]: https://www.saasworthy.com/product/commented-io/pricing
+
+[^75]: https://es.wordpress.org/plugins/oa-social-login/
+
+[^76]: https://codeengineered.com/blog/09/12/managing-comment-spam/
+
+[^77]: https://msfjarvis.dev/posts/integrating-comments-in-hugo-sites-with-commento/
+
+[^78]: https://opencollective.com/cusdis
+
+[^79]: https://blog.cusdis.com/announcing-cusdis-pro/
+
+[^80]: https://10web.io/wordpress-plugin/disqus-comment-system/pricing/
+
+[^81]: https://github.com/avoidwork/filesize.js
+
+[^82]: https://auth0.com/learn/social-login
+
+[^83]: https://getpublii.com/docs/cusdis-comments.html
+
+[^84]: https://www.npmjs.com/package/filesize
+
+[^85]: https://waline.js.org/en/guide/get-started/
+
+[^86]: https://learn.wisenet.co/social-login-on-portal/
+
+[^87]: https://github.com/Tritonix711/Spam-Filter-AI
+
+[^88]: https://endgameviable.com/dev/2024/08/new-comment-systems/
+
+[^89]: https://betterblogcomments.com/blogs/guides/top-6-shopify-blog-comment-apps-2024
+
+[^90]: https://www.kevinmuldoon.com/third-party-commenting-systems/
+
+[^91]: https://bloggerspassion.com/list-of-high-quality-blog-commenting-sites/
+
+[^92]: https://elfsight.com/alternatives/html-comment-box/
+
+[^93]: https://crocoblock.com/blog/best-wordpress-comments-plugins/
+
+[^94]: https://gtmetrix.com/minify-javascript.html
+
+[^95]: https://about.codecov.io/blog/8-ways-to-optimize-your-javascript-bundle-size/
+
+[^96]: https://stackoverflow.com/questions/65491/what-is-the-best-method-to-reduce-the-size-of-my-javascript-and-css-files
+
+[^97]: https://www.sitepoint.com/optimizing-javascript-files/
+
+[^98]: https://www.nearsure.com/blog/javascript-files
+
+[^99]: https://world.optimizely.com/blogs/sarahs-blog/dates/2025/6/javascript-sdk-v6-lightest-most-efficient-sdk-yet-/
+
+[^100]: https://www.debugbear.com/blog/chat-widget-site-performance
+
+[^101]: https://dev.to/ped4enko/top-10-micro-sized-javascript-libraries-aa9
+
+[^102]: https://jscompress.com
