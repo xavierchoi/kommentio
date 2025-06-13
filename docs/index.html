@@ -18,7 +18,10 @@
     <meta name="twitter:title" content="Kommentio - Ultra-Premium Comment System">
     <meta name="twitter:description" content="Apple급 프리미엄 디자인의 무료 댓글 시스템">
     
-    <link rel="icon" href="/assets/favicon-CvwY7gig.ico">
+    <!-- Dynamic Favicon for Dark/Light Mode -->
+    <link rel="icon" href="/assets/favicon-light.ico" media="(prefers-color-scheme: light)">
+    <link rel="icon" href="/assets/favicon-dark.ico" media="(prefers-color-scheme: dark)">
+    <link rel="icon" href="/assets/favicon-CvwY7gig.ico">  <!-- Fallback for older browsers -->
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1898,6 +1901,29 @@
                 });
             });
         }, 2000);
+
+        // Dynamic Favicon Switching for Dark/Light Mode
+        function updateFavicon() {
+            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const favicon = document.querySelector('link[rel="icon"]:not([media])');
+            
+            if (favicon) {
+                if (isDarkMode) {
+                    favicon.href = '/assets/favicon-dark.ico';
+                } else {
+                    favicon.href = '/assets/favicon-light.ico';
+                }
+            }
+        }
+
+        // Update favicon on load
+        updateFavicon();
+
+        // Listen for theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', updateFavicon);
+
+        console.log('🎨 Dynamic favicon switching enabled for dark/light mode');
     </script>
 </body>
 </html>
