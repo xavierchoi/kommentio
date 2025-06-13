@@ -1534,6 +1534,190 @@ document.head.appendChild(script);
 - [ ] 관리 대시보드 접속 확인 (kommentio.tech/admin-dashboard/)
 - [ ] 성능 개선 효과 모니터링
 
+## 🔐 OAuth 프로바이더 도메인 업데이트 가이드
+
+### ⚠️ 중요: 도메인 변경 필수 작업
+
+**kommentio.tech 도메인 사용을 위해 모든 OAuth 프로바이더에서 도메인 설정을 업데이트해야 합니다.**
+
+### 1️⃣ Google OAuth Console
+
+**🔗 URL**: https://console.developers.google.com/apis/credentials
+
+**업데이트 항목:**
+```
+기존: xavierchoi.github.io
+추가: kommentio.tech
+
+1. 승인된 JavaScript 원본:
+   - https://kommentio.tech
+
+2. 승인된 리디렉션 URI:
+   - https://kommentio.tech/auth/callback/google
+   - https://kommentio.tech (루트 도메인도 추가)
+```
+
+### 2️⃣ GitHub OAuth App
+
+**🔗 URL**: https://github.com/settings/developers
+
+**업데이트 항목:**
+```
+기존: https://xavierchoi.github.io/kommentio
+추가: https://kommentio.tech
+
+1. Homepage URL:
+   - https://kommentio.tech
+
+2. Authorization callback URL:
+   - https://kommentio.tech/auth/callback/github
+```
+
+### 3️⃣ Facebook for Developers
+
+**🔗 URL**: https://developers.facebook.com/apps/
+
+**업데이트 항목:**
+```
+기존: xavierchoi.github.io
+추가: kommentio.tech
+
+1. 앱 도메인:
+   - kommentio.tech
+
+2. 유효한 OAuth 리디렉션 URI:
+   - https://kommentio.tech/auth/callback/facebook
+
+3. 사이트 URL:
+   - https://kommentio.tech
+```
+
+### 4️⃣ X (Twitter) Developer Portal
+
+**🔗 URL**: https://developer.twitter.com/en/portal/dashboard
+
+**업데이트 항목:**
+```
+기존: https://xavierchoi.github.io/kommentio
+추가: https://kommentio.tech
+
+1. Website URL:
+   - https://kommentio.tech
+
+2. Callback URLs:
+   - https://kommentio.tech/auth/callback/twitter
+
+3. Terms of Service URL:
+   - https://kommentio.tech/terms-of-service
+
+4. Privacy Policy URL:
+   - https://kommentio.tech/privacy-policy
+```
+
+### 5️⃣ Apple Developer Console
+
+**🔗 URL**: https://developer.apple.com/account/resources/identifiers/
+
+**업데이트 항목:**
+```
+기존: xavierchoi.github.io
+추가: kommentio.tech
+
+1. Services ID > Website URLs:
+   - Primary Domain: kommentio.tech
+   - Return URLs: https://kommentio.tech/auth/callback/apple
+
+2. App ID Description:
+   - Kommentio - kommentio.tech
+```
+
+### 6️⃣ Kakao Developers
+
+**🔗 URL**: https://developers.kakao.com/console/app
+
+**업데이트 항목:**
+```
+기존: https://xavierchoi.github.io
+추가: https://kommentio.tech
+
+1. 플랫폼 > Web > 도메인:
+   - kommentio.tech
+
+2. 카카오 로그인 > Redirect URI:
+   - https://kommentio.tech/auth/callback/kakao
+
+3. 카카오 로그인 > 로그아웃 Redirect URI:
+   - https://kommentio.tech
+```
+
+### 7️⃣ LinkedIn Developer Console
+
+**🔗 URL**: https://www.linkedin.com/developers/apps/
+
+**업데이트 항목:**
+```
+기존: https://xavierchoi.github.io/kommentio
+추가: https://kommentio.tech
+
+1. Authorized redirect URLs:
+   - https://kommentio.tech/auth/callback/linkedin
+
+2. App settings > Website URL:
+   - https://kommentio.tech
+```
+
+### 🔄 Supabase 설정 업데이트
+
+**Supabase Dashboard > Authentication > Settings > Site URL**
+```
+기존: https://xavierchoi.github.io/kommentio
+새 값: https://kommentio.tech
+
+Additional Redirect URLs:
+- https://kommentio.tech/auth/callback/*
+- https://kommentio.tech (루트 도메인)
+```
+
+### ⚡ 즉시 적용을 위한 우선순위
+
+**🔥 즉시 업데이트 필요 (High Priority):**
+1. ✅ Google OAuth (가장 많이 사용)
+2. ✅ GitHub OAuth (개발자 친화적)
+3. ✅ Supabase Site URL (필수)
+4. ✅ Kakao OAuth (한국 사용자용)
+
+**📋 단계별 업데이트 (Medium Priority):**
+5. Facebook OAuth
+6. X(Twitter) OAuth  
+7. Apple OAuth
+8. LinkedIn OAuth
+
+### 🧪 테스트 검증
+
+각 프로바이더 업데이트 후 테스트:
+```javascript
+// kommentio.tech에서 소셜 로그인 테스트
+// 1. 각 프로바이더 버튼 클릭
+// 2. OAuth 플로우 정상 동작 확인
+// 3. 콜백 URL 리디렉션 확인
+// 4. 사용자 정보 수신 확인
+
+console.log('✅ OAuth Provider:', providerName, 'Status:', success ? 'OK' : 'FAILED');
+```
+
+### 📝 업데이트 체크리스트
+
+- [ ] Google OAuth Console 도메인 추가
+- [ ] GitHub OAuth App 설정 변경
+- [ ] Facebook Developer Console 업데이트
+- [ ] X Developer Portal 설정 변경
+- [ ] Apple Developer Console 도메인 추가
+- [ ] Kakao Developers 도메인 추가  
+- [ ] LinkedIn Developer 설정 업데이트
+- [ ] Supabase Site URL 변경
+- [ ] kommentio.tech에서 전체 OAuth 테스트
+- [ ] 기존 xavierchoi.github.io 도메인 유지 (백업용)
+
 ## Future Enhancements (Phase 2)
 - Korean social login (Kakao, Line)
 - Premium features (emoji reactions, GIF support)
