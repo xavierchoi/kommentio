@@ -1837,7 +1837,7 @@
             
             // 카드 호버 이벤트 최적화
             document.addEventListener('mouseenter', (e) => {
-                if (e.target.classList.contains('feature-card-3d')) {
+                if (e.target && e.target.classList && e.target.classList.contains('feature-card-3d')) {
                     activeCards.add(e.target);
                     if (!rafId) {
                         rafId = requestAnimationFrame(updateCardAnimations);
@@ -1846,7 +1846,7 @@
             }, true);
             
             document.addEventListener('mouseleave', (e) => {
-                if (e.target.classList.contains('feature-card-3d')) {
+                if (e.target && e.target.classList && e.target.classList.contains('feature-card-3d')) {
                     activeCards.delete(e.target);
                     // 즉시 원래 상태로 복원
                     e.target.style.transform = 'translateZ(0)';
