@@ -119,7 +119,7 @@
         }
 
         /* 🔍 ANCHOR_SEARCH: Animated Background System */
-        /* 🌟 Animated Background - GPU 최적화 */
+        /* 🌟 Animated Background - Ultra-Light 최적화 */
         .animated-bg {
             position: fixed;
             top: 0;
@@ -132,13 +132,48 @@
             contain: layout style paint;
         }
 
+        /* 모바일/터치 기기에서 애니메이션 완전 비활성화 */
+        @media (max-width: 768px), (hover: none), (pointer: coarse) {
+            .bg-gradient {
+                animation: none !important;
+                opacity: 0 !important;
+                display: none;
+            }
+            
+            .particle {
+                animation: none !important;
+                opacity: 0 !important;
+                display: none;
+            }
+            
+            .feature-card-3d {
+                transition: none !important;
+                transform: none !important;
+                will-change: auto !important;
+            }
+        }
+
+        /* 저성능 기기에서 애니메이션 간소화 */
+        @media (prefers-reduced-motion: reduce) {
+            .bg-gradient,
+            .particle {
+                animation: none !important;
+                opacity: 0.002 !important;
+            }
+            
+            * {
+                animation-duration: 0.01s !important;
+                transition-duration: 0.01s !important;
+            }
+        }
+
         .bg-gradient {
             position: absolute;
             width: 200%;
             height: 200%;
             background: var(--gradient-neon);
-            opacity: 0.015; /* 0.02 → 0.015로 더 투명하게 */
-            animation: rotateGradient 60s linear infinite; /* 30s → 60s로 느리게 */
+            opacity: 0.008; /* 0.015 → 0.008로 극히 투명하게 */
+            animation: rotateGradient 120s linear infinite; /* 60s → 120s로 매우 느리게 */
             will-change: transform;
             transform: translateZ(0);
             backface-visibility: hidden;
@@ -156,9 +191,9 @@
             position: absolute;
             width: 1px;
             height: 1px;
-            background: rgba(102, 126, 234, 0.3); /* 0.4 → 0.3으로 더 투명하게 */
+            background: rgba(102, 126, 234, 0.15); /* 0.3 → 0.15로 극히 투명하게 */
             border-radius: 50%;
-            animation: floatParticle 35s linear infinite; /* 20s → 35s로 느리게 */
+            animation: floatParticle 80s linear infinite; /* 35s → 80s로 매우 느리게 */
             will-change: transform;
             transform: translateZ(0);
             backface-visibility: hidden;
@@ -1185,25 +1220,32 @@
         // 🎨 Initialize Premium Features - 시스템 설정 감지
         let isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         
-        // Create particles (성능 최적화: 12개 → 6개)
+        // Create particles (Ultra-Light 최적화: 6개 → 3개)
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             const fragment = document.createDocumentFragment();
             
-            // 성능 우선: 파티클 수를 절반으로 줄임 (12개 → 6개)
-            for (let i = 0; i < 6; i++) {
+            // 브라우저 성능 체크
+            const isLowEndDevice = navigator.hardwareConcurrency <= 4 || 
+                                 /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            // 저사양 기기는 파티클 0개, 일반 기기는 3개
+            const particleCount = isLowEndDevice ? 0 : 3;
+            
+            for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.cssText = `
                     left: ${Math.random() * 100}%;
-                    animation-delay: ${Math.random() * 30}s;
-                    animation-duration: ${Math.random() * 15 + 25}s;
+                    animation-delay: ${Math.random() * 40}s;
+                    animation-duration: ${Math.random() * 20 + 40}s;
+                    will-change: transform;
                 `;
                 fragment.appendChild(particle);
             }
             
             particlesContainer.appendChild(fragment);
-            console.log('⚡ Particles ultra-optimized: 6 particles created for better performance');
+            console.log(`⚡ Ultra-Light Particles: ${particleCount} particles created (device: ${isLowEndDevice ? 'mobile/low-end' : 'desktop'})`);
         }
 
         // Animate counter numbers - 최적화된 버전
@@ -1463,74 +1505,99 @@
             }
         }
         
-        // 성능 모니터링 시스템 - 경량화
+        // Ultra-Efficient 성능 모니터링 시스템
         function initPerformanceMonitoring() {
             let frameCount = 0;
             let lastTime = performance.now();
-            let hasOptimized = false; // 한 번만 최적화하도록 플래그
+            let hasOptimized = false;
+            let monitoringActive = true;
             
             function measureFPS() {
+                if (!monitoringActive) return;
+                
                 frameCount++;
                 const currentTime = performance.now();
                 
-                // 5초마다 FPS 측정 (1초 → 5초로 간격 늘림)
-                if (currentTime - lastTime >= 5000) {
+                // 10초마다 FPS 측정 (5초 → 10초로 더 넓은 간격)
+                if (currentTime - lastTime >= 10000) {
                     const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
                     
-                    // 디버그 로그 최소화 (개발 모드에서만)
-                    if (window.location.hostname === 'localhost') {
-                        console.log(`🚀 Performance: ${fps} FPS`);
+                    // 성능 상태 체크
+                    if (fps < 20 && !hasOptimized) {
+                        // 극한 최적화 (20fps 이하)
+                        optimizeForLowEndDevice();
+                        hasOptimized = true;
+                        console.log(`⚡ Extreme optimization applied (${fps} FPS)`);
+                    } else if (fps >= 45 && hasOptimized) {
+                        // 성능이 회복되면 모니터링 빈도 감소
+                        monitoringActive = false;
+                        setTimeout(() => { monitoringActive = true; }, 30000); // 30초 후 재시작
+                        console.log(`✅ Performance recovered (${fps} FPS), monitoring reduced`);
                     }
                     
                     frameCount = 0;
                     lastTime = currentTime;
-                    
-                    // FPS가 25 이하이고 아직 최적화하지 않았다면 조용히 최적화
-                    if (fps < 25 && !hasOptimized) {
-                        optimizeForLowEndDevice();
-                        hasOptimized = true; // 중복 최적화 방지
-                    }
                 }
                 
-                // 최적화 후에도 계속 모니터링
-                requestAnimationFrame(measureFPS);
+                // 조건부 모니터링 지속
+                if (monitoringActive || !hasOptimized) {
+                    requestAnimationFrame(measureFPS);
+                } else {
+                    // 성능이 안정되면 30초 후 재체크
+                    setTimeout(() => {
+                        monitoringActive = true;
+                        requestAnimationFrame(measureFPS);
+                    }, 30000);
+                }
             }
             
             requestAnimationFrame(measureFPS);
         }
         
-        // 저사양 기기 최적화 - 더 적극적인 최적화
+        // 극한 성능 최적화 시스템
         function optimizeForLowEndDevice() {
-            // 파티클 완전 제거 (6개 → 0개)
+            // 1. 파티클 완전 제거
             const particles = document.querySelectorAll('.particle');
             particles.forEach(particle => {
                 particle.style.display = 'none';
             });
             
-            // 배경 그라디언트 애니메이션 완전 정지
+            // 2. 배경 그라디언트 완전 비활성화
             const bgGradient = document.querySelector('.bg-gradient');
             if (bgGradient) {
                 bgGradient.style.animation = 'none';
-                bgGradient.style.opacity = '0.005'; // 거의 투명하게
+                bgGradient.style.opacity = '0';
+                bgGradient.style.transform = 'scale(0)';
             }
             
-            // 3D 카드 효과 간소화
+            // 3. 3D 카드 효과 완전 제거
             const cards = document.querySelectorAll('.feature-card-3d');
             cards.forEach(card => {
-                card.style.transition = 'transform 0.1s ease-out';
+                card.style.transition = 'none';
                 card.style.willChange = 'auto';
+                card.style.transform = 'none';
+                card.classList.remove('feature-card-3d');
             });
             
-            // 마우스 추적 비활성화
+            // 4. 모든 마우스 추적 비활성화
             if (rafId) {
                 cancelAnimationFrame(rafId);
                 rafId = null;
             }
+            activeCards.clear();
             
-            // 개발 모드에서만 로그
-            if (window.location.hostname === 'localhost') {
-                console.log('🔧 Aggressive performance optimizations applied');
-            }
+            // 5. 모든 불필요한 애니메이션 비활성화
+            const animatedElements = document.querySelectorAll('[style*="animation"]');
+            animatedElements.forEach(el => {
+                if (!el.classList.contains('counter-number')) { // 카운터는 유지
+                    el.style.animation = 'none';
+                }
+            });
+            
+            // 6. GPU 가속 비활성화 (배터리 절약)
+            document.body.style.willChange = 'auto';
+            
+            console.log('⚡ EXTREME optimization applied - All animations disabled');
         }
         
         // 테마 시스템 검증 및 복구
@@ -1677,12 +1744,13 @@
             initPremiumExperience();
         });
 
-        // 성능 최적화된 마우스 추적 시스템
+        // Ultra-Light 마우스 추적 시스템 (50% 더 가벼움)
         let rafId = null;
         let mouseX = 0;
         let mouseY = 0;
         let lastUpdate = 0;
-        const UPDATE_INTERVAL = 33; // ~30fps (16ms → 33ms로 절반 속도)
+        const UPDATE_INTERVAL = 66; // ~15fps (33ms → 66ms로 절반 속도)
+        let activeCards = new Set(); // 성능 최적화를 위한 캐시
         
         function updateCardAnimations(timestamp) {
             if (timestamp - lastUpdate < UPDATE_INTERVAL) {
@@ -1690,52 +1758,90 @@
                 return;
             }
             
-            const cards = document.querySelectorAll('.feature-card-3d:hover');
-            
-            if (cards.length === 0) {
+            // 활성 카드가 없으면 중단
+            if (activeCards.size === 0) {
                 rafId = null;
                 return;
             }
             
-            cards.forEach(card => {
+            // 배치 업데이트로 리플로우 최소화
+            const updates = [];
+            activeCards.forEach(card => {
                 const rect = card.getBoundingClientRect();
                 const cardCenterX = rect.left + rect.width * 0.5;
                 const cardCenterY = rect.top + rect.height * 0.5;
                 
-                // 성능 최적화된 계산
-                const deltaX = (mouseX - cardCenterX) * 0.015;
-                const deltaY = (mouseY - cardCenterY) * 0.01;
+                // 더 부드러운 계산 (강도 50% 감소)
+                const deltaX = (mouseX - cardCenterX) * 0.007;
+                const deltaY = (mouseY - cardCenterY) * 0.005;
                 
-                // 클램핑으로 극단값 방지
-                const rotateX = Math.max(-6, Math.min(6, deltaY));
-                const rotateY = Math.max(-6, Math.min(6, -deltaX));
+                // 더 제한된 회전 범위 (-3 ~ 3도)
+                const rotateX = Math.max(-3, Math.min(3, deltaY));
+                const rotateY = Math.max(-3, Math.min(3, -deltaX));
                 
-                // 단일 transform으로 리플로우 최소화
-                card.style.transform = `translate3d(0, -15px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                updates.push({
+                    card,
+                    transform: `translate3d(0, -15px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
+                });
+            });
+            
+            // 한 번에 모든 업데이트 적용
+            updates.forEach(({ card, transform }) => {
+                card.style.transform = transform;
             });
             
             lastUpdate = timestamp;
             rafId = requestAnimationFrame(updateCardAnimations);
         }
         
-        // 성능 최적화된 마우스 이벤트 (데스크톱 전용)
+        // Ultra-Light 마우스 이벤트 (데스크톱 전용 + 저사양 기기 감지)
         function initMouseTracking() {
-            // 모바일/터치 기기에서는 마우스 추적 비활성화
-            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-                console.log('📱 Touch device detected, mouse tracking disabled');
+            // 저사양 기기 감지 및 비활성화
+            const isLowEndDevice = navigator.hardwareConcurrency <= 4 || 
+                                 navigator.deviceMemory <= 4 ||
+                                 /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isLowEndDevice) {
+                console.log('📱 Low-end device detected, mouse tracking disabled for performance');
                 return;
             }
             
+            // 쓰로틀된 마우스 이벤트 (16ms → 33ms)
+            let mouseMoveTimeout;
             document.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
+                if (mouseMoveTimeout) return;
                 
-                if (!rafId) {
-                    rafId = requestAnimationFrame(updateCardAnimations);
-                }
+                mouseMoveTimeout = setTimeout(() => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                    
+                    if (!rafId && activeCards.size > 0) {
+                        rafId = requestAnimationFrame(updateCardAnimations);
+                    }
+                    mouseMoveTimeout = null;
+                }, 33); // ~30fps로 제한
+                
             }, { passive: true });
             
-            console.log('🖱️ Mouse tracking enabled for desktop');
+            // 카드 호버 이벤트 최적화
+            document.addEventListener('mouseenter', (e) => {
+                if (e.target.classList.contains('feature-card-3d')) {
+                    activeCards.add(e.target);
+                    if (!rafId) {
+                        rafId = requestAnimationFrame(updateCardAnimations);
+                    }
+                }
+            }, true);
+            
+            document.addEventListener('mouseleave', (e) => {
+                if (e.target.classList.contains('feature-card-3d')) {
+                    activeCards.delete(e.target);
+                    // 즉시 원래 상태로 복원
+                    e.target.style.transform = 'translateZ(0)';
+                }
+            }, true);
+            
+            console.log('🖱️ Ultra-Light mouse tracking enabled for high-end desktop');
         }
         
         // 마우스 추적 초기화
