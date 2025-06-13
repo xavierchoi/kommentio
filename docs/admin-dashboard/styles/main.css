@@ -1,6 +1,8 @@
+/* 🔍 ANCHOR_SEARCH: Kommentio Admin Dashboard Styles */
 /* Kommentio Admin Dashboard - Vanilla CSS */
 /* HeroUI-inspired design system */
 
+/* 🔍 ANCHOR_SEARCH: CSS Animations */
 /* Animations */
 @keyframes pulse {
   0%, 100% {
@@ -15,6 +17,7 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* 🔍 ANCHOR_SEARCH: Modal System */
 /* 실제 사용 가능한 모달 - 레이아웃 우선 */
 .modal-overlay {
   position: fixed !important;
@@ -323,6 +326,7 @@
   word-spacing: normal !important;
 }
 
+/* 🔍 ANCHOR_SEARCH: CSS Variables Root */
 :root {
   /* Colors */
   --primary: #0070f3;
@@ -393,12 +397,14 @@ body {
   line-height: 1.5;
 }
 
+/* 🔍 ANCHOR_SEARCH: Layout System */
 /* Layout */
 #app {
   display: flex;
   height: 100vh;
 }
 
+/* 🔍 ANCHOR_SEARCH: Sidebar Styles */
 /* Sidebar */
 .sidebar {
   width: 16rem;
@@ -506,6 +512,7 @@ body {
   line-height: 1.4;
 }
 
+/* 🔍 ANCHOR_SEARCH: Main Content Area */
 /* Main Content */
 .main-content {
   flex: 1;
@@ -642,6 +649,7 @@ body {
   color: var(--danger-600);
 }
 
+/* 🔍 ANCHOR_SEARCH: Button Components */
 /* Buttons */
 .btn {
   display: inline-flex;
@@ -737,6 +745,7 @@ body {
   font-size: 0.75rem;
 }
 
+/* 🔍 ANCHOR_SEARCH: Responsive Design Media Queries */
 /* 태블릿/모바일에서 작은 버튼도 44px로 확장 */
 @media (max-width: 1024px) {
   .btn-sm {
@@ -1083,15 +1092,7 @@ body {
     grid-template-columns: 1fr;
   }
   
-  .header {
-    padding: 16px var(--spacing-4) !important;
-    height: 64px !important;
-  }
-  
-  .sidebar-header {
-    padding: 16px var(--spacing-4) !important;
-    height: 64px !important;
-  }
+  /* header와 sidebar-header 높이는 이미 1159px 이하에서 설정됨 */
   
   .page-title {
     font-size: 1.25rem !important;
@@ -1263,6 +1264,19 @@ body {
 @media (min-width: 1025px) {
   .sidebar-toggle-container {
     display: none !important;
+  }
+}
+
+/* 1160px 미만에서 header 높이 통일 */
+@media (max-width: 1159px) {
+  .header {
+    height: 64px !important;
+    padding: 16px var(--spacing-4) !important;
+  }
+  
+  .sidebar-header {
+    height: 64px !important;
+    padding: 16px var(--spacing-4) !important;
   }
 }
 

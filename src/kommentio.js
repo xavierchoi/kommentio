@@ -1,8 +1,14 @@
 /**
  * Kommentio - 오픈소스 댓글 위젯
  * 사용법: <div id="kommentio" data-site-id="your-site-id"></div>
+ * 
+ * 🔍 ANCHOR_SEARCH: Main Kommentio Widget Class
+ * - 핵심 위젯 클래스 정의
+ * - 소셜 로그인 프로바이더 설정
+ * - 초기화 및 옵션 관리
  */
 
+// 🔍 ANCHOR_SEARCH: Kommentio Class Definition
 class Kommentio {
   constructor(options = {}) {
     this.version = '0.2.0';
@@ -94,6 +100,7 @@ class Kommentio {
     this.init();
   }
 
+  // 🔍 ANCHOR_SEARCH: Widget Initialization
   /**
    * 위젯 초기화
    */
@@ -209,6 +216,7 @@ class Kommentio {
     }
   }
 
+  // 🔍 ANCHOR_SEARCH: Social Provider Icons
   /**
    * 소셜 프로바이더 SVG 아이콘 생성
    */
@@ -296,6 +304,7 @@ class Kommentio {
     return icons[provider] || '';
   }
 
+  // 🔍 ANCHOR_SEARCH: Supabase Integration
   /**
    * Supabase 클라이언트 로드 및 초기화
    */
@@ -989,7 +998,14 @@ class Kommentio {
   /**
    * 위젯 렌더링
    */
+  // 🔍 ANCHOR_SEARCH: Main Render Function
   render() {
+    // 컨테이너가 존재하지 않는 경우 조기 반환
+    if (!this.container) {
+      console.error('Kommentio container not found');
+      return;
+    }
+
     this.container.innerHTML = `
       <div class="kommentio-container">
         <header class="kommentio-header">
@@ -1011,6 +1027,7 @@ class Kommentio {
     this.loadComments();
   }
 
+  // 🔍 ANCHOR_SEARCH: Auth Buttons Rendering
   /**
    * 인증 버튼 렌더링
    */
@@ -1155,6 +1172,7 @@ class Kommentio {
     ];
   }
 
+  // 🔍 ANCHOR_SEARCH: Load Comments Function
   /**
    * 댓글 로드
    */
@@ -1215,6 +1233,12 @@ class Kommentio {
    */
   renderComments() {
     const container = document.getElementById('kommentio-comments');
+    
+    // DOM 요소가 존재하지 않는 경우 조기 반환
+    if (!container) {
+      console.warn('kommentio-comments container not found');
+      return;
+    }
     
     if (this.comments.length === 0) {
       container.innerHTML = '<p class="kommentio-text-secondary">첫 번째 댓글을 작성해보세요!</p>';
@@ -1285,6 +1309,10 @@ class Kommentio {
    */
   renderError(message) {
     const container = document.getElementById('kommentio-comments');
+    if (!container) {
+      console.error('kommentio-comments container not found for error display');
+      return;
+    }
     container.innerHTML = `<div class="kommentio-error">${message}</div>`;
   }
 
@@ -1695,6 +1723,7 @@ class Kommentio {
     }
   }
 
+  // 🔍 ANCHOR_SEARCH: Create Comment Function
   /**
    * 댓글 생성
    */
@@ -1811,6 +1840,7 @@ class Kommentio {
     }
   }
 
+  // 🔍 ANCHOR_SEARCH: Login Function
   /**
    * 로그인
    */
@@ -1968,6 +1998,7 @@ class Kommentio {
     }
   }
 
+  // 🔍 ANCHOR_SEARCH: Logout Function
   /**
    * 로그아웃
    */

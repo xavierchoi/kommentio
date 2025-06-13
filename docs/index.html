@@ -31,6 +31,7 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <style>
+        /* 🔍 ANCHOR_SEARCH: Premium Landing Page Styles */
         /* 🎨 Premium Design System Variables */
         :root {
             /* Premium Color Palette */
@@ -117,6 +118,7 @@
             transition: all 0.3s var(--ease-premium);
         }
 
+        /* 🔍 ANCHOR_SEARCH: Animated Background System */
         /* 🌟 Animated Background - GPU 최적화 */
         .animated-bg {
             position: fixed;
@@ -135,8 +137,8 @@
             width: 200%;
             height: 200%;
             background: var(--gradient-neon);
-            opacity: 0.02;
-            animation: rotateGradient 30s linear infinite;
+            opacity: 0.015; /* 0.02 → 0.015로 더 투명하게 */
+            animation: rotateGradient 60s linear infinite; /* 30s → 60s로 느리게 */
             will-change: transform;
             transform: translateZ(0);
             backface-visibility: hidden;
@@ -154,9 +156,9 @@
             position: absolute;
             width: 1px;
             height: 1px;
-            background: rgba(102, 126, 234, 0.4);
+            background: rgba(102, 126, 234, 0.3); /* 0.4 → 0.3으로 더 투명하게 */
             border-radius: 50%;
-            animation: floatParticle 20s linear infinite;
+            animation: floatParticle 35s linear infinite; /* 20s → 35s로 느리게 */
             will-change: transform;
             transform: translateZ(0);
             backface-visibility: hidden;
@@ -185,6 +187,7 @@
             }
         }
 
+        /* 🔍 ANCHOR_SEARCH: Glass Morphism Components */
         /* 🎭 Glass Morphism Components */
         .glass {
             background: var(--bg-glass);
@@ -201,6 +204,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        /* 🔍 ANCHOR_SEARCH: Premium Navigation */
         /* 🎪 Premium Navigation */
         .nav-premium {
             position: fixed;
@@ -380,7 +384,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: 120px 2rem 2rem 2rem; /* 네비게이션 겹침 방지를 위한 상단 여백 확보 */
             position: relative;
             overflow: hidden;
         }
@@ -721,16 +725,17 @@
 
         /* 🚀 Responsive Design - 모바일 성능 최적화 */
         @media (max-width: 768px) {
-            /* 모바일에서 애니메이션 간소화 */
+            /* 모바일에서 애니메이션 더욱 간소화 */
             .bg-gradient {
-                animation-duration: 40s;
-                opacity: 0.01;
+                animation-duration: 80s; /* 더 느리게 */
+                opacity: 0.008; /* 거의 보이지 않게 */
             }
             
             .particle {
                 width: 0.5px;
                 height: 0.5px;
-                animation-duration: 25s;
+                animation-duration: 45s; /* 더 느리게 */
+                opacity: 0.2; /* 더 투명하게 */
             }
             
             .nav-premium {
@@ -775,7 +780,7 @@
             }
 
             .hero-premium {
-                padding: 1rem;
+                padding: 100px 1rem 1rem 1rem; /* 모바일에서도 네비게이션 겹침 방지 */
                 min-height: 90vh;
             }
 
@@ -986,7 +991,7 @@
             <div class="hero-content">
                 <div class="hero-badge">
                     <i data-lucide="sparkles"></i>
-                    v0.2.02 Ultra-Premium Release
+                    v0.2.42 Performance Optimized Release
                 </div>
                 
                 <h1 class="hero-title">Kommentio</h1>
@@ -1180,24 +1185,25 @@
         // 🎨 Initialize Premium Features - 시스템 설정 감지
         let isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         
-        // Create particles (극한 최적화: 20개 → 12개)
+        // Create particles (성능 최적화: 12개 → 6개)
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             const fragment = document.createDocumentFragment();
             
-            for (let i = 0; i < 12; i++) {
+            // 성능 우선: 파티클 수를 절반으로 줄임 (12개 → 6개)
+            for (let i = 0; i < 6; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.cssText = `
                     left: ${Math.random() * 100}%;
-                    animation-delay: ${Math.random() * 25}s;
-                    animation-duration: ${Math.random() * 10 + 20}s;
+                    animation-delay: ${Math.random() * 30}s;
+                    animation-duration: ${Math.random() * 15 + 25}s;
                 `;
                 fragment.appendChild(particle);
             }
             
             particlesContainer.appendChild(fragment);
-            console.log('⚡ Particles optimized: 12 particles created');
+            console.log('⚡ Particles ultra-optimized: 6 particles created for better performance');
         }
 
         // Animate counter numbers - 최적화된 버전
@@ -1457,52 +1463,74 @@
             }
         }
         
-        // 성능 모니터링 시스템
+        // 성능 모니터링 시스템 - 경량화
         function initPerformanceMonitoring() {
             let frameCount = 0;
             let lastTime = performance.now();
+            let hasOptimized = false; // 한 번만 최적화하도록 플래그
             
             function measureFPS() {
                 frameCount++;
                 const currentTime = performance.now();
                 
-                if (currentTime - lastTime >= 1000) {
+                // 5초마다 FPS 측정 (1초 → 5초로 간격 늘림)
+                if (currentTime - lastTime >= 5000) {
                     const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
-                    console.log(`🚀 Performance: ${fps} FPS`);
+                    
+                    // 디버그 로그 최소화 (개발 모드에서만)
+                    if (window.location.hostname === 'localhost') {
+                        console.log(`🚀 Performance: ${fps} FPS`);
+                    }
                     
                     frameCount = 0;
                     lastTime = currentTime;
                     
-                    // FPS가 30 이하면 경고
-                    if (fps < 30) {
-                        console.warn('⚠️ Low FPS detected, optimizing...');
+                    // FPS가 25 이하이고 아직 최적화하지 않았다면 조용히 최적화
+                    if (fps < 25 && !hasOptimized) {
                         optimizeForLowEndDevice();
+                        hasOptimized = true; // 중복 최적화 방지
                     }
                 }
                 
+                // 최적화 후에도 계속 모니터링
                 requestAnimationFrame(measureFPS);
             }
             
             requestAnimationFrame(measureFPS);
         }
         
-        // 저사양 기기 최적화
+        // 저사양 기기 최적화 - 더 적극적인 최적화
         function optimizeForLowEndDevice() {
-            // 파티클 수 줄이기
+            // 파티클 완전 제거 (6개 → 0개)
             const particles = document.querySelectorAll('.particle');
-            particles.forEach((particle, index) => {
-                if (index % 2 === 0) {
-                    particle.style.display = 'none';
-                }
+            particles.forEach(particle => {
+                particle.style.display = 'none';
             });
             
-            // 배경 그라디언트 애니메이션 비활성화
+            // 배경 그라디언트 애니메이션 완전 정지
             const bgGradient = document.querySelector('.bg-gradient');
             if (bgGradient) {
                 bgGradient.style.animation = 'none';
+                bgGradient.style.opacity = '0.005'; // 거의 투명하게
             }
             
-            console.log('🔧 Low-end device optimizations applied');
+            // 3D 카드 효과 간소화
+            const cards = document.querySelectorAll('.feature-card-3d');
+            cards.forEach(card => {
+                card.style.transition = 'transform 0.1s ease-out';
+                card.style.willChange = 'auto';
+            });
+            
+            // 마우스 추적 비활성화
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            
+            // 개발 모드에서만 로그
+            if (window.location.hostname === 'localhost') {
+                console.log('🔧 Aggressive performance optimizations applied');
+            }
         }
         
         // 테마 시스템 검증 및 복구
@@ -1649,12 +1677,12 @@
             initPremiumExperience();
         });
 
-        // 극한 최적화된 마우스 추적 시스템
+        // 성능 최적화된 마우스 추적 시스템
         let rafId = null;
         let mouseX = 0;
         let mouseY = 0;
         let lastUpdate = 0;
-        const UPDATE_INTERVAL = 16; // ~60fps
+        const UPDATE_INTERVAL = 33; // ~30fps (16ms → 33ms로 절반 속도)
         
         function updateCardAnimations(timestamp) {
             if (timestamp - lastUpdate < UPDATE_INTERVAL) {
