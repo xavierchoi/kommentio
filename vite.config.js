@@ -2,13 +2,11 @@ import { defineConfig } from 'vite';
 
 // 개발용 설정 - 안정성 및 성능 최적화
 export default defineConfig({
-  root: './docs', // 개발 서버 루트를 docs 폴더로 설정
+  root: process.env.CI ? '.' : './docs', // CI에서는 프로젝트 루트, 로컬에서는 docs
   build: {
-    outDir: '../dist', // docs 폴더 기준이므로 상위 디렉토리로 출력
+    outDir: process.env.CI ? './dist' : '../dist', // CI용 경로 조정
     rollupOptions: {
-      input: {
-        main: 'index.html' // docs가 root이므로 index.html로 변경
-      }
+      input: process.env.CI ? 'docs/index.html' : 'index.html' // CI용 경로 조정
     }
   },
   server: {
