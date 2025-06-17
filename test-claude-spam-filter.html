@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude API 스팸 필터링 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .success { background: #10b981; color: white; }
+        .warning { background: #f59e0b; color: white; }
+        .error { background: #ef4444; color: white; }
+        .info { background: #3b82f6; color: white; }
+        .test-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 8px;
+        }
+        .test-output {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        .comment-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .spam-score {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        .score-safe { background: #10b981; color: white; }
+        .score-suspicious { background: #f59e0b; color: white; }
+        .score-spam { background: #ef4444; color: white; }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Claude API 스팸 필터링 테스트</h1>
+        
+        <div class="info status">
+            <strong>🎯 목적:</strong> Claude Haiku API를 사용한 실시간 스팸 댓글 감지 시스템 검증
+        </div>
+
+        <div class="warning status">
+            <strong>⚠️ 주의:</strong> 실제 Claude API 키가 필요합니다. Mock 모드에서는 시뮬레이션으로 동작합니다.
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 API 설정 확인</h3>
+            <button class="btn-primary" onclick="checkClaudeAPI()">Claude API 연결 테스트</button>
+            <div id="api-status" class="test-output"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 스팸 필터링 테스트</h3>
+            <p>다양한 유형의 댓글을 테스트하여 스팸 감지 정확도를 확인하세요:</p>
+            
+            <div class="grid">
+                <div>
+                    <h4>미리 준비된 테스트 케이스</h4>
+                    <button class="btn-success" onclick="testSampleComments()">샘플 댓글 테스트</button>
+                    <button class="btn-warning" onclick="testEdgeCases()">경계 케이스 테스트</button>
+                    <button class="btn-danger" onclick="testSpamComments()">스팸 댓글 테스트</button>
+                </div>
+                
+                <div>
+                    <h4>사용자 정의 테스트</h4>
+                    <textarea class="comment-input" id="custom-comment" placeholder="테스트할 댓글을 입력하세요..."></textarea>
+                    <button class="btn-primary" onclick="testCustomComment()">사용자 댓글 테스트</button>
+                </div>
+            </div>
+            
+            <div id="spam-test-output" class="test-output"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 성능 및 응답 시간 테스트</h3>
+            <button class="btn-primary" onclick="testPerformance()">성능 테스트 실행</button>
+            <div id="performance-output" class="test-output"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 실시간 스팸 감지 시뮬레이션</h3>
+            <p>실제 댓글 작성 시나리오에서 스팸 필터링이 어떻게 작동하는지 확인하세요:</p>
+            <div 
+                data-kommentio
+                data-site-id="claude-spam-test"
+                data-theme="light"
+                data-language="ko"
+                data-supabase-url="https://nwjbtsjeikrwyqltkpqv.supabase.co"
+                data-supabase-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ"
+                data-claude-api-key="your-claude-api-key-here"
+            ></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 스팸 필터링 리포트</h3>
+            <button class="btn-success" onclick="generateSpamReport()">종합 리포트 생성</button>
+            <div id="spam-report" class="test-output"></div>
+        </div>
+    </div>
+
+    <!-- Production 위젯 로드 -->
+    <script src="https://kommentio.tech/kommentio.js"></script>
+
+    <script>
+        let testResults = {
+            apiConnection: null,
+            sampleTests: [],
+            edgeCases: [],
+            spamTests: [],
+            customTests: [],
+            performance: null
+        };
+
+        // Claude API 연결 테스트
+        async function checkClaudeAPI() {
+            const output = document.getElementById('api-status');
+            let result = '🔍 Claude API 연결 상태 확인...\n';
+            output.textContent = result;
+
+            try {
+                if (!window.kommentio) {
+                    result += '⏳ Kommentio 위젯 로딩 대기...\n';
+                    output.textContent = result;
+                    setTimeout(checkClaudeAPI, 1000);
+                    return;
+                }
+
+                result += '✅ Kommentio 위젯 로드 완료\n';
+
+                // Claude API 키 확인
+                const hasClaudeKey = window.kommentio.options.claudeApiKey || window.kommentio.claudeApiKey;
+                if (hasClaudeKey && hasClaudeKey !== 'your-claude-api-key-here') {
+                    result += '✅ Claude API 키 설정됨\n';
+                    
+                    // API 연결 테스트
+                    result += '🔍 API 연결 테스트 중...\n';
+                    output.textContent = result;
+
+                    const testComment = "안녕하세요, 좋은 글이네요!";
+                    const spamScore = await window.kommentio.checkSpamScore(testComment);
+                    
+                    if (spamScore !== null) {
+                        result += `✅ Claude API 연결 성공\n`;
+                        result += `📊 테스트 댓글 스팸 점수: ${spamScore.toFixed(3)}\n`;
+                        testResults.apiConnection = true;
+                    } else {
+                        result += `❌ Claude API 응답 실패\n`;
+                        testResults.apiConnection = false;
+                    }
+                } else {
+                    result += '⚠️ Claude API 키 없음 - Mock 모드로 동작\n';
+                    result += '💡 Mock 모드에서는 시뮬레이션된 스팸 점수를 사용합니다\n';
+                    testResults.apiConnection = 'mock';
+                }
+
+                // 스팸 감지 설정 확인
+                result += `\n⚙️ 스팸 감지 설정:\n`;
+                result += `   - 임계값: ${window.kommentio.spamThreshold || 0.7}\n`;
+                result += `   - 자동 차단: ${window.kommentio.autoBlock ? '활성화' : '비활성화'}\n`;
+
+            } catch (error) {
+                result += `❌ API 테스트 오류: ${error.message}\n`;
+                testResults.apiConnection = false;
+            }
+
+            output.textContent = result;
+        }
+
+        // 샘플 댓글 테스트
+        async function testSampleComments() {
+            const output = document.getElementById('spam-test-output');
+            let result = '🧪 샘플 댓글 스팸 감지 테스트...\n';
+            result += '=' .repeat(50) + '\n\n';
+            output.textContent = result;
+
+            const samples = [
+                { text: "정말 유익한 글이네요. 많은 도움이 되었습니다!", expected: "safe" },
+                { text: "안녕하세요! 질문이 있는데 답변 부탁드려요.", expected: "safe" },
+                { text: "👍👍👍 좋아요!", expected: "safe" },
+                { text: "감사합니다. 잘 읽었어요.", expected: "safe" },
+                { text: "이 글 정말 최고예요! 공유할게요.", expected: "safe" }
+            ];
+
+            testResults.sampleTests = [];
+
+            for (const sample of samples) {
+                try {
+                    const startTime = performance.now();
+                    const spamScore = await window.kommentio.checkSpamScore(sample.text);
+                    const responseTime = performance.now() - startTime;
+
+                    const scoreClass = spamScore < 0.3 ? 'score-safe' : spamScore < 0.7 ? 'score-suspicious' : 'score-spam';
+                    const scoreText = spamScore < 0.3 ? '안전' : spamScore < 0.7 ? '의심' : '스팸';
+
+                    result += `📝 "${sample.text}"\n`;
+                    result += `📊 스팸 점수: ${spamScore.toFixed(3)} (${scoreText})\n`;
+                    result += `⏱️ 응답 시간: ${responseTime.toFixed(0)}ms\n\n`;
+
+                    testResults.sampleTests.push({
+                        text: sample.text,
+                        score: spamScore,
+                        responseTime: responseTime,
+                        classification: scoreText
+                    });
+
+                    output.textContent = result;
+                    
+                    // UI 업데이트를 위한 짧은 지연
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                } catch (error) {
+                    result += `❌ 테스트 오류: ${error.message}\n\n`;
+                    output.textContent = result;
+                }
+            }
+
+            result += `✅ 샘플 댓글 테스트 완료 (${samples.length}개)\n`;
+            output.textContent = result;
+        }
+
+        // 경계 케이스 테스트
+        async function testEdgeCases() {
+            const output = document.getElementById('spam-test-output');
+            let result = '🔍 경계 케이스 스팸 감지 테스트...\n';
+            result += '=' .repeat(50) + '\n\n';
+            output.textContent = result;
+
+            const edgeCases = [
+                { text: "", description: "빈 댓글" },
+                { text: "a", description: "한 글자 댓글" },
+                { text: "ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ", description: "반복 문자" },
+                { text: "👍".repeat(50), description: "이모지 반복" },
+                { text: "https://suspicious-link.com", description: "의심스러운 링크" },
+                { text: "무료! 지금 당장! 클릭하세요! 대박 이벤트!", description: "마케팅 스팸 패턴" },
+                { text: "이건 정말 진짜 진짜 진짜 좋은 글이에요 진짜 진짜", description: "단어 반복" }
+            ];
+
+            testResults.edgeCases = [];
+
+            for (const testCase of edgeCases) {
+                try {
+                    const startTime = performance.now();
+                    const spamScore = await window.kommentio.checkSpamScore(testCase.text);
+                    const responseTime = performance.now() - startTime;
+
+                    const scoreText = spamScore < 0.3 ? '안전' : spamScore < 0.7 ? '의심' : '스팸';
+
+                    result += `🔍 ${testCase.description}\n`;
+                    result += `📝 "${testCase.text.substring(0, 50)}${testCase.text.length > 50 ? '...' : '"}"\n`;
+                    result += `📊 스팸 점수: ${spamScore.toFixed(3)} (${scoreText})\n`;
+                    result += `⏱️ 응답 시간: ${responseTime.toFixed(0)}ms\n\n`;
+
+                    testResults.edgeCases.push({
+                        description: testCase.description,
+                        text: testCase.text,
+                        score: spamScore,
+                        responseTime: responseTime,
+                        classification: scoreText
+                    });
+
+                    output.textContent = result;
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                } catch (error) {
+                    result += `❌ 테스트 오류: ${error.message}\n\n`;
+                    output.textContent = result;
+                }
+            }
+
+            result += `✅ 경계 케이스 테스트 완료 (${edgeCases.length}개)\n`;
+            output.textContent = result;
+        }
+
+        // 스팸 댓글 테스트
+        async function testSpamComments() {
+            const output = document.getElementById('spam-test-output');
+            let result = '🚨 스팸 댓글 감지 테스트...\n';
+            result += '=' .repeat(50) + '\n\n';
+            output.textContent = result;
+
+            const spamComments = [
+                { text: "💰💰💰 지금 클릭하면 1000만원! 무료 가입! 💰💰💰", type: "금전 스팸" },
+                { text: "섹시 미녀와 만남! 클릭하세요!", type: "성인 스팸" },
+                { text: "This is definitely spam content with promotional links!", type: "영어 스팸" },
+                { text: "바카라 카지노 무료 머니! 지금 바로!", type: "도박 스팸" },
+                { text: "시발 개새끼 좆같은", type: "욕설 스팸" },
+                { text: "🎯🎯 대박 이벤트 🎯🎯 무료 체험 🎯🎯 지금 신청 🎯🎯", type: "이모지 스팸" }
+            ];
+
+            testResults.spamTests = [];
+
+            for (const spam of spamComments) {
+                try {
+                    const startTime = performance.now();
+                    const spamScore = await window.kommentio.checkSpamScore(spam.text);
+                    const responseTime = performance.now() - startTime;
+
+                    const scoreText = spamScore < 0.3 ? '안전' : spamScore < 0.7 ? '의심' : '스팸';
+                    const isCorrect = spamScore >= 0.7; // 스팸으로 올바르게 감지되었는지
+
+                    result += `🚨 ${spam.type}\n`;
+                    result += `📝 "${spam.text}"\n`;
+                    result += `📊 스팸 점수: ${spamScore.toFixed(3)} (${scoreText}) ${isCorrect ? '✅' : '❌'}\n`;
+                    result += `⏱️ 응답 시간: ${responseTime.toFixed(0)}ms\n\n`;
+
+                    testResults.spamTests.push({
+                        type: spam.type,
+                        text: spam.text,
+                        score: spamScore,
+                        responseTime: responseTime,
+                        classification: scoreText,
+                        correctlyDetected: isCorrect
+                    });
+
+                    output.textContent = result;
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                } catch (error) {
+                    result += `❌ 테스트 오류: ${error.message}\n\n`;
+                    output.textContent = result;
+                }
+            }
+
+            const correctDetections = testResults.spamTests.filter(t => t.correctlyDetected).length;
+            const accuracy = (correctDetections / spamComments.length * 100).toFixed(1);
+            
+            result += `📊 스팸 감지 정확도: ${accuracy}% (${correctDetections}/${spamComments.length})\n`;
+            output.textContent = result;
+        }
+
+        // 사용자 정의 댓글 테스트
+        async function testCustomComment() {
+            const customText = document.getElementById('custom-comment').value.trim();
+            const output = document.getElementById('spam-test-output');
+            
+            if (!customText) {
+                output.textContent = '❌ 테스트할 댓글을 입력하세요.';
+                return;
+            }
+
+            let result = '🔍 사용자 정의 댓글 테스트...\n';
+            result += '=' .repeat(50) + '\n\n';
+            output.textContent = result;
+
+            try {
+                const startTime = performance.now();
+                const spamScore = await window.kommentio.checkSpamScore(customText);
+                const responseTime = performance.now() - startTime;
+
+                const scoreText = spamScore < 0.3 ? '안전' : spamScore < 0.7 ? '의심' : '스팸';
+                const recommendation = spamScore >= 0.7 ? '자동 차단 권장' : spamScore >= 0.3 ? '수동 검토 권장' : '승인 권장';
+
+                result += `📝 입력된 댓글:\n"${customText}"\n\n`;
+                result += `📊 분석 결과:\n`;
+                result += `   - 스팸 점수: ${spamScore.toFixed(3)}\n`;
+                result += `   - 분류: ${scoreText}\n`;
+                result += `   - 권장 조치: ${recommendation}\n`;
+                result += `   - 응답 시간: ${responseTime.toFixed(0)}ms\n\n`;
+
+                testResults.customTests.push({
+                    text: customText,
+                    score: spamScore,
+                    responseTime: responseTime,
+                    classification: scoreText,
+                    recommendation: recommendation
+                });
+
+                result += `✅ 사용자 댓글 분석 완료\n`;
+            } catch (error) {
+                result += `❌ 테스트 오류: ${error.message}\n`;
+            }
+
+            output.textContent = result;
+        }
+
+        // 성능 테스트
+        async function testPerformance() {
+            const output = document.getElementById('performance-output');
+            let result = '📈 Claude API 성능 테스트...\n';
+            result += '=' .repeat(50) + '\n\n';
+            output.textContent = result;
+
+            const testComments = [
+                "짧은 댓글",
+                "조금 더 긴 댓글입니다. 여러 단어가 포함되어 있어요.",
+                "매우 긴 댓글입니다. ".repeat(20) + "끝!",
+                "👍👏🎉 이모지가 포함된 댓글이에요! 😊✨",
+                "English comment with mixed languages 한국어도 있어요"
+            ];
+
+            const results = [];
+            let totalTime = 0;
+
+            for (let i = 0; i < testComments.length; i++) {
+                const comment = testComments[i];
+                result += `📝 테스트 ${i + 1}/5: "${comment.substring(0, 30)}${comment.length > 30 ? '...' : ''}"\n`;
+                output.textContent = result;
+
+                try {
+                    const startTime = performance.now();
+                    const spamScore = await window.kommentio.checkSpamScore(comment);
+                    const responseTime = performance.now() - startTime;
+
+                    results.push({
+                        length: comment.length,
+                        responseTime: responseTime,
+                        score: spamScore
+                    });
+
+                    totalTime += responseTime;
+
+                    result += `   ⏱️ 응답 시간: ${responseTime.toFixed(0)}ms\n`;
+                    result += `   📊 스팸 점수: ${spamScore.toFixed(3)}\n\n`;
+                    output.textContent = result;
+
+                    // API 호출 간격 조절
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                } catch (error) {
+                    result += `   ❌ 오류: ${error.message}\n\n`;
+                    output.textContent = result;
+                }
+            }
+
+            // 성능 요약
+            const avgResponseTime = totalTime / results.length;
+            const minResponseTime = Math.min(...results.map(r => r.responseTime));
+            const maxResponseTime = Math.max(...results.map(r => r.responseTime));
+
+            result += `📊 성능 요약:\n`;
+            result += `-`.repeat(30) + '\n';
+            result += `평균 응답 시간: ${avgResponseTime.toFixed(0)}ms\n`;
+            result += `최단 응답 시간: ${minResponseTime.toFixed(0)}ms\n`;
+            result += `최장 응답 시간: ${maxResponseTime.toFixed(0)}ms\n`;
+            result += `총 처리 시간: ${totalTime.toFixed(0)}ms\n\n`;
+
+            // 성능 평가
+            if (avgResponseTime < 1000) {
+                result += `✅ 성능 평가: 우수 (1초 미만)\n`;
+            } else if (avgResponseTime < 3000) {
+                result += `⚠️ 성능 평가: 양호 (3초 미만)\n`;
+            } else {
+                result += `❌ 성능 평가: 개선 필요 (3초 이상)\n`;
+            }
+
+            testResults.performance = {
+                avgResponseTime,
+                minResponseTime,
+                maxResponseTime,
+                totalTests: results.length
+            };
+
+            output.textContent = result;
+        }
+
+        // 종합 리포트 생성
+        function generateSpamReport() {
+            const output = document.getElementById('spam-report');
+            
+            let report = '📋 Claude API 스팸 필터링 종합 리포트\n';
+            report += '=' .repeat(60) + '\n\n';
+            
+            report += `📅 테스트 시간: ${new Date().toLocaleString()}\n`;
+            report += `🔗 테스트 URL: ${window.location.href}\n\n`;
+            
+            // API 연결 상태
+            report += '🔧 API 연결 상태:\n';
+            report += '-'.repeat(30) + '\n';
+            if (testResults.apiConnection === true) {
+                report += '✅ Claude API 연결 성공\n';
+            } else if (testResults.apiConnection === 'mock') {
+                report += '⚠️ Mock 모드로 동작 (시뮬레이션)\n';
+            } else {
+                report += '❌ Claude API 연결 실패\n';
+            }
+
+            // 테스트 결과 요약
+            report += '\n📊 테스트 결과 요약:\n';
+            report += '-'.repeat(30) + '\n';
+            
+            const totalSampleTests = testResults.sampleTests.length;
+            const totalEdgeCases = testResults.edgeCases.length;
+            const totalSpamTests = testResults.spamTests.length;
+            const totalCustomTests = testResults.customTests.length;
+            const totalTests = totalSampleTests + totalEdgeCases + totalSpamTests + totalCustomTests;
+
+            report += `샘플 댓글 테스트: ${totalSampleTests}개\n`;
+            report += `경계 케이스 테스트: ${totalEdgeCases}개\n`;
+            report += `스팸 댓글 테스트: ${totalSpamTests}개\n`;
+            report += `사용자 정의 테스트: ${totalCustomTests}개\n`;
+            report += `총 테스트: ${totalTests}개\n`;
+
+            // 스팸 감지 정확도
+            if (testResults.spamTests.length > 0) {
+                const correctSpamDetections = testResults.spamTests.filter(t => t.correctlyDetected).length;
+                const spamAccuracy = (correctSpamDetections / testResults.spamTests.length * 100).toFixed(1);
+                report += `\n🎯 스팸 감지 정확도: ${spamAccuracy}%\n`;
+            }
+
+            // 성능 분석
+            if (testResults.performance) {
+                report += '\n⚡ 성능 분석:\n';
+                report += '-'.repeat(30) + '\n';
+                report += `평균 응답 시간: ${testResults.performance.avgResponseTime.toFixed(0)}ms\n`;
+                report += `최단 응답 시간: ${testResults.performance.minResponseTime.toFixed(0)}ms\n`;
+                report += `최장 응답 시간: ${testResults.performance.maxResponseTime.toFixed(0)}ms\n`;
+            }
+
+            // 권장 사항
+            report += '\n💡 권장 사항:\n';
+            report += '-'.repeat(30) + '\n';
+            
+            if (testResults.apiConnection !== true) {
+                report += '- 실제 Claude API 키 설정으로 정확한 스팸 감지 활성화\n';
+            }
+            
+            if (testResults.performance && testResults.performance.avgResponseTime > 2000) {
+                report += '- API 응답 시간 최적화 고려 (현재 2초 이상)\n';
+            }
+            
+            if (testResults.spamTests.length > 0) {
+                const accuracy = testResults.spamTests.filter(t => t.correctlyDetected).length / testResults.spamTests.length;
+                if (accuracy < 0.8) {
+                    report += '- 스팸 감지 임계값 조정 검토 (현재 정확도 80% 미만)\n';
+                }
+            }
+
+            report += '- 실제 운영 환경에서 추가 모니터링 및 튜닝 권장\n';
+            report += '- 정기적인 스팸 패턴 업데이트 및 필터 개선\n';
+
+            output.textContent = report;
+        }
+
+        // 자동 시작
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (window.kommentio) {
+                    checkClaudeAPI();
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

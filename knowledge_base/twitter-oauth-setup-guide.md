@@ -8,9 +8,9 @@
 ```
 App name: Kommentio Comment System
 App description: Open-source embeddable comment widget - Ad-free alternative to Disqus
-Website URL: https://kommentio.com
-Terms of Service: https://kommentio.com/terms
-Privacy Policy: https://kommentio.com/privacy
+Website URL: https://kommentio.tech
+Terms of Service: https://kommentio.tech/terms-of-service.html
+Privacy Policy: https://kommentio.tech/privacy-policy.html
 ```
 
 #### 1.2 앱 권한 설정
@@ -26,7 +26,7 @@ Type of App: Web App, Automated App or Bot
 OAuth 2.0: Enable
 Request email from users: Yes
 Callback URL / Redirect URL: https://nwjbtsjeikrwyqltkpqv.supabase.co/auth/v1/callback
-Website URL: https://kommentio.com
+Website URL: https://kommentio.tech
 ```
 
 #### 2.2 생성된 Keys 확인

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v0.3.1 마크다운 댓글 시스템 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+        }
+        .hero h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .hero p {
+            margin: 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .test-examples {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            margin: 1rem 0;
+            line-height: 1.6;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .feature-card h3 {
+            margin: 0 0 1rem 0;
+            color: #667eea;
+        }
+        .feature-card ul {
+            margin: 0;
+            padding-left: 1.2rem;
+        }
+        .feature-card li {
+            margin: 0.5rem 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        .status.new {
+            background: #10b981;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>🎨 Kommentio v0.3.1</h1>
+        <p>마크다운 지원 댓글 시스템 <span class="status new">NEW</span></p>
+    </div>
+
+    <div class="container">
+        <h2>✨ v0.3.1 새로운 기능</h2>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>🔥 마크다운 지원</h3>
+                <ul>
+                    <li><strong>**볼드 텍스트**</strong></li>
+                    <li><em>*이탤릭 텍스트*</em></li>
+                    <li><code>`인라인 코드`</code></li>
+                    <li>📝 > 인용구</li>
+                    <li>🔗 [링크](URL) 지원</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>⚡ 실시간 미리보기</h3>
+                <ul>
+                    <li>탭 기반 작성/미리보기 전환</li>
+                    <li>300ms 디바운스 최적화</li>
+                    <li>메모이제이션으로 성능 향상</li>
+                    <li>모바일 반응형 지원</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>⌨️ 키보드 단축키</h3>
+                <ul>
+                    <li><kbd>Ctrl+Enter</kbd>: 댓글 빠른 등록</li>
+                    <li><kbd>Ctrl+Tab</kbd>: 탭 전환</li>
+                    <li><kbd>ESC</kbd>: 작성 모드로 돌아가기</li>
+                    <li>크로스 플랫폼 단축키 지원</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>🔒 보안 강화</h3>
+                <ul>
+                    <li>XSS 방지 HTML 이스케이프</li>
+                    <li>안전한 URL만 링크 허용</li>
+                    <li>외부 라이브러리 없는 자체 파서</li>
+                    <li>컨텐츠 검증 및 필터링</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 마크다운 테스트 예제</h3>
+            <p>아래 댓글 창에서 다음 예제들을 테스트해보세요:</p>
+            
+            <div class="test-examples">**볼드 텍스트입니다**
+*이탤릭 텍스트입니다*
+`console.log('인라인 코드')`
+> 이것은 인용구입니다
+[Google](https://google.com) 링크 테스트
+
+**조합 테스트:**
+이것은 **볼드**와 *이탤릭*을 `코드`와 함께 사용한 예제입니다.
+
+> **인용구 안의 볼드**와 *이탤릭*
+> `인용구 안의 코드`도 가능합니다.</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 성능 정보</h3>
+            <ul>
+                <li><strong>번들 크기:</strong> 62.23 KB (gzip: 17.09 KB)</li>
+                <li><strong>외부 의존성:</strong> 0개 (자체 구현)</li>
+                <li><strong>지원 문법:</strong> 5가지 핵심 마크다운</li>
+                <li><strong>디바운스:</strong> 300ms 최적화</li>
+                <li><strong>메모리:</strong> 이전 파싱 결과 캐시</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Kommentio 위젯 -->
+    <div class="container">
+        <h2>💬 마크다운 댓글 테스트</h2>
+        <p>위의 예제를 복사해서 아래 댓글 창에 붙여넣고 "미리보기" 탭을 클릭해보세요!</p>
+        
+        <div 
+            data-kommentio 
+            data-site-id="markdown-test-v031"
+            data-theme="light"
+            data-language="ko"
+        ></div>
+    </div>
+
+    <script src="./src/kommentio.js"></script>
+    
+    <script>
+        // 개발 모드 확인
+        setTimeout(() => {
+            if (window.kommentio) {
+                console.log('🎨 Kommentio v0.3.1 로드됨');
+                console.log('📊 모드:', window.kommentio.mockMode ? 'Mock' : 'Production');
+                console.log('🎯 사이트 ID:', window.kommentio.options.siteId);
+                
+                // 마크다운 파싱 테스트
+                const testMarkdown = '**볼드** *이탤릭* `코드` > 인용구 [링크](https://google.com)';
+                const parsed = window.kommentio.parseMarkdown(testMarkdown);
+                console.log('🔍 마크다운 파싱 테스트:', parsed);
+            }
+        }, 1000);
+        
+        // 페이지 로드 시 안내
+        window.addEventListener('load', () => {
+            console.log(`
+🎨 Kommentio v0.3.1 마크다운 테스트 페이지
+
+✨ 새로운 기능:
+- 📝 5가지 마크다운 문법 지원
+- ⚡ 실시간 미리보기 (탭 시스템)
+- ⌨️ 키보드 단축키 (Ctrl+Enter, Ctrl+Tab, ESC)
+- 🔒 XSS 방지 보안 강화
+- 📱 모바일 반응형 최적화
+
+🎯 테스트 방법:
+1. 위의 예제 코드를 복사
+2. 댓글 창에 붙여넣기
+3. "미리보기" 탭 클릭
+4. 마크다운 렌더링 확인
+
+⌨️ 단축키:
+- Ctrl+Enter: 댓글 등록
+- Ctrl+Tab: 작성/미리보기 전환
+- ESC: 작성 모드로 돌아가기
+            `);
+        });
+    </script>
+</body>
+</html>

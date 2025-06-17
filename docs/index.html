@@ -1602,12 +1602,7 @@
                 card.classList.remove('feature-card-3d');
             });
             
-            // 4. 모든 마우스 추적 비활성화
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-            activeCards.clear();
+            // 4. 마우스 추적 이미 비활성화됨 (3D 추적 기능 제거됨)
             
             // 5. 모든 불필요한 애니메이션 비활성화
             const animatedElements = document.querySelectorAll('[style*="animation"]');

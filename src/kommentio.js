@@ -11,7 +11,7 @@
 // 🔍 ANCHOR_SEARCH: Kommentio Class Definition
 class Kommentio {
   constructor(options = {}) {
-    this.version = '0.2.0';
+    this.version = '0.3.1';
     this.options = {
       siteId: null,
       theme: 'light', // 'light' | 'dark' | 'auto'
@@ -691,9 +691,52 @@ class Kommentio {
         margin-bottom: var(--space-6);
       }
 
+      /* 🎨 v0.3.1 마크다운 탭 시스템 CSS */
+      .kommentio-form-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--kommentio-border);
+        margin-bottom: 0;
+        gap: 0;
+      }
+
+      .kommentio-tab {
+        background: transparent;
+        border: none;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        color: var(--kommentio-secondary);
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-weight: 500;
+      }
+
+      .kommentio-tab:hover {
+        color: var(--kommentio-text);
+        background: var(--kommentio-border);
+      }
+
+      .kommentio-tab-active {
+        color: var(--kommentio-primary);
+        border-bottom-color: var(--kommentio-primary);
+        background: var(--kommentio-bg);
+      }
+
+      .kommentio-tab-content {
+        display: none;
+        padding: 1rem 0 0 0;
+      }
+
+      .kommentio-tab-content-active {
+        display: block;
+      }
+
       .kommentio-textarea {
         width: 100%;
-        min-height: 100px;
+        min-height: 120px;
         padding: 0.75rem;
         border: 1px solid var(--kommentio-border);
         border-radius: 6px;
@@ -702,6 +745,57 @@ class Kommentio {
         resize: vertical;
         font-family: inherit;
         box-sizing: border-box;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-top: none;
+      }
+
+      /* 미리보기 컨테이너 */
+      .kommentio-preview-container {
+        min-height: 120px;
+        padding: 0.75rem;
+        border: 1px solid var(--kommentio-border);
+        border-radius: 6px;
+        background: var(--kommentio-bg);
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-top: none;
+      }
+
+      .kommentio-preview-content {
+        color: var(--kommentio-text);
+        line-height: 1.5;
+        font-size: 0.875rem;
+        min-height: 90px;
+        display: flex;
+        align-items: center;
+      }
+
+      .kommentio-preview-content:empty::before {
+        content: "미리보기를 보려면 댓글을 입력하세요...";
+        color: var(--kommentio-secondary);
+        font-style: italic;
+      }
+
+      /* 폼 하단 영역 */
+      .kommentio-form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.75rem;
+        gap: 1rem;
+      }
+
+      .kommentio-markdown-help {
+        flex: 1;
+        color: var(--kommentio-secondary);
+      }
+
+      .kommentio-markdown-help code {
+        background: var(--kommentio-border);
+        padding: 0.125rem 0.25rem;
+        border-radius: 3px;
+        font-size: 0.75rem;
       }
 
       .kommentio-comments {
@@ -745,6 +839,63 @@ class Kommentio {
         margin-bottom: 0.75rem;
         font-size: 0.875rem;
         color: var(--kommentio-text);
+      }
+
+      /* 🎨 v0.3.1 마크다운 지원 CSS */
+      .kommentio-content .kommentio-bold {
+        font-weight: 600;
+        color: var(--kommentio-text);
+      }
+
+      .kommentio-content .kommentio-italic {
+        font-style: italic;
+        color: var(--kommentio-secondary);
+      }
+
+      .kommentio-content .kommentio-inline-code {
+        background: var(--kommentio-border);
+        color: var(--kommentio-primary);
+        padding: 0.125rem 0.25rem;
+        border-radius: 3px;
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        font-size: 0.8125rem;
+        font-weight: 500;
+      }
+
+      .kommentio-content .kommentio-link {
+        color: var(--kommentio-primary);
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+        transition: all 0.2s ease;
+      }
+
+      .kommentio-content .kommentio-link:hover {
+        color: var(--kommentio-primary);
+        text-decoration-thickness: 2px;
+        opacity: 0.8;
+      }
+
+      .kommentio-content .kommentio-quote {
+        margin: 0.5rem 0;
+        padding: 0.5rem 0.75rem;
+        border-left: 3px solid var(--kommentio-primary);
+        background: var(--kommentio-bg);
+        border-radius: 0 4px 4px 0;
+        font-style: italic;
+        color: var(--kommentio-secondary);
+        opacity: 0.9;
+      }
+
+      /* 다크 모드에서 마크다운 요소 최적화 */
+      .kommentio-widget[data-theme="dark"] .kommentio-inline-code {
+        background: var(--kommentio-border);
+        color: var(--kommentio-primary);
+      }
+
+      .kommentio-widget[data-theme="dark"] .kommentio-quote {
+        background: rgba(255, 255, 255, 0.02);
+        border-left-color: var(--kommentio-primary);
       }
 
       .kommentio-actions {
@@ -966,6 +1117,50 @@ class Kommentio {
           width: 100%;
           min-height: 44px;
           justify-content: center;
+        }
+
+        /* v0.3.1 모바일 탭 시스템 최적화 */
+        .kommentio-form-tabs {
+          border-bottom: 1px solid var(--kommentio-border);
+        }
+
+        .kommentio-tab {
+          padding: 0.625rem 0.75rem;
+          font-size: 0.8125rem;
+          min-height: 44px;
+          gap: 0.25rem;
+        }
+
+        .kommentio-textarea {
+          font-size: 16px; /* iOS 줌 방지 */
+          min-height: 100px;
+          padding: 12px;
+        }
+
+        .kommentio-preview-container {
+          min-height: 100px;
+          padding: 12px;
+          font-size: 16px;
+        }
+
+        .kommentio-preview-content {
+          min-height: 76px;
+          font-size: 0.8125rem;
+        }
+
+        .kommentio-form-footer {
+          flex-direction: column;
+          gap: 0.75rem;
+          align-items: stretch;
+        }
+
+        .kommentio-markdown-help {
+          text-align: center;
+          font-size: 0.75rem;
+        }
+
+        .kommentio-markdown-help code {
+          font-size: 0.6875rem;
         }
       }
       
@@ -1263,13 +1458,45 @@ class Kommentio {
 
     return `
       <form class="kommentio-form" onsubmit="kommentio.handleSubmit(event)">
-        <textarea 
-          class="kommentio-textarea" 
-          placeholder="댓글을 입력하세요..."
-          required
-        ></textarea>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
-          <small class="kommentio-text-secondary kommentio-helper-text">Markdown 문법을 지원합니다. • Ctrl+Enter로 빠른 등록</small>
+        <!-- 탭 네비게이션 -->
+        <div class="kommentio-form-tabs">
+          <button type="button" class="kommentio-tab kommentio-tab-active" data-tab="write" onclick="kommentio.switchTab(event, 'write')">
+            ✏️ 작성
+          </button>
+          <button type="button" class="kommentio-tab" data-tab="preview" onclick="kommentio.switchTab(event, 'preview')">
+            👁️ 미리보기
+          </button>
+        </div>
+
+        <!-- 작성 탭 -->
+        <div class="kommentio-tab-content kommentio-tab-write kommentio-tab-content-active">
+          <textarea 
+            class="kommentio-textarea" 
+            placeholder="댓글을 입력하세요..."
+            oninput="kommentio.updatePreview(this.value)"
+            onkeydown="kommentio.handleKeydown(event)"
+            required
+          ></textarea>
+        </div>
+
+        <!-- 미리보기 탭 -->
+        <div class="kommentio-tab-content kommentio-tab-preview">
+          <div class="kommentio-preview-container">
+            <div class="kommentio-preview-content">
+              미리보기를 보려면 댓글을 입력하세요...
+            </div>
+          </div>
+        </div>
+
+        <!-- 하단 컨트롤 -->
+        <div class="kommentio-form-footer">
+          <div class="kommentio-markdown-help">
+            <small class="kommentio-text-secondary">
+              <strong>**볼드**</strong> • <em>*이탤릭*</em> • <code>\`코드\`</code> • <span style="opacity: 0.7;">&gt; 인용구</span> • <span style="color: var(--kommentio-primary);">[링크](URL)</span>
+              <br>
+              <span style="opacity: 0.8;">💡 Ctrl+Enter: 빠른 등록 • Ctrl+Tab: 탭 전환 • ESC: 작성으로 돌아가기</span>
+            </small>
+          </div>
           <button type="submit" class="kommentio-btn kommentio-btn-primary">댓글 작성</button>
         </div>
       </form>
@@ -1512,16 +1739,58 @@ class Kommentio {
   }
 
   /**
-   * 컨텐츠 안전화 (XSS 방지)
+   * 경량화된 마크다운 파서 (v0.3.1)
+   * 지원 문법: **bold**, *italic*, `code`, > quote, [link](url)
    */
-  sanitizeContent(content) {
-    return content
+  parseMarkdown(content) {
+    // 1. HTML 이스케이프 (XSS 방지)
+    let html = content
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;')
-      .replace(/\n/g, '<br>');
+      .replace(/'/g, '&#039;');
+
+    // 2. 마크다운 파싱 (순서 중요!)
+    
+    // 코드 블록 (인라인) - 먼저 처리하여 내부 마크다운 무시
+    html = html.replace(/`([^`]+)`/g, '<code class="kommentio-inline-code">$1</code>');
+    
+    // 볼드 텍스트
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="kommentio-bold">$1</strong>');
+    
+    // 이탤릭 텍스트 (볼드 처리 후)
+    html = html.replace(/\*([^*]+)\*/g, '<em class="kommentio-italic">$1</em>');
+    
+    // 링크 (안전한 URL만 허용)
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
+      // URL 검증 (http/https만 허용)
+      if (/^https?:\/\//.test(url)) {
+        return `<a href="${url}" class="kommentio-link" target="_blank" rel="noopener noreferrer">${text}</a>`;
+      }
+      return match; // 유효하지 않은 URL은 원문 유지
+    });
+    
+    // 인용구 (라인 단위 처리)
+    html = html.split('\n').map(line => {
+      if (line.trim().startsWith('&gt; ')) {
+        const quotedText = line.replace(/^&gt; /, '');
+        return `<blockquote class="kommentio-quote">${quotedText}</blockquote>`;
+      }
+      return line;
+    }).join('\n');
+    
+    // 3. 줄바꿈 처리 (마지막에)
+    html = html.replace(/\n/g, '<br>');
+    
+    return html;
+  }
+
+  /**
+   * 컨텐츠 안전화 및 마크다운 렌더링 (XSS 방지)
+   */
+  sanitizeContent(content) {
+    return this.parseMarkdown(content);
   }
 
   /**
@@ -2538,6 +2807,121 @@ class Kommentio {
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
       }
+    }
+  }
+
+  /**
+   * v0.3.1 마크다운 탭 전환 기능
+   */
+  switchTab(event, tabName) {
+    event.preventDefault();
+    
+    const form = event.target.closest('.kommentio-form');
+    if (!form) return;
+
+    // 모든 탭 버튼에서 active 클래스 제거
+    const tabs = form.querySelectorAll('.kommentio-tab');
+    tabs.forEach(tab => tab.classList.remove('kommentio-tab-active'));
+    
+    // 클릭된 탭에 active 클래스 추가
+    event.target.classList.add('kommentio-tab-active');
+
+    // 모든 탭 콘텐츠 숨기기
+    const tabContents = form.querySelectorAll('.kommentio-tab-content');
+    tabContents.forEach(content => content.classList.remove('kommentio-tab-content-active'));
+    
+    // 선택된 탭 콘텐츠 보이기
+    const targetContent = form.querySelector(`.kommentio-tab-${tabName}`);
+    if (targetContent) {
+      targetContent.classList.add('kommentio-tab-content-active');
+    }
+
+    // 미리보기 탭으로 전환 시 현재 텍스트로 미리보기 업데이트
+    if (tabName === 'preview') {
+      const textarea = form.querySelector('.kommentio-textarea');
+      if (textarea) {
+        this.updatePreview(textarea.value);
+      }
+    }
+
+    // 작성 탭으로 전환 시 textarea에 포커스
+    if (tabName === 'write') {
+      const textarea = form.querySelector('.kommentio-textarea');
+      if (textarea) {
+        textarea.focus();
+      }
+    }
+  }
+
+  /**
+   * v0.3.1 실시간 마크다운 미리보기 업데이트 (성능 최적화)
+   */
+  updatePreview(content) {
+    // 성능 최적화: 같은 내용이면 스킵
+    if (this.lastPreviewContent === content) return;
+    
+    // 디바운스 처리로 성능 최적화
+    if (this.previewTimeout) {
+      clearTimeout(this.previewTimeout);
+    }
+
+    this.previewTimeout = setTimeout(() => {
+      const previewElement = document.querySelector('.kommentio-preview-content');
+      if (!previewElement) return;
+
+      if (!content || content.trim() === '') {
+        previewElement.innerHTML = '<span class="kommentio-text-secondary">미리보기를 보려면 댓글을 입력하세요...</span>';
+        this.lastPreviewContent = '';
+        return;
+      }
+
+      // 마크다운 파싱 및 렌더링 (메모이제이션)
+      const parsedContent = this.parseMarkdown(content);
+      previewElement.innerHTML = parsedContent;
+      this.lastPreviewContent = content;
+    }, 300); // 300ms 디바운스
+  }
+
+  /**
+   * v0.3.1 키보드 단축키 핸들러
+   */
+  handleKeydown(event) {
+    // Ctrl+Enter (Windows/Linux) 또는 Cmd+Enter (macOS)로 폼 제출
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      event.preventDefault();
+      const form = event.target.closest('form');
+      if (form) {
+        form.dispatchEvent(new Event('submit', { cancelable: true }));
+      }
+      return;
+    }
+
+    // Tab 키로 탭 전환 (Ctrl+Tab)
+    if (event.ctrlKey && event.key === 'Tab') {
+      event.preventDefault();
+      const currentTab = document.querySelector('.kommentio-tab-active');
+      if (currentTab) {
+        const isWriteTab = currentTab.dataset.tab === 'write';
+        const targetTab = isWriteTab ? 'preview' : 'write';
+        const targetButton = document.querySelector(`[data-tab="${targetTab}"]`);
+        if (targetButton) {
+          this.switchTab({ target: targetButton, preventDefault: () => {} }, targetTab);
+        }
+      }
+      return;
+    }
+
+    // Escape 키로 미리보기에서 작성으로 전환
+    if (event.key === 'Escape') {
+      const currentTab = document.querySelector('.kommentio-tab-active');
+      if (currentTab && currentTab.dataset.tab === 'preview') {
+        event.preventDefault();
+        const writeButton = document.querySelector('[data-tab="write"]');
+        if (writeButton) {
+          this.switchTab({ target: writeButton, preventDefault: () => {} }, 'write');
+        }
+      }
+      return;
     }
   }
 }

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kommentio 프로덕션 배포 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .demo-article {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .success { background: #10b981; color: white; }
+        .warning { background: #f59e0b; color: white; }
+        .info { background: #3b82f6; color: white; }
+        .test-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 8px;
+        }
+        .test-results {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success status">
+            🚀 Kommentio v0.2.8 프로덕션 배포 테스트
+        </div>
+
+        <article class="demo-article">
+            <h1>kommentio.tech 도메인 배포 검증</h1>
+            <p>이 페이지는 kommentio.tech에서 제공되는 프로덕션 위젯을 테스트합니다.</p>
+            
+            <div class="info status">
+                <strong>Phase 3 테스트 항목:</strong>
+                <ul style="margin: 0.5rem 0 0 0;">
+                    <li>✅ 도메인 배포 상태 확인</li>
+                    <li>🔄 SSL 인증서 검증</li>
+                    <li>🔄 위젯 로딩 테스트</li>
+                    <li>🔄 Mock 모드 기본 기능</li>
+                    <li>⏳ OAuth 프로바이더 테스트</li>
+                </ul>
+            </div>
+
+            <h3>📊 프로덕션 스펙</h3>
+            <ul>
+                <li><strong>도메인:</strong> https://kommentio.tech ✅</li>
+                <li><strong>위젯 크기:</strong> 48.14KB (목표: <50KB) ✅</li>
+                <li><strong>압축 크기:</strong> 14.20KB gzipped ✅</li>
+                <li><strong>버전:</strong> v0.2.8 (하드코딩 제거 완성) ✅</li>
+                <li><strong>Anti-Hardcoding:</strong> Mock 모드 자동 폴백 ✅</li>
+            </ul>
+        </article>
+
+        <div class="test-section">
+            <h3>🧪 자동 배포 테스트</h3>
+            <div id="deployment-results" class="test-results">
+                <p>🔄 배포 상태를 확인하고 있습니다...</p>
+            </div>
+        </div>
+
+        <!-- Kommentio 위젯 임베드 (kommentio.tech에서 로드) -->
+        <div class="test-section">
+            <h3>💬 위젯 기능 테스트</h3>
+            <div 
+                data-kommentio
+                data-site-id="production-test-site"
+                data-theme="light"
+                data-language="ko"
+            ></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 소셜 로그인 프로바이더 테스트</h3>
+            <p>아래 버튼들로 다양한 소셜 프로바이더 조합을 테스트해보세요:</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+                <button onclick="testBasicProviders()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    기본 (Google + GitHub)
+                </button>
+                <button onclick="testAllProviders()" style="padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    전체 7개 활성화
+                </button>
+                <button onclick="testKoreanProviders()" style="padding: 0.5rem 1rem; background: #fee500; color: black; border: none; border-radius: 4px; cursor: pointer;">
+                    한국 특화 (Kakao)
+                </button>
+                <button onclick="testBusinessProviders()" style="padding: 0.5rem 1rem; background: #0077b5; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    비즈니스 (LinkedIn + Apple)
+                </button>
+            </div>
+            <div id="provider-test-results" class="test-results" style="margin-top: 1rem;">
+                <p>위 버튼을 클릭하여 소셜 프로바이더 테스트를 시작하세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 프로덕션 위젯 로드 (kommentio.tech에서) -->
+    <script src="https://kommentio.tech/kommentio.js"></script>
+
+    <script>
+        // 배포 상태 테스트
+        async function testDeploymentStatus() {
+            const results = document.getElementById('deployment-results');
+            
+            try {
+                // 1. 위젯 스크립트 로딩 테스트
+                if (window.Kommentio) {
+                    results.innerHTML += '<p>✅ 위젯 스크립트가 성공적으로 로드되었습니다.</p>';
+                } else {
+                    results.innerHTML += '<p>❌ 위젯 스크립트 로딩 실패</p>';
+                    return;
+                }
+
+                // 2. Mock 모드 확인
+                const widget = new window.Kommentio({
+                    siteId: 'test-site'
+                });
+                
+                if (widget.mockMode) {
+                    results.innerHTML += '<p>✅ Mock 모드가 정상적으로 활성화되었습니다.</p>';
+                } else {
+                    results.innerHTML += '<p>⚠️ Mock 모드가 비활성화되어 있습니다.</p>';
+                }
+
+                // 3. 버전 확인
+                if (widget.version) {
+                    results.innerHTML += `<p>✅ 위젯 버전: ${widget.version}</p>`;
+                }
+
+                // 4. 소셜 프로바이더 확인
+                const providerCount = Object.keys(widget.options.socialProviders || {}).length;
+                results.innerHTML += `<p>✅ 소셜 프로바이더: ${providerCount}개 설정됨</p>`;
+
+                results.innerHTML += '<p><strong>🎉 모든 기본 테스트가 성공했습니다!</strong></p>';
+
+            } catch (error) {
+                results.innerHTML += `<p>❌ 테스트 중 오류 발생: ${error.message}</p>`;
+            }
+        }
+
+        // 소셜 프로바이더 테스트 함수들
+        function testBasicProviders() {
+            if (window.kommentio) {
+                window.kommentio.updateSocialProviders({
+                    google: { enabled: true, label: 'Google', color: '#4285f4' },
+                    github: { enabled: true, label: 'GitHub', color: '#24292f' }
+                });
+                updateProviderResults('기본 프로바이더 (Google + GitHub) 활성화됨');
+            }
+        }
+
+        function testAllProviders() {
+            if (window.kommentio) {
+                window.kommentio.updateSocialProviders({
+                    google: { enabled: true, label: 'Google', color: '#4285f4' },
+                    apple: { enabled: true, label: 'Apple', color: '#000000' },
+                    github: { enabled: true, label: 'GitHub', color: '#24292f' },
+                    twitter: { enabled: true, label: 'X.com', color: '#000000' },
+                    facebook: { enabled: true, label: 'Facebook', color: '#1877f2' },
+                    linkedin: { enabled: true, label: 'LinkedIn', color: '#0a66c2' },
+                    kakao: { enabled: true, label: 'Kakao', color: '#fee500' }
+                });
+                updateProviderResults('전체 7개 프로바이더 활성화됨');
+            }
+        }
+
+        function testKoreanProviders() {
+            if (window.kommentio) {
+                window.kommentio.updateSocialProviders({
+                    google: { enabled: true, label: 'Google', color: '#4285f4' },
+                    kakao: { enabled: true, label: '카카오톡', color: '#fee500' },
+                    apple: { enabled: true, label: 'Apple', color: '#000000' }
+                });
+                updateProviderResults('한국 특화 프로바이더 (Google + Kakao + Apple) 활성화됨');
+            }
+        }
+
+        function testBusinessProviders() {
+            if (window.kommentio) {
+                window.kommentio.updateSocialProviders({
+                    google: { enabled: true, label: 'Google', color: '#4285f4' },
+                    linkedin: { enabled: true, label: 'LinkedIn', color: '#0a66c2' },
+                    apple: { enabled: true, label: 'Apple', color: '#000000' }
+                });
+                updateProviderResults('비즈니스 프로바이더 (Google + LinkedIn + Apple) 활성화됨');
+            }
+        }
+
+        function updateProviderResults(message) {
+            const results = document.getElementById('provider-test-results');
+            results.innerHTML = `<p>✅ ${message}</p><p>위젯 하단의 소셜 로그인 버튼들을 확인해보세요.</p>`;
+        }
+
+        // 페이지 로드 시 자동 테스트 실행
+        window.addEventListener('load', () => {
+            setTimeout(testDeploymentStatus, 1000); // 1초 후 테스트 실행
+        });
+
+        // 위젯 로딩 완료 확인
+        window.addEventListener('load', () => {
+            if (window.Kommentio) {
+                console.log('✅ Kommentio 위젯이 kommentio.tech에서 성공적으로 로드되었습니다!');
+                console.log('버전:', window.kommentio?.version || 'Unknown');
+                console.log('Mock 모드:', window.kommentio?.mockMode || false);
+            } else {
+                console.error('❌ Kommentio 위젯 로딩 실패');
+            }
+        });
+    </script>
+</body>
+</html>

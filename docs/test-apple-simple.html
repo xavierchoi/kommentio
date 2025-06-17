@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Login 간단 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f7;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            height: 200px;
+            overflow-y: auto;
+            margin: 20px 0;
+            white-space: pre-wrap;
+        }
+        .test-btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🍎 Apple Login 간단 테스트</h1>
+        
+        <button class="test-btn" onclick="testAppleLogin()">Apple 로그인 테스트</button>
+        <button class="test-btn" onclick="clearLog()">로그 지우기</button>
+        
+        <div class="test-log" id="testLog">테스트 준비 완료. Apple 로그인 버튼을 클릭하세요.\n</div>
+        
+        <!-- Kommentio 위젯 -->
+        <div 
+            data-kommentio
+            data-site-id="apple-test"
+            data-page-url="/apple-test"
+            data-theme="light"
+        ></div>
+    </div>
+
+    <script src="kommentio.js"></script>
+    
+    <script>
+        function log(message) {
+            const logEl = document.getElementById('testLog');
+            const time = new Date().toLocaleTimeString();
+            logEl.textContent += `[${time}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('testLog').textContent = '로그 지워짐.\n';
+        }
+        
+        async function testAppleLogin() {
+            log('🍎 Apple 로그인 테스트 시작...');
+            
+            try {
+                // Kommentio 로드 확인
+                if (typeof kommentio === 'undefined') {
+                    log('❌ Kommentio 위젯이 로드되지 않음');
+                    return;
+                }
+                
+                log('✅ Kommentio 위젯 발견');
+                log(`📊 Mock 모드: ${kommentio.mockMode}`);
+                
+                // Apple 로그인 실행
+                log('⏳ Apple 로그인 실행 중...');
+                await kommentio.login('apple');
+                
+                log('🎉 Apple 로그인 완료!');
+                
+                // 현재 사용자 정보 출력
+                if (kommentio.currentUser) {
+                    log(`👤 사용자 ID: ${kommentio.currentUser.id}`);
+                    log(`📧 이메일: ${kommentio.currentUser.email}`);
+                    log(`🏷️ 이름: ${kommentio.currentUser.user_metadata?.name}`);
+                    log(`🔗 프로바이더: ${kommentio.currentUser.user_metadata?.provider}`);
+                    
+                    // Avatar URL 확인
+                    if (kommentio.currentUser.user_metadata?.avatar_url) {
+                        log(`🖼️ 아바타: ${kommentio.currentUser.user_metadata.avatar_url}`);
+                    }
+                    
+                    log('✅ Apple 로그인 테스트 성공!');
+                } else {
+                    log('⚠️ 사용자 정보를 찾을 수 없음');
+                }
+                
+            } catch (error) {
+                log(`❌ 에러 발생: ${error.message}`);
+                console.error('Apple 로그인 에러:', error);
+            }
+        }
+        
+        // 페이지 로드시 초기화
+        window.addEventListener('load', function() {
+            log('📄 페이지 로드 완료');
+            
+            setTimeout(() => {
+                if (typeof kommentio !== 'undefined') {
+                    log('✅ Kommentio 위젯 로드 완료');
+                    log(`🔧 Mock 모드: ${kommentio.mockMode ? 'Yes' : 'No'}`);
+                    log('🚀 테스트 준비 완료!');
+                } else {
+                    log('⚠️ Kommentio 위젯 로드 실패');
+                    log('📁 kommentio.js 파일 경로를 확인하세요');
+                }
+            }, 1000);
+        });
+        
+        // 로그인 상태 변화 감지
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        const loginForm = document.querySelector('.kommentio-login-form');
+                        const userInfo = document.querySelector('.kommentio-user-info');
+                        
+                        if (userInfo && !loginForm) {
+                            log('👤 사용자 로그인 상태 감지');
+                        } else if (loginForm && !userInfo) {
+                            log('🚪 사용자 로그아웃 상태 감지');
+                        }
+                    }
+                });
+            });
+            
+            const widgetContainer = document.querySelector('[data-kommentio]');
+            if (widgetContainer) {
+                observer.observe(widgetContainer, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+        });
+    </script>
+</body>
+</html>
