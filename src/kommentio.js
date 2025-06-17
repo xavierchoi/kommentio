@@ -328,6 +328,9 @@ class Kommentio {
         this.options.supabaseKey
       );
 
+      // 사이트 ID를 UUID로 해결
+      await this.resolveSiteId();
+
       // 현재 사용자 확인 (Supabase + 커스텀 로그인)
       const { data: { user }, error: userError } = await this.supabase.auth.getUser();
       
@@ -458,6 +461,13 @@ class Kommentio {
         --kommentio-border: #e5e7eb;
         --kommentio-primary: #3b82f6;
         --kommentio-secondary: #6b7280;
+        
+        /* 8px 기반 spacing 시스템 */
+        --space-1: 0.25rem; /* 4px */
+        --space-2: 0.5rem;  /* 8px */
+        --space-3: 0.75rem; /* 12px */
+        --space-4: 1rem;    /* 16px */
+        --space-6: 1.5rem;  /* 24px */
       }
 
       .kommentio-widget[data-theme="dark"] {
@@ -535,9 +545,12 @@ class Kommentio {
       }
 
       .kommentio-btn-primary {
-        background: var(--kommentio-primary);
+        background: #6366f1;
         color: white;
-        border-color: var(--kommentio-primary);
+        border-color: #6366f1;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
       }
 
       /* 🔥 프리미엄 원형 소셜 로그인 버튼 */
@@ -675,7 +688,7 @@ class Kommentio {
       }
 
       .kommentio-form {
-        margin-bottom: 2rem;
+        margin-bottom: var(--space-6);
       }
 
       .kommentio-textarea {
@@ -698,13 +711,13 @@ class Kommentio {
       .kommentio-comment {
         border: 1px solid var(--kommentio-border);
         border-radius: 6px;
-        padding: 1rem;
-        margin-bottom: 1rem;
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
       }
 
       .kommentio-comment-nested {
         margin-left: 2rem;
-        margin-top: 1rem;
+        margin-top: var(--space-4);
       }
 
       .kommentio-comment-header {
@@ -717,16 +730,21 @@ class Kommentio {
       .kommentio-author {
         font-weight: 600;
         color: var(--kommentio-primary);
+        font-size: 0.9375rem;
+        margin-bottom: 0.25rem;
       }
 
       .kommentio-timestamp {
         color: var(--kommentio-secondary);
-        font-size: 0.875rem;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
       }
 
       .kommentio-content {
-        line-height: 1.6;
+        line-height: 1.5;
         margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+        color: var(--kommentio-text);
       }
 
       .kommentio-actions {
@@ -797,14 +815,14 @@ class Kommentio {
       /* 모바일 최적화 (768px 이하) */
       @media (max-width: 768px) {
         .kommentio-container {
-          padding: 1rem;
+          padding: var(--space-4);
           border-radius: 8px;
-          margin: 0.5rem;
+          margin: var(--space-2);
         }
         
         .kommentio-title {
           font-size: 1.125rem;
-          margin-bottom: 1rem;
+          margin-bottom: var(--space-4);
         }
         
         .kommentio-widget {
@@ -817,6 +835,20 @@ class Kommentio {
           padding: 12px;
         }
         
+        /* 모바일에서 도움말 텍스트 숨김 */
+        .kommentio-helper-text {
+          display: none;
+        }
+        
+        /* 모바일에서 댓글 작성 버튼 스타일 완화 */
+        .kommentio-btn-primary {
+          background: #6366f1;
+          padding: 0.5rem 1rem;
+          font-size: 0.8125rem;
+          border-radius: 6px;
+          font-weight: 500;
+        }
+        
         .kommentio-comment-nested {
           margin-left: 1rem; /* 모바일에서 중첩 간격 줄임 */
         }
@@ -827,10 +859,21 @@ class Kommentio {
         
         .kommentio-author {
           font-size: 0.875rem;
+          margin-bottom: 0.25rem;
         }
         
         .kommentio-timestamp {
           font-size: 0.75rem;
+          margin-bottom: 0.5rem;
+        }
+        
+        .kommentio-content {
+          font-size: 0.875rem;
+          line-height: 1.5;
+        }
+        
+        .kommentio-comment-header {
+          margin-bottom: 0.5rem;
         }
         
         .kommentio-actions {
@@ -869,7 +912,7 @@ class Kommentio {
           gap: 12px;
           justify-content: center;
           max-width: 100%;
-          margin: 0 auto 1rem auto;
+          margin: 0 auto var(--space-4) auto;
         }
         
         .kommentio-btn-social {
@@ -893,6 +936,15 @@ class Kommentio {
           margin-right: -0.75rem;
           padding-left: 0.75rem;
           padding-right: 0.75rem;
+        }
+        
+        /* 640px에서 답글 계층 구조 유지 */
+        .kommentio-comment-nested {
+          margin-left: 0.75rem;
+        }
+        
+        .kommentio-comment-nested .kommentio-comment-nested {
+          margin-left: 0.5rem;
         }
         
         .kommentio-comment-header {
@@ -942,6 +994,118 @@ class Kommentio {
         .kommentio-textarea {
           min-height: 100px;
           padding: 10px;
+        }
+      }
+      
+      /* 극소형 모바일 (360px 이하) - 소셜 로그인 2줄 4+3 레이아웃 */
+      @media (max-width: 360px) {
+        .kommentio-container {
+          padding: 0.5rem;
+          margin: 0.125rem;
+        }
+        
+        .kommentio-social-login {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 8px;
+          max-width: 100%;
+          margin: 0 auto var(--space-4) auto;
+        }
+        
+        .kommentio-btn-social {
+          width: 44px;
+          height: 44px;
+          min-width: 44px;
+          min-height: 44px;
+        }
+        
+        /* 2줄 레이아웃: 첫 번째 줄 4개, 두 번째 줄 3개 */
+        .kommentio-btn-social:nth-child(5),
+        .kommentio-btn-social:nth-child(6),
+        .kommentio-btn-social:nth-child(7) {
+          grid-column: 1 / span 1;
+        }
+        
+        .kommentio-btn-social:nth-child(5) {
+          grid-column: 2;
+        }
+        
+        .kommentio-btn-social:nth-child(6) {
+          grid-column: 3;
+        }
+        
+        .kommentio-btn-social:nth-child(7) {
+          grid-column: 4;
+        }
+        
+        .kommentio-title {
+          font-size: 0.875rem;
+        }
+        
+        /* 360px에서 답글 계층 구조 유지 */
+        .kommentio-comment-nested {
+          margin-left: 0.5rem;
+        }
+        
+        .kommentio-comment-nested .kommentio-comment-nested {
+          margin-left: 0.25rem;
+        }
+      }
+      
+      /* 최소형 모바일 (320px 이하) - 소셜 로그인 2줄 4+3 레이아웃 최적화 */
+      @media (max-width: 320px) {
+        .kommentio-container {
+          padding: 0.25rem;
+          margin: 0;
+          max-width: calc(100vw - 1rem);
+        }
+        
+        .kommentio-social-login {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 4px;
+          max-width: 280px;
+          margin: 0 auto 0.75rem auto;
+        }
+        
+        .kommentio-btn-social {
+          width: 40px;
+          height: 40px;
+          min-width: 40px;
+          min-height: 40px;
+        }
+        
+        /* 2줄 레이아웃: 첫 번째 줄 4개, 두 번째 줄 3개 중앙 정렬 */
+        .kommentio-btn-social:nth-child(5) {
+          grid-column: 2;
+        }
+        
+        .kommentio-btn-social:nth-child(6) {
+          grid-column: 3;
+        }
+        
+        .kommentio-btn-social:nth-child(7) {
+          grid-column: 4;
+        }
+        
+        .kommentio-title {
+          font-size: 0.75rem;
+          margin-bottom: 0.75rem;
+        }
+        
+        .kommentio-textarea {
+          min-height: 80px;
+          padding: 8px;
+          font-size: 14px;
+        }
+        
+        /* 320px에서 답글 계층 구조 유지 */
+        .kommentio-comment-nested {
+          margin-left: 0.5rem;
+        }
+        
+        .kommentio-comment-nested .kommentio-comment-nested {
+          margin-left: 0.25rem;
         }
       }
       
@@ -1105,11 +1269,67 @@ class Kommentio {
           required
         ></textarea>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
-          <small class="kommentio-text-secondary">Markdown 문법을 지원합니다. • Ctrl+Enter로 빠른 등록</small>
+          <small class="kommentio-text-secondary kommentio-helper-text">Markdown 문법을 지원합니다. • Ctrl+Enter로 빠른 등록</small>
           <button type="submit" class="kommentio-btn kommentio-btn-primary">댓글 작성</button>
         </div>
       </form>
     `;
+  }
+
+  /**
+   * 사이트 ID를 UUID로 해결 (사이트가 없으면 자동 생성)
+   */
+  async resolveSiteId() {
+    try {
+      const siteName = this.options.siteId;
+      
+      // 1. 기존 사이트 확인
+      const { data: existingSite, error: selectError } = await this.supabase
+        .from('sites')
+        .select('id')
+        .eq('name', siteName)
+        .eq('is_active', true)
+        .single();
+
+      if (existingSite && !selectError) {
+        this.siteUUID = existingSite.id;
+        console.log('✅ 기존 사이트 ID 찾음:', this.siteUUID);
+        return;
+      }
+
+      // 2. 사이트가 없으면 자동 생성
+      console.log('🔧 새 사이트 생성 중:', siteName);
+      const { data: newSite, error: insertError } = await this.supabase
+        .from('sites')
+        .insert([{
+          name: siteName,
+          domain: window.location.hostname,
+          description: `Auto-created site for ${siteName}`,
+          owner_id: null, // 익명 소유자
+          settings: {
+            allow_anonymous: true,
+            moderation_enabled: false,
+            max_comment_length: 2000,
+            theme: this.options.theme,
+            language: this.options.language
+          }
+        }])
+        .select('id')
+        .single();
+
+      if (newSite && !insertError) {
+        this.siteUUID = newSite.id;
+        console.log('✅ 새 사이트 생성 완료:', this.siteUUID);
+      } else {
+        console.error('❌ 사이트 생성 실패:', insertError);
+        // 실패해도 계속 진행 (Mock 모드로 fallback)
+        this.siteUUID = siteName; // fallback
+      }
+      
+    } catch (error) {
+      console.error('❌ 사이트 ID 해결 실패:', error);
+      this.siteUUID = this.options.siteId; // fallback
+    }
   }
 
   /**
@@ -1119,7 +1339,7 @@ class Kommentio {
     this.mockComments = [
       {
         id: 'mock-1',
-        site_id: this.options.siteId,
+        site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
         content: 'Kommentio 정말 좋네요! Disqus보다 훨씬 빠르고 깔끔한 것 같아요. 👍',
         parent_id: null,
@@ -1132,7 +1352,7 @@ class Kommentio {
       },
       {
         id: 'mock-2',
-        site_id: this.options.siteId,
+        site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
         content: '오픈소스라서 더욱 신뢰가 갑니다. 광고도 없고 완전 무료라니 최고예요!',
         parent_id: null,
@@ -1145,7 +1365,7 @@ class Kommentio {
       },
       {
         id: 'mock-3',
-        site_id: this.options.siteId,
+        site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
         content: '맞아요! 로딩 속도가 정말 빨라요. React 없이 Vanilla JS로 만든 덕분인 것 같아요.',
         parent_id: 'mock-1',
@@ -1158,7 +1378,7 @@ class Kommentio {
       },
       {
         id: 'mock-4',
-        site_id: this.options.siteId,
+        site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
         content: '정말 인상적인 프로젝트네요! PRD 명세대로 잘 구현되고 있는 것 같아요. 🚀',
         parent_id: null,
@@ -1188,7 +1408,7 @@ class Kommentio {
       const { data: comments, error } = await this.supabase
         .from('comments')
         .select('*')
-        .eq('site_id', this.options.siteId)
+        .eq('site_id', this.siteUUID || this.options.siteId)
         .eq('page_url', window.location.pathname)
         .eq('is_deleted', false)
         .order('created_at', { ascending: true });
@@ -1400,7 +1620,7 @@ class Kommentio {
         
         const newComment = {
           id: 'mock-realtime-' + Date.now(),
-          site_id: this.options.siteId,
+          site_id: this.siteUUID || this.options.siteId,
           page_url: window.location.pathname,
           content: randomComments[Math.floor(Math.random() * randomComments.length)],
           parent_id: null,
@@ -1483,7 +1703,7 @@ class Kommentio {
       console.log('🔄 실시간 구독 설정 중...');
       
       // 채널 이름을 사이트별로 고유하게 생성
-      const channelName = `comments-${this.options.siteId}`;
+      const channelName = `comments-${this.siteUUID || this.options.siteId}`;
       
       this.realtimeChannel = this.supabase
         .channel(channelName)
@@ -1491,7 +1711,7 @@ class Kommentio {
           event: '*',
           schema: 'public', 
           table: 'comments',
-          filter: `site_id=eq.${this.options.siteId}`
+          filter: `site_id=eq.${this.siteUUID || this.options.siteId}`
         }, (payload) => {
           console.log('💬 댓글 실시간 이벤트:', payload);
           this.handleRealtimeCommentEvent(payload);
@@ -1530,7 +1750,7 @@ class Kommentio {
     switch (eventType) {
       case 'INSERT':
         // 새 댓글 추가
-        if (newRecord && newRecord.site_id === this.options.siteId) {
+        if (newRecord && newRecord.site_id === (this.siteUUID || this.options.siteId)) {
           this.showNotification(`💬 새 댓글: ${newRecord.author_name}`);
           this.loadComments(); // 댓글 목록 새로고침
         }
@@ -1538,7 +1758,7 @@ class Kommentio {
         
       case 'UPDATE':
         // 댓글 수정
-        if (newRecord && newRecord.site_id === this.options.siteId) {
+        if (newRecord && newRecord.site_id === (this.siteUUID || this.options.siteId)) {
           if (oldRecord.is_deleted === false && newRecord.is_deleted === true) {
             this.showNotification('🗑️ 댓글이 삭제되었습니다.');
           } else {
@@ -1733,7 +1953,7 @@ class Kommentio {
       const mockSpamCheck = Math.random() > 0.9; // 10% 확률로 스팸 감지
       const newComment = {
         id: 'mock-' + Date.now(),
-        site_id: this.options.siteId,
+        site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
         content: content,
         parent_id: parentId,
@@ -1770,7 +1990,7 @@ class Kommentio {
     const { error } = await this.supabase
       .from('comments')
       .insert({
-        site_id: this.options.siteId,
+        site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
         content: content,
         parent_id: parentId,
@@ -1799,7 +2019,7 @@ class Kommentio {
       'facebook': 'facebook',
       'twitter': 'twitter',
       'apple': 'apple',
-      'linkedin': 'linkedin', // 다시 linkedin으로 시도 (OIDC는 Supabase 내부 처리)
+      'linkedin': 'linkedin_oidc', // LinkedIn OIDC 프로바이더 사용 (2024년 업데이트)
       'kakao': 'kakao'
     };
 
@@ -2247,7 +2467,7 @@ class Kommentio {
           required
         ></textarea>
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <small style="color: var(--kommentio-secondary);">Markdown 문법을 지원합니다. • Ctrl+Enter로 빠른 등록</small>
+          <small class="kommentio-helper-text" style="color: var(--kommentio-secondary);">Markdown 문법을 지원합니다. • Ctrl+Enter로 빠른 등록</small>
           <div style="display: flex; gap: 0.5rem;">
             <button 
               type="button" 
@@ -2367,10 +2587,10 @@ function autoInit() {
 window.Kommentio = Kommentio;
 
 // 초기에는 null로 설정, autoInit에서 실제 인스턴스 할당
-window.kommentio = null;
+// window.kommentio = null; // 🐛 BUG FIX: 이 라인이 초기화된 인스턴스를 덮어쓰고 있었음
 
 // 위젯 로딩 대기 및 안전한 함수 실행을 위한 헬퍼
-window.waitForKommentio = function(callback, timeout = 5000) {
+window.waitForKommentio = function(callback, timeout = 15000) {
   const startTime = Date.now();
   
   function check() {

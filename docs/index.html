@@ -23,15 +23,16 @@
     <link rel="icon" href="/assets/favicon-dark.ico" media="(prefers-color-scheme: dark)">
     <link rel="icon" href="/assets/favicon-CvwY7gig.ico">  <!-- Fallback for older browsers -->
     
-    <!-- Google Fonts -->
+    <!-- Optimized Google Fonts - Critical weights only -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap&subset=latin" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap&subset=latin" rel="stylesheet"></noscript>
     
     <!-- Framer Motion 제거 - React 의존성 때문에 에러 발생 -->
     
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Lucide Icons - Async loading -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" async onload="initLucideIcons()"></script>
     
     <style>
         /* 🔍 ANCHOR_SEARCH: Premium Landing Page Styles */
@@ -87,6 +88,25 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        /* 🔧 Anti-CLS: Prevent layout shifts from async-loaded icons & fonts */
+        [data-lucide] {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            vertical-align: middle;
+        }
+        
+        .nav-link [data-lucide] {
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Font loading optimization - prevent FOIT/FOUT */
+        body {
+            font-display: swap;
         }
 
         ::-moz-selection {
@@ -154,7 +174,7 @@
                 display: none;
             }
             
-            .feature-card-3d {
+            .feature-card-optimized {
                 transition: none !important;
                 transform: none !important;
                 will-change: auto !important;
@@ -632,11 +652,11 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2rem;
-            perspective: 1000px;
+            /* perspective 제거 - 3D 효과 비활성화 */
             contain: layout;
         }
 
-        .feature-card-3d {
+        .feature-card-optimized {
             background: var(--bg-glass);
             -webkit-backdrop-filter: blur(15px);
                     backdrop-filter: blur(15px);
@@ -644,36 +664,19 @@
             border-radius: 20px;
             padding: 2.5rem;
             position: relative;
-            transition: transform 0.25s var(--ease-premium), box-shadow 0.25s var(--ease-premium);
-            transform-style: preserve-3d;
+            transition: transform 0.25s var(--ease-premium), background 0.25s var(--ease-premium);
+            /* 3D 효과 제거: transform-style, will-change, backface-visibility 삭제 */
             overflow: hidden;
-            will-change: transform;
-            backface-visibility: hidden;
             contain: layout style paint;
-            transform: translateZ(0);
         }
 
-        .feature-card-3d::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-neon);
-            opacity: 0.05;
-            transition: left 0.6s var(--ease-premium);
-        }
+        /* CLS 원인인 ::before 의사 요소 완전 제거 - 주석 처리됨 */
 
-        .feature-card-3d:hover::before {
-            left: 100%;
-        }
-
-        .feature-card-3d:hover {
-            transform: translateY(-15px) rotateX(3deg) rotateY(3deg);
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.25),
-                var(--shadow-neon);
+        .feature-card-optimized:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(0, 221, 203, 0.3);
+            box-shadow: 0 12px 32px rgba(0, 221, 203, 0.15);
         }
 
         .feature-icon-3d {
@@ -690,8 +693,8 @@
             will-change: transform, box-shadow;
         }
 
-        .feature-card-3d:hover .feature-icon-3d {
-            transform: scale(1.05) rotateY(15deg);
+        .feature-card-optimized:hover .feature-icon-3d {
+            transform: scale(1.05);
             box-shadow: var(--shadow-cyber);
         }
 
@@ -792,27 +795,28 @@
                 top: 10px;
                 left: 10px;
                 right: 10px;
-                transform: none;
+                /* ✅ 중앙 정렬 유지 - transform 제거하지 않음 */
+                transform: translateX(0); /* left/right로 이미 중앙 정렬됨 */
                 border-radius: 20px;
                 -webkit-backdrop-filter: blur(10px);
                         backdrop-filter: blur(10px);
             }
             
-            /* 모바일에서 스크롤 숨김 상태 */
+            /* 모바일에서 스크롤 숨김 상태 - 중앙 정렬 유지 */
             .nav-premium.nav-hidden {
-                transform: translateY(-100px);
+                transform: translateX(0) translateY(-100px);
                 opacity: 0;
                 pointer-events: none;
             }
             
-            /* 모바일에서 스크롤 표시 상태 */
+            /* 모바일에서 스크롤 표시 상태 - 중앙 정렬 유지 */
             .nav-premium.nav-visible {
-                transform: translateY(0);
+                transform: translateX(0) translateY(0);
                 opacity: 1;
                 pointer-events: auto;
             }
             
-            .feature-card-3d {
+            .feature-card-optimized {
                 -webkit-backdrop-filter: blur(8px);
                         backdrop-filter: blur(8px);
                 will-change: auto;
@@ -820,7 +824,7 @@
             }
             
             /* 모바일에서 3D 효과 간소화 */
-            .feature-card-3d:hover {
+            .feature-card-optimized:hover {
                 transform: translateY(-8px) scale(1.02);
             }
 
@@ -843,7 +847,7 @@
                 gap: 1.5rem;
             }
 
-            .feature-card-3d {
+            .feature-card-optimized {
                 padding: 2rem;
             }
 
@@ -1101,7 +1105,7 @@
             </div>
 
             <div class="features-grid" id="featuresGrid">
-                <div class="feature-card-3d">
+                <div class="feature-card-optimized">
                     <div class="feature-icon-3d">
                         <i data-lucide="zap"></i>
                     </div>
@@ -1111,7 +1115,7 @@
                     </p>
                 </div>
 
-                <div class="feature-card-3d">
+                <div class="feature-card-optimized">
                     <div class="feature-icon-3d">
                         <i data-lucide="shield-check"></i>
                     </div>
@@ -1121,7 +1125,7 @@
                     </p>
                 </div>
 
-                <div class="feature-card-3d">
+                <div class="feature-card-optimized">
                     <div class="feature-icon-3d">
                         <i data-lucide="users"></i>
                     </div>
@@ -1131,7 +1135,7 @@
                     </p>
                 </div>
 
-                <div class="feature-card-3d">
+                <div class="feature-card-optimized">
                     <div class="feature-icon-3d">
                         <i data-lucide="activity"></i>
                     </div>
@@ -1141,7 +1145,7 @@
                     </p>
                 </div>
 
-                <div class="feature-card-3d">
+                <div class="feature-card-optimized">
                     <div class="feature-icon-3d">
                         <i data-lucide="layout-dashboard"></i>
                     </div>
@@ -1151,7 +1155,7 @@
                     </p>
                 </div>
 
-                <div class="feature-card-3d">
+                <div class="feature-card-optimized">
                     <div class="feature-icon-3d">
                         <i data-lucide="heart"></i>
                     </div>
@@ -1219,7 +1223,7 @@
     </footer>
 
     <!-- Kommentio Widget Script -->
-    <script src="/kommentio.js"></script>
+    <script src="/kommentio.js?v=hierarchy-fix" async></script>
     
     <!-- Force Mock Mode -->
     <script>
@@ -1358,7 +1362,7 @@
 
         // Smooth reveal animations
         function revealOnScroll() {
-            const cards = document.querySelectorAll('.feature-card-3d');
+            const cards = document.querySelectorAll('.feature-card-optimized');
             cards.forEach((card, index) => {
                 const rect = card.getBoundingClientRect();
                 if (rect.top < window.innerHeight - 100) {
@@ -1383,7 +1387,7 @@
 
             // Initialize components
             createParticles();
-            lucide.createIcons();
+            initLucideIconsWhenReady();
             
             // 테마 아이콘 시스템 초기화
             initThemeSystem();
@@ -1590,7 +1594,7 @@
             }
             
             // 3. 3D 카드 효과 완전 제거
-            const cards = document.querySelectorAll('.feature-card-3d');
+            const cards = document.querySelectorAll('.feature-card-optimized');
             cards.forEach(card => {
                 card.style.transition = 'none';
                 card.style.willChange = 'auto';
@@ -1746,10 +1750,46 @@
             
             // 스크롤이 완전히 멈췄을 때 네비게이션을 살짝 강조
             if (nav.classList.contains('nav-visible')) {
-                nav.style.transform = 'translateX(-50%) translateY(-5px)';
-                setTimeout(() => {
-                    nav.style.transform = 'translateX(-50%) translateY(0)';
-                }, 200);
+                // 모바일과 데스크톱 구분하여 올바른 transform 적용
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    nav.style.transform = 'translateX(0) translateY(-5px)';
+                    setTimeout(() => {
+                        nav.style.transform = 'translateX(0) translateY(0)';
+                    }, 200);
+                } else {
+                    nav.style.transform = 'translateX(-50%) translateY(-5px)';
+                    setTimeout(() => {
+                        nav.style.transform = 'translateX(-50%) translateY(0)';
+                    }, 200);
+                }
+            }
+        }
+
+        // Async Lucide Icons handling
+        let lucideReady = false;
+        
+        function initLucideIcons() {
+            if (window.lucide) {
+                window.lucide.createIcons();
+                lucideReady = true;
+                console.log('🔧 Lucide icons initialized');
+            }
+        }
+        
+        function initLucideIconsWhenReady() {
+            if (lucideReady) {
+                window.lucide.createIcons();
+            } else {
+                // Wait for Lucide to load
+                const checkLucide = setInterval(() => {
+                    if (window.lucide) {
+                        clearInterval(checkLucide);
+                        window.lucide.createIcons();
+                        lucideReady = true;
+                        console.log('🔧 Lucide icons initialized (delayed)');
+                    }
+                }, 100);
             }
         }
 
@@ -1763,148 +1803,33 @@
             initPremiumExperience();
         });
 
-        // Ultra-Light 마우스 추적 시스템 (50% 더 가벼움)
-        let rafId = null;
-        let mouseX = 0;
-        let mouseY = 0;
-        let lastUpdate = 0;
-        const UPDATE_INTERVAL = 66; // ~15fps (33ms → 66ms로 절반 속도)
-        let activeCards = new Set(); // 성능 최적화를 위한 캐시
+        // 🚫 3D 마우스 추적 완전 비활성화 - CLS와 성능 최적화 우선
+        // 저사양 환경에서 성능 문제와 레이아웃 시프트를 방지하기 위해 비활성화
+        console.log('🎯 3D animations disabled for optimal performance and CLS reduction');
         
-        function updateCardAnimations(timestamp) {
-            if (timestamp - lastUpdate < UPDATE_INTERVAL) {
-                rafId = requestAnimationFrame(updateCardAnimations);
-                return;
-            }
-            
-            // 활성 카드가 없으면 중단
-            if (activeCards.size === 0) {
-                rafId = null;
-                return;
-            }
-            
-            // 배치 업데이트로 리플로우 최소화
-            const updates = [];
-            activeCards.forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const cardCenterX = rect.left + rect.width * 0.5;
-                const cardCenterY = rect.top + rect.height * 0.5;
-                
-                // 더 부드러운 계산 (강도 50% 감소)
-                const deltaX = (mouseX - cardCenterX) * 0.007;
-                const deltaY = (mouseY - cardCenterY) * 0.005;
-                
-                // 더 제한된 회전 범위 (-3 ~ 3도)
-                const rotateX = Math.max(-3, Math.min(3, deltaY));
-                const rotateY = Math.max(-3, Math.min(3, -deltaX));
-                
-                updates.push({
-                    card,
-                    transform: `translate3d(0, -15px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
-                });
-            });
-            
-            // 한 번에 모든 업데이트 적용
-            updates.forEach(({ card, transform }) => {
-                card.style.transform = transform;
-            });
-            
-            lastUpdate = timestamp;
-            rafId = requestAnimationFrame(updateCardAnimations);
-        }
-        
-        // Ultra-Light 마우스 이벤트 (데스크톱 전용 + 저사양 기기 감지)
-        function initMouseTracking() {
-            // 저사양 기기 감지 및 비활성화
-            const isLowEndDevice = navigator.hardwareConcurrency <= 4 || 
-                                 navigator.deviceMemory <= 4 ||
-                                 /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isLowEndDevice) {
-                console.log('📱 Low-end device detected, mouse tracking disabled for performance');
-                return;
-            }
-            
-            // 쓰로틀된 마우스 이벤트 (16ms → 33ms)
-            let mouseMoveTimeout;
-            document.addEventListener('mousemove', (e) => {
-                if (mouseMoveTimeout) return;
-                
-                mouseMoveTimeout = setTimeout(() => {
-                    mouseX = e.clientX;
-                    mouseY = e.clientY;
-                    
-                    if (!rafId && activeCards.size > 0) {
-                        rafId = requestAnimationFrame(updateCardAnimations);
-                    }
-                    mouseMoveTimeout = null;
-                }, 33); // ~30fps로 제한
-                
-            }, { passive: true });
-            
-            // 카드 호버 이벤트 최적화
-            document.addEventListener('mouseenter', (e) => {
-                if (e.target && e.target.classList && e.target.classList.contains('feature-card-3d')) {
-                    activeCards.add(e.target);
-                    if (!rafId) {
-                        rafId = requestAnimationFrame(updateCardAnimations);
-                    }
-                }
-            }, true);
-            
-            document.addEventListener('mouseleave', (e) => {
-                if (e.target && e.target.classList && e.target.classList.contains('feature-card-3d')) {
-                    activeCards.delete(e.target);
-                    // 즉시 원래 상태로 복원
-                    e.target.style.transform = 'translateZ(0)';
-                }
-            }, true);
-            
-            console.log('🖱️ Ultra-Light mouse tracking enabled for high-end desktop');
-        }
-        
-        // 마우스 추적 초기화
-        initMouseTracking();
-        
-        // 효율적인 리셋
-        document.addEventListener('mouseleave', () => {
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-            
-            // 배치 업데이트로 리플로우 최소화
-            requestAnimationFrame(() => {
-                const cards = document.querySelectorAll('.feature-card-3d');
-                cards.forEach(card => {
-                    card.style.transform = 'translateZ(0)';
-                });
-            });
-        }, { passive: true });
+        // 3D 효과 제거 - CSS only 호버 효과로 대체
 
-        // Kommentio widget integration functions
-        function waitForKommentio(callback) {
-            if (window.kommentio && window.kommentio.updateSocialProviders) {
-                callback(window.kommentio);
-            } else {
-                setTimeout(() => waitForKommentio(callback), 100);
-            }
-        }
-
-        // Auto-enable all providers for premium demo
+        // Auto-enable all providers for premium demo (increased delay for async loading)  
         setTimeout(() => {
-            waitForKommentio((kommentio) => {
-                kommentio.updateSocialProviders({
-                    google: { enabled: true, label: 'Google', color: '#4285f4', icon: '🔍' },
-                    github: { enabled: true, label: 'GitHub', color: '#333', icon: '🐙' },
-                    facebook: { enabled: true, label: 'Facebook', color: '#1877f2', icon: '📘' },
-                    twitter: { enabled: true, label: 'X.com', color: '#000', icon: '🐦' },
-                    apple: { enabled: true, label: 'Apple', color: '#000', icon: '🍎' },
-                    linkedin: { enabled: true, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
-                    kakao: { enabled: true, label: '카카오톡', color: '#fee500', icon: '💬' }
-                });
-            });
-        }, 2000);
+            // Use a simple check instead of the conflicting waitForKommentio
+            const checkWidget = () => {
+                if (window.kommentio && window.kommentio.updateSocialProviders) {
+                    window.kommentio.updateSocialProviders({
+                        google: { enabled: true, label: 'Google', color: '#4285f4', icon: '🔍' },
+                        github: { enabled: true, label: 'GitHub', color: '#333', icon: '🐙' },
+                        facebook: { enabled: true, label: 'Facebook', color: '#1877f2', icon: '📘' },
+                        twitter: { enabled: true, label: 'X.com', color: '#000', icon: '🐦' },
+                        apple: { enabled: true, label: 'Apple', color: '#000', icon: '🍎' },
+                        linkedin: { enabled: true, label: 'LinkedIn', color: '#0077b5', icon: '💼' },
+                        kakao: { enabled: true, label: '카카오톡', color: '#fee500', icon: '💬' }
+                    });
+                } else {
+                    // If not ready, try again in 500ms
+                    setTimeout(checkWidget, 500);
+                }
+            };
+            checkWidget();
+        }, 3000); // Increased from 2s to 3s for async widget loading
 
         // Dynamic Favicon Switching for Dark/Light Mode
         function updateFavicon() {
