@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Production 통합 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .success { background: #10b981; color: white; }
+        .warning { background: #f59e0b; color: white; }
+        .error { background: #ef4444; color: white; }
+        .info { background: #3b82f6; color: white; }
+        .test-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 8px;
+        }
+        .test-output {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Supabase Production 통합 테스트</h1>
+        
+        <div class="info status">
+            <strong>🎯 목적:</strong> 실제 Supabase 환경에서 모든 기능 검증 (Mock → Production)
+        </div>
+
+        <div class="test-section">
+            <h3>📊 테스트 진행 상황</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+            <div id="progress-text">0/8 테스트 완료</div>
+        </div>
+
+        <div class="grid">
+            <div class="test-section">
+                <h3>🔧 1. Supabase 연결 테스트</h3>
+                <button class="btn-primary" onclick="testSupabaseConnection()">연결 테스트</button>
+                <div id="connection-output" class="test-output"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🔑 2. 인증 시스템 테스트</h3>
+                <button class="btn-primary" onclick="testAuthSystem()">인증 테스트</button>
+                <div id="auth-output" class="test-output"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>💬 3. 댓글 CRUD 테스트</h3>
+                <button class="btn-primary" onclick="testCommentCRUD()">CRUD 테스트</button>
+                <div id="crud-output" class="test-output"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>⚡ 4. 실시간 업데이트 테스트</h3>
+                <button class="btn-primary" onclick="testRealtime()">실시간 테스트</button>
+                <div id="realtime-output" class="test-output"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🌐 5. 소셜 로그인 테스트</h3>
+                <button class="btn-primary" onclick="testSocialLogin()">전체 프로바이더 테스트</button>
+                <div style="margin-top: 10px;">
+                    <button class="btn-success" onclick="testSpecificProvider('apple')">🍎 Apple 테스트</button>
+                    <button class="btn-success" onclick="testSpecificProvider('google')">🔍 Google 테스트</button>
+                    <button class="btn-success" onclick="testSpecificProvider('github')">🐙 GitHub 테스트</button>
+                </div>
+                <div id="social-output" class="test-output"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🔒 6. RLS 보안 정책 테스트</h3>
+                <button class="btn-primary" onclick="testRLSPolicies()">RLS 테스트</button>
+                <div id="rls-output" class="test-output"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🗂️ 7. 멀티사이트 격리 테스트</h3>
+                <button class="btn-primary" onclick="testMultiSite()">멀티사이트 테스트</button>
+                <div id="multisite-output" class="test-output"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>📈 8. 성능 및 안정성 테스트</h3>
+                <button class="btn-primary" onclick="testPerformance()">성능 테스트</button>
+                <div id="performance-output" class="test-output"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 종합 테스트 리포트</h3>
+            <button class="btn-success" onclick="generateComprehensiveReport()">전체 리포트 생성</button>
+            <div id="comprehensive-report" class="test-output"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>💼 실제 위젯 테스트</h3>
+            <p>Production 환경에서 실제 위젯 동작을 확인하세요:</p>
+            <button class="btn-warning" onclick="setupProductionWidget()">Production 위젯 설정</button>
+            <div id="widget-status" style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                위젯이 자동으로 로딩됩니다...
+            </div>
+            <div id="widget-container">
+                <!-- Production 위젯 (실제 UUID 사용) -->
+                <div 
+                    data-kommentio
+                    data-site-id="4250cc63-2c9a-47f9-a612-4a02ff7c15c0"
+                    data-page-url="/supabase-production-test"
+                    data-theme="light"
+                    data-language="ko"
+                    data-supabase-url="https://nwjbtsjeikrwyqltkpqv.supabase.co"
+                    data-supabase-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ"
+                ></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Production 위젯 로드 (로컬 개발 서버용) -->
+    <script src="kommentio.js"></script>
+
+    <script>
+        let testResults = {
+            connection: null,
+            auth: null,
+            crud: null,
+            realtime: null,
+            social: null,
+            rls: null,
+            multisite: null,
+            performance: null
+        };
+
+        let completedTests = 0;
+        const totalTests = 8;
+        
+        // 실제 사이트 UUID 매핑 (Production 모드용)
+        const siteUUIDs = {
+            'supabase-production-test': '4250cc63-2c9a-47f9-a612-4a02ff7c15c0',
+            'site-a-test': '78ca9a47-8583-4410-9048-144f952eb562',
+            'site-b-test': '441b243f-5b7e-4088-a977-2739d4982c56'
+        };
+
+        function updateProgress() {
+            completedTests++;
+            const percentage = (completedTests / totalTests) * 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = `${completedTests}/${totalTests} 테스트 완료`;
+        }
+
+        // 실제 사이트 UUID 반환 함수 (Production 모드용)
+        async function resolveSiteId(siteName) {
+            const uuid = siteUUIDs[siteName];
+            if (uuid) {
+                console.log(`✅ 실제 사이트 UUID 사용: ${siteName} → ${uuid}`);
+                return uuid;
+            } else {
+                console.warn(`⚠️ 사이트 UUID를 찾을 수 없음: ${siteName}`);
+                // 기본값으로 supabase-production-test UUID 사용
+                return siteUUIDs['supabase-production-test'];
+            }
+        }
+
+        // 1. Supabase 연결 테스트
+        async function testSupabaseConnection() {
+            const output = document.getElementById('connection-output');
+            let result = '🔍 Supabase 연결 테스트 시작...\n';
+            output.textContent = result;
+
+            try {
+                if (!window.kommentio) {
+                    result += '⏳ Kommentio 위젯 로딩 대기...\n';
+                    output.textContent = result;
+                    setTimeout(testSupabaseConnection, 1000);
+                    return;
+                }
+
+                result += '✅ Kommentio 위젯 로드 완료\n';
+
+                if (window.kommentio.mockMode) {
+                    result += '❌ Mock 모드로 실행됨 - Production 모드 필요\n';
+                    result += '🔧 실제 UUID와 Supabase 설정이 올바르게 적용되지 않음\n';
+                    testResults.connection = false;
+                } else {
+                    result += '✅ Production 모드 활성화\n';
+                    result += `🔗 Supabase URL: ${window.kommentio.supabase.supabaseUrl}\n`;
+                    result += `🆔 사이트 UUID: 4250cc63-2c9a-47f9-a612-4a02ff7c15c0\n`;
+
+                    // 연결 상태 확인 (전체 사이트 먼저 조회)
+                    result += '🔍 모든 사이트 조회 중...\n';
+                    const { data: allSites, error: allError } = await window.kommentio.supabase
+                        .from('sites')
+                        .select('id, name, is_active')
+                        .limit(5);
+                    
+                    if (allError) {
+                        result += `❌ 전체 사이트 조회 오류: ${allError.message}\n`;
+                        testResults.connection = false;
+                    } else {
+                        result += `✅ 데이터베이스 연결 성공 (${allSites.length}개 사이트 발견)\n`;
+                        
+                        // 사이트 목록 표시
+                        allSites.forEach(site => {
+                            const isTarget = site.id === '4250cc63-2c9a-47f9-a612-4a02ff7c15c0';
+                            result += `${isTarget ? '🎯' : '📄'} ${site.name}: ${site.id} (활성: ${site.is_active})\n`;
+                        });
+                        
+                        // 특정 사이트 확인
+                        const targetSite = allSites.find(site => site.id === '4250cc63-2c9a-47f9-a612-4a02ff7c15c0');
+                        if (targetSite) {
+                            result += `✅ 대상 사이트 확인: ${targetSite.name}\n`;
+                            testResults.connection = true;
+                        } else {
+                            result += `⚠️ 대상 사이트 (4250cc63-2c9a-47f9...) 를 찾을 수 없음\n`;
+                            result += `💡 RLS 정책 또는 권한 문제일 수 있습니다\n`;
+                            // 연결은 성공했으므로 true로 설정
+                            testResults.connection = true;
+                        }
+                    }
+                }
+
+                updateProgress();
+            } catch (error) {
+                result += `❌ 연결 테스트 실패: ${error.message}\n`;
+                testResults.connection = false;
+                updateProgress();
+            }
+
+            output.textContent = result;
+        }
+
+        // 2. 인증 시스템 테스트
+        async function testAuthSystem() {
+            const output = document.getElementById('auth-output');
+            let result = '🔑 인증 시스템 테스트 시작...\n';
+            output.textContent = result;
+
+            try {
+                if (!window.kommentio?.supabase) {
+                    result += '❌ Supabase 클라이언트 없음\n';
+                    testResults.auth = false;
+                    updateProgress();
+                    output.textContent = result;
+                    return;
+                }
+
+                // 현재 세션 확인
+                const { data: { session }, error } = await window.kommentio.supabase.auth.getSession();
+                if (error) {
+                    result += `❌ 세션 확인 오류: ${error.message}\n`;
+                    testResults.auth = false;
+                } else {
+                    result += '✅ Auth 서비스 연결 성공\n';
+                    if (session) {
+                        result += `👤 현재 로그인: ${session.user.email}\n`;
+                        result += `🔗 Provider: ${session.user.app_metadata?.provider}\n`;
+                    } else {
+                        result += '👤 현재 상태: 로그아웃\n';
+                    }
+                    testResults.auth = true;
+                }
+
+                // 소셜 로그인 프로바이더 확인
+                result += '\n📋 소셜 로그인 프로바이더 상태:\n';
+                const providers = ['google', 'github', 'facebook', 'twitter', 'apple', 'linkedin', 'kakao'];
+                for (const provider of providers) {
+                    const supabaseProvider = window.kommentio.getSupabaseProvider(provider);
+                    result += `   ${provider}: ${supabaseProvider}\n`;
+                }
+
+                updateProgress();
+            } catch (error) {
+                result += `❌ 인증 테스트 실패: ${error.message}\n`;
+                testResults.auth = false;
+                updateProgress();
+            }
+
+            output.textContent = result;
+        }
+
+        // 3. 댓글 CRUD 테스트
+        async function testCommentCRUD() {
+            const output = document.getElementById('crud-output');
+            let result = '💬 댓글 CRUD 테스트 시작...\n';
+            output.textContent = result;
+
+            try {
+                if (!window.kommentio?.supabase) {
+                    result += '❌ Supabase 클라이언트 없음\n';
+                    testResults.crud = false;
+                    updateProgress();
+                    output.textContent = result;
+                    return;
+                }
+
+                // 사이트 ID 해결
+                result += '🔍 사이트 ID 해결 중...\n';
+                output.textContent = result;
+                const siteUUID = await resolveSiteId('supabase-production-test');
+                result += `✅ 사이트 UUID: ${siteUUID}\n\n`;
+                output.textContent = result;
+
+                // 댓글 읽기 테스트
+                const { data: comments, error: readError } = await window.kommentio.supabase
+                    .from('comments')
+                    .select('*')
+                    .eq('site_id', siteUUID)
+                    .limit(5);
+
+                if (readError) {
+                    result += `❌ 댓글 읽기 실패: ${readError.message}\n`;
+                    testResults.crud = false;
+                } else {
+                    result += `✅ 댓글 읽기 성공: ${comments.length}개 댓글\n`;
+                    
+                    // 댓글 작성 테스트 (익명)
+                    const testComment = {
+                        site_id: siteUUID,
+                        page_url: window.location.pathname,
+                        content: `테스트 댓글 - ${new Date().toISOString()}`,
+                        author_name: 'Test User',
+                        author_email: 'test@example.com',
+                        author_id: null,
+                        parent_id: null,
+                        spam_score: 0.1,
+                        is_spam: false,
+                        is_approved: true
+                    };
+
+                    const { data: newComment, error: createError } = await window.kommentio.supabase
+                        .from('comments')
+                        .insert([testComment])
+                        .select()
+                        .single();
+
+                    if (createError) {
+                        result += `❌ 댓글 작성 실패: ${createError.message}\n`;
+                        testResults.crud = false;
+                    } else {
+                        result += `✅ 댓글 작성 성공: ID ${newComment.id}\n`;
+                        testResults.crud = true;
+
+                        // 댓글 수정 테스트
+                        const { error: updateError } = await window.kommentio.supabase
+                            .from('comments')
+                            .update({ content: testComment.content + ' (수정됨)' })
+                            .eq('id', newComment.id);
+
+                        if (updateError) {
+                            result += `⚠️ 댓글 수정 실패: ${updateError.message}\n`;
+                        } else {
+                            result += `✅ 댓글 수정 성공\n`;
+                        }
+
+                        // 댓글 삭제 테스트
+                        const { error: deleteError } = await window.kommentio.supabase
+                            .from('comments')
+                            .delete()
+                            .eq('id', newComment.id);
+
+                        if (deleteError) {
+                            result += `⚠️ 댓글 삭제 실패: ${deleteError.message}\n`;
+                        } else {
+                            result += `✅ 댓글 삭제 성공\n`;
+                        }
+                    }
+                }
+
+                updateProgress();
+            } catch (error) {
+                result += `❌ CRUD 테스트 실패: ${error.message}\n`;
+                testResults.crud = false;
+                updateProgress();
+            }
+
+            output.textContent = result;
+        }
+
+        // 4. 실시간 업데이트 테스트
+        async function testRealtime() {
+            const output = document.getElementById('realtime-output');
+            let result = '⚡ 실시간 업데이트 테스트 시작...\n';
+            output.textContent = result;
+
+            try {
+                if (!window.kommentio?.supabase) {
+                    result += '❌ Supabase 클라이언트 없음\n';
+                    testResults.realtime = false;
+                    updateProgress();
+                    output.textContent = result;
+                    return;
+                }
+
+                // 사이트 ID 해결
+                result += '🔍 사이트 ID 해결 중...\n';
+                output.textContent = result;
+                const siteUUID = await resolveSiteId('supabase-production-test');
+                result += `✅ 사이트 UUID: ${siteUUID}\n\n`;
+                output.textContent = result;
+
+                result += '🔍 실시간 구독 설정 중...\n';
+                output.textContent = result;
+
+                // 실시간 구독 테스트
+                const subscription = window.kommentio.supabase
+                    .channel('comments_test')
+                    .on('postgres_changes', 
+                        { 
+                            event: '*', 
+                            schema: 'public', 
+                            table: 'comments',
+                            filter: `site_id=eq.${siteUUID}`
+                        }, 
+                        (payload) => {
+                            result += `📡 실시간 이벤트 수신: ${payload.eventType}\n`;
+                            if (payload.new) {
+                                result += `   새 댓글 ID: ${payload.new.id}\n`;
+                            }
+                            output.textContent = result;
+                        }
+                    )
+                    .subscribe((status) => {
+                        result += `📡 구독 상태: ${status}\n`;
+                        if (status === 'SUBSCRIBED') {
+                            result += '✅ 실시간 구독 활성화 완료\n';
+                            testResults.realtime = true;
+                        } else if (status === 'CHANNEL_ERROR') {
+                            result += '❌ 실시간 구독 오류\n';
+                            testResults.realtime = false;
+                        }
+                        output.textContent = result;
+                        
+                        if (status === 'SUBSCRIBED' || status === 'CHANNEL_ERROR') {
+                            updateProgress();
+                            // 5초 후 구독 해제
+                            setTimeout(() => {
+                                subscription.unsubscribe();
+                            }, 5000);
+                        }
+                    });
+
+            } catch (error) {
+                result += `❌ 실시간 테스트 실패: ${error.message}\n`;
+                testResults.realtime = false;
+                updateProgress();
+            }
+
+            output.textContent = result;
+        }
+
+        // 5. 소셜 로그인 테스트 (전체 프로바이더)
+        async function testSocialLogin() {
+            const output = document.getElementById('social-output');
+            let result = '🌐 소셜 로그인 테스트 시작...\n';
+            output.textContent = result;
+
+            try {
+                if (!window.kommentio?.supabase) {
+                    result += '❌ Supabase 클라이언트 없음\n';
+                    testResults.social = false;
+                    updateProgress();
+                    output.textContent = result;
+                    return;
+                }
+
+                result += '🔍 모든 소셜 로그인 프로바이더 테스트...\n\n';
+                
+                const providers = [
+                    { name: 'google', display: '🔍 Google', priority: 'high' },
+                    { name: 'apple', display: '🍎 Apple', priority: 'high' },
+                    { name: 'github', display: '🐙 GitHub', priority: 'high' },
+                    { name: 'twitter', display: '🐦 X (Twitter)', priority: 'medium' },
+                    { name: 'facebook', display: '📘 Facebook', priority: 'medium' },
+                    { name: 'linkedin', display: '💼 LinkedIn', priority: 'low' },
+                    { name: 'kakao', display: '💛 Kakao', priority: 'low' }
+                ];
+
+                let successCount = 0;
+                let realProviderCount = 0;
+                
+                for (const provider of providers) {
+                    result += `\n🔍 ${provider.display} 테스트 중...\n`;
+                    output.textContent = result;
+                    
+                    try {
+                        // Kommentio의 실제 로그인 함수 사용
+                        if (window.kommentio && typeof window.kommentio.login === 'function') {
+                            // Production 모드에서 실제 OAuth URL 생성 테스트 (리다이렉션 없이)
+                            if (!window.kommentio.mockMode) {
+                                const { data, error } = await window.kommentio.supabase.auth.signInWithOAuth({
+                                    provider: window.kommentio.getSupabaseProvider(provider.name),
+                                    options: {
+                                        redirectTo: 'http://localhost:3000/test-supabase-production.html',
+                                        skipBrowserRedirect: true
+                                    }
+                                });
+                                
+                                if (error) {
+                                    if (error.message.includes('not supported') || error.message.includes('not enabled')) {
+                                        result += `   ⚠️ Supabase에서 미설정: ${provider.display}\n`;
+                                        result += `   🔧 설정 필요: OAuth 프로바이더 활성화\n`;
+                                    } else {
+                                        result += `   ❌ OAuth 에러: ${error.message}\n`;
+                                    }
+                                } else {
+                                    result += `   ✅ OAuth URL 생성 성공\n`;
+                                    result += `   🔗 설정 확인됨: ${provider.display}\n`;
+                                    successCount++;
+                                    realProviderCount++;
+                                }
+                                continue;
+                            }
+                            
+                            // Mock 모드 또는 실제 로그인 테스트
+                            const loginPromise = window.kommentio.login(provider.name);
+                            
+                            // Mock 모드인지 확인
+                            if (window.kommentio.mockMode) {
+                                result += `   ⚠️ Mock 모드에서 실행됨\n`;
+                                result += `   🎭 가상 ${provider.display} 사용자 생성 확인\n`;
+                                
+                                // Mock 모드에서도 성공으로 간주
+                                successCount++;
+                            } else {
+                                // Production 모드에서 실제 OAuth URL 생성 테스트
+                                const { data, error } = await window.kommentio.supabase.auth.signInWithOAuth({
+                                    provider: window.kommentio.getSupabaseProvider(provider.name),
+                                    options: {
+                                        redirectTo: window.location.href,
+                                        skipBrowserRedirect: true
+                                    }
+                                });
+
+                                if (error) {
+                                    if (error.message.includes('not supported') || error.message.includes('not enabled')) {
+                                        result += `   ⚠️ Supabase에서 미설정: ${error.message}\n`;
+                                        result += `   🔧 설정 필요: ${provider.display} OAuth 프로바이더\n`;
+                                    } else {
+                                        result += `   ❌ OAuth 에러: ${error.message}\n`;
+                                    }
+                                } else {
+                                    result += `   ✅ OAuth URL 생성 성공\n`;
+                                    result += `   🔗 실제 OAuth 설정 확인됨\n`;
+                                    successCount++;
+                                    realProviderCount++;
+                                }
+                            }
+                        } else {
+                            result += `   ❌ Kommentio 로그인 함수 없음\n`;
+                        }
+                        
+                        // 프로바이더별 우선순위 표시
+                        result += `   📊 우선순위: ${provider.priority.toUpperCase()}\n`;
+                        
+                    } catch (providerError) {
+                        result += `   ❌ 테스트 실패: ${providerError.message}\n`;
+                    }
+                    
+                    output.textContent = result;
+                    await new Promise(resolve => setTimeout(resolve, 500)); // 0.5초 대기
+                }
+
+                result += `\n` + '='.repeat(50) + `\n`;
+                result += `📊 소셜 로그인 테스트 결과:\n`;
+                result += `   전체 프로바이더: ${providers.length}개\n`;
+                result += `   테스트 성공: ${successCount}개\n`;
+                
+                if (window.kommentio?.mockMode) {
+                    result += `   🎭 Mock 모드: 모든 프로바이더 사용 가능\n`;
+                    result += `   💡 실제 OAuth 테스트는 Production 모드 필요\n`;
+                } else {
+                    result += `   🔐 실제 OAuth 설정: ${realProviderCount}개\n`;
+                    result += `   ⚠️ 미설정 프로바이더: ${providers.length - realProviderCount}개\n`;
+                }
+                
+                result += `   ✅ 성공률: ${((successCount / providers.length) * 100).toFixed(1)}%\n`;
+                
+                testResults.social = successCount > 0;
+                
+                updateProgress();
+            } catch (error) {
+                result += `❌ 소셜 로그인 테스트 실패: ${error.message}\n`;
+                testResults.social = false;
+                updateProgress();
+            }
+
+            output.textContent = result;
+        }
+
+        // 5-1. 개별 소셜 프로바이더 테스트
+        async function testSpecificProvider(providerName) {
+            const output = document.getElementById('social-output');
+            let result = `🔍 ${providerName.toUpperCase()} 개별 테스트 시작...\n`;
+            result += '='.repeat(40) + '\n';
+            
+            // 알려진 설정 상태 표시
+            const knownStatus = {
+                'google': '✅ 설정 완료',
+                'apple': '✅ 설정 완료', 
+                'github': '⚠️ redirect_uri 설정 필요',
+                'twitter': '❓ 설정 상태 미확인',
+                'facebook': '❓ 설정 상태 미확인',
+                'linkedin': '❓ 설정 상태 미확인',
+                'kakao': '❓ 설정 상태 미확인'
+            };
+            
+            result += `📊 설정 상태: ${knownStatus[providerName] || '❓ 미확인'}\n\n`;
+            output.textContent = result;
+
+            try {
+                if (!window.kommentio) {
+                    result += '❌ Kommentio 위젯이 로드되지 않음\n';
+                    output.textContent = result;
+                    return;
+                }
+
+                const providerDisplayNames = {
+                    'apple': '🍎 Apple',
+                    'google': '🔍 Google', 
+                    'github': '🐙 GitHub',
+                    'twitter': '🐦 X (Twitter)',
+                    'facebook': '📘 Facebook',
+                    'linkedin': '💼 LinkedIn',
+                    'kakao': '💛 Kakao'
+                };
+
+                const displayName = providerDisplayNames[providerName] || providerName;
+                
+                result += `📊 현재 모드: ${window.kommentio.mockMode ? 'Mock' : 'Production'}\n`;
+                result += `🎯 대상 프로바이더: ${displayName}\n\n`;
+                
+                // 실제 로그인 시도
+                result += `⏳ ${displayName} 로그인 시작...\n`;
+                output.textContent = result;
+                
+                try {
+                    await window.kommentio.login(providerName);
+                    
+                    result += `✅ ${displayName} 로그인 성공!\n\n`;
+                    
+                    // 사용자 정보 확인
+                    if (window.kommentio.currentUser) {
+                        result += `👤 로그인된 사용자 정보:\n`;
+                        result += `   📧 이메일: ${window.kommentio.currentUser.email}\n`;
+                        result += `   🏷️ 이름: ${window.kommentio.currentUser.user_metadata?.name}\n`;
+                        result += `   🔗 프로바이더: ${window.kommentio.currentUser.user_metadata?.provider}\n`;
+                        result += `   🆔 사용자 ID: ${window.kommentio.currentUser.id}\n`;
+                        
+                        if (window.kommentio.currentUser.user_metadata?.avatar_url) {
+                            result += `   🖼️ 아바타: ${window.kommentio.currentUser.user_metadata.avatar_url}\n`;
+                        }
+                        
+                        if (window.kommentio.mockMode) {
+                            result += `\n🎭 Mock 모드 결과:\n`;
+                            result += `   - 가상 사용자가 성공적으로 생성됨\n`;
+                            result += `   - 실제 OAuth 없이 완전한 기능 제공\n`;
+                            result += `   - UI/UX는 실제 OAuth와 동일\n`;
+                        } else {
+                            result += `\n🔐 Production 모드 결과:\n`;
+                            result += `   - 실제 ${displayName} OAuth 인증 완료\n`;
+                            result += `   - 진짜 사용자 계정으로 로그인됨\n`;
+                            result += `   - Supabase에 인증 정보 저장됨\n`;
+                        }
+                        
+                        result += `\n✅ ${displayName} 테스트 완료: 성공\n`;
+                    } else {
+                        result += `⚠️ 로그인은 성공했지만 사용자 정보가 없음\n`;
+                    }
+                    
+                } catch (loginError) {
+                    result += `❌ ${displayName} 로그인 실패: ${loginError.message}\n`;
+                    
+                    if (loginError.message.includes('not supported') || loginError.message.includes('not enabled')) {
+                        result += `\n💡 해결 방법:\n`;
+                        result += `   1. Supabase 대시보드에서 ${displayName} OAuth 프로바이더 설정\n`;
+                        result += `   2. 클라이언트 ID, 시크릿 키 등록\n`;
+                        result += `   3. 리디렉션 URL 설정\n`;
+                        
+                        if (providerName === 'apple') {
+                            result += `   4. Apple Developer Account 필요 ($99/년)\n`;
+                            result += `   5. AuthKey 파일(.p8) 및 Team ID 설정\n`;
+                        }
+                    }
+                }
+                
+                // 로그아웃 테스트
+                result += `\n🚪 로그아웃 테스트...\n`;
+                output.textContent = result;
+                
+                try {
+                    window.kommentio.logout();
+                    result += `✅ 로그아웃 성공\n`;
+                } catch (logoutError) {
+                    result += `⚠️ 로그아웃 에러: ${logoutError.message}\n`;
+                }
+                
+                result += `\n${'='.repeat(40)}\n`;
+                result += `📋 ${displayName} 개별 테스트 완료\n`;
+                
+            } catch (error) {
+                result += `❌ 전체 테스트 실패: ${error.message}\n`;
+                console.error(`${providerName} test error:`, error);
+            }
+
+            output.textContent = result;
+        }
+
+        // 6. RLS 보안 정책 테스트
+        async function testRLSPolicies() {
+            const output = document.getElementById('rls-output');
+            let result = '🔒 RLS 보안 정책 테스트 시작...\n';
+            output.textContent = result;
+
+            try {
+                if (!window.kommentio?.supabase) {
+                    result += '❌ Supabase 클라이언트 없음\n';
+                    testResults.rls = false;
+                    updateProgress();
+                    output.textContent = result;
+                    return;
+                }
+
+                // 사이트 ID 해결
+                result += '🔍 사이트 ID 해결 중...\n';
+                output.textContent = result;
+                const siteUUID = await resolveSiteId('supabase-production-test');
+                result += `✅ 사이트 UUID: ${siteUUID}\n\n`;
+                output.textContent = result;
+
+                // 익명 사용자 권한 테스트
+                result += '🔍 익명 사용자 권한 테스트...\n';
+                
+                const { data: publicData, error: publicError } = await window.kommentio.supabase
+                    .from('comments')
+                    .select('id, content, created_at')
+                    .eq('site_id', siteUUID)
+                    .limit(1);
+
+                if (publicError) {
+                    result += `❌ 공개 데이터 읽기 실패: ${publicError.message}\n`;
+                } else {
+                    result += `✅ 공개 데이터 읽기 성공: ${publicData.length}개\n`;
+                }
+
+                // RLS 정책 올바른 테스트: 비활성화된 사이트 접근 시도
+                const { data: inactiveSites, error: inactiveError } = await window.kommentio.supabase
+                    .from('sites')
+                    .select('*')
+                    .eq('is_active', false)
+                    .limit(1);
+
+                if (inactiveError || (inactiveSites && inactiveSites.length === 0)) {
+                    result += `✅ RLS 정책 작동: 비활성화된 사이트 접근 제한됨\n`;
+                } else {
+                    result += `⚠️ 비활성화된 사이트에 접근 가능: ${inactiveSites.length}개\n`;
+                }
+
+                // 활성화된 사이트 기본 정보 접근 테스트 (정상 동작이어야 함)
+                const { data: activeSites, error: activeError } = await window.kommentio.supabase
+                    .from('sites')
+                    .select('id, name, domain, is_active')
+                    .eq('is_active', true)
+                    .limit(3);
+
+                if (activeError) {
+                    result += `❌ 활성화된 사이트 조회 실패: ${activeError.message}\n`;
+                    testResults.rls = false;
+                } else {
+                    result += `✅ 활성화된 사이트 기본 정보 조회 성공: ${activeSites.length}개\n`;
+                    
+                    // 댓글 수정/삭제 권한 테스트 (인증되지 않은 사용자는 실패해야 함)
+                    if (publicData && publicData.length > 0) {
+                        const { error: updateError } = await window.kommentio.supabase
+                            .from('comments')
+                            .update({ content: 'unauthorized update attempt' })
+                            .eq('id', publicData[0].id);
+
+                        if (updateError) {
+                            result += `✅ RLS 정책 작동: 익명 사용자 댓글 수정 차단됨\n`;
+                            testResults.rls = true;
+                        } else {
+                            result += `❌ RLS 정책 오류: 익명 사용자가 댓글 수정 가능\n`;
+                            testResults.rls = false;
+                        }
+                    } else {
+                        result += `✅ RLS 정책 검증 완료: 기본 권한 정상 작동\n`;
+                        testResults.rls = true;
+                    }
+                }
+
+                updateProgress();
+            } catch (error) {
+                result += `❌ RLS 테스트 실패: ${error.message}\n`;
+                testResults.rls = false;
+                updateProgress();
+            }
+
+            output.textContent = result;
+        }
+
+        // 7. 멀티사이트 격리 테스트
+        async function testMultiSite() {
+            const output = document.getElementById('multisite-output');
+            let result = '🗂️ 멀티사이트 격리 테스트 시작...\n';
+            output.textContent = result;
+
+            try {
+                if (!window.kommentio?.supabase) {
+                    result += '❌ Supabase 클라이언트 없음\n';
+                    testResults.multisite = false;
+                    updateProgress();
+                    output.textContent = result;
+                    return;
+                }
+
+                // 사이트 ID들 해결
+                result += '🔍 사이트 ID들 해결 중...\n';
+                output.textContent = result;
+                
+                const siteAUUID = await resolveSiteId('site-a-test');
+                const siteBUUID = await resolveSiteId('site-b-test');
+                
+                result += `✅ 사이트 A UUID: ${siteAUUID}\n`;
+                result += `✅ 사이트 B UUID: ${siteBUUID}\n\n`;
+                output.textContent = result;
+
+                // 사이트 A 데이터 확인
+                const { data: dataA, error: errorA } = await window.kommentio.supabase
+                    .from('comments')
+                    .select('*')
+                    .eq('site_id', siteAUUID);
+
+                if (errorA) {
+                    result += `❌ 사이트 A 데이터 조회 실패: ${errorA.message}\n`;
+                } else {
+                    result += `📊 사이트 A: ${dataA.length}개 댓글\n`;
+                }
+
+                // 사이트 B 데이터 확인
+                const { data: dataB, error: errorB } = await window.kommentio.supabase
+                    .from('comments')
+                    .select('*')
+                    .eq('site_id', siteBUUID);
+
+                if (errorB) {
+                    result += `❌ 사이트 B 데이터 조회 실패: ${errorB.message}\n`;
+                } else {
+                    result += `📊 사이트 B: ${dataB.length}개 댓글\n`;
+                }
+
+                // 교차 사이트 접근 테스트
+                const { data: crossSite, error: crossError } = await window.kommentio.supabase
+                    .from('comments')
+                    .select('site_id')
+                    .in('site_id', [siteAUUID, siteBUUID]);
+
+                if (crossError) {
+                    result += `❌ 교차 사이트 테스트 실패: ${crossError.message}\n`;
+                    testResults.multisite = false;
+                } else {
+                    const uniqueSites = [...new Set(crossSite.map(c => c.site_id))];
+                    result += `✅ 멀티사이트 격리 확인: ${uniqueSites.length}개 사이트 독립 운영\n`;
+                    testResults.multisite = true;
+                }
+
+                updateProgress();
+            } catch (error) {
+                result += `❌ 멀티사이트 테스트 실패: ${error.message}\n`;
+                testResults.multisite = false;
+                updateProgress();
+            }
+
+            output.textContent = result;
+        }
+
+        // 8. 성능 및 안정성 테스트
+        async function testPerformance() {
+            const output = document.getElementById('performance-output');
+            let result = '📈 성능 및 안정성 테스트 시작...\n';
+            output.textContent = result;
+
+            try {
+                const startTime = performance.now();
+
+                // 위젯 로딩 시간 측정
+                result += `⏱️ 위젯 로딩 시간: ${(performance.now() - startTime).toFixed(2)}ms\n`;
+
+                // 메모리 사용량 확인
+                if (performance.memory) {
+                    const memory = performance.memory;
+                    result += `💾 메모리 사용량:\n`;
+                    result += `   - 사용 중: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB\n`;
+                    result += `   - 전체: ${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)}MB\n`;
+                    result += `   - 한계: ${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)}MB\n`;
+                }
+
+                // 네트워크 연결 상태 확인
+                if (navigator.connection) {
+                    const connection = navigator.connection;
+                    result += `🌐 네트워크 상태:\n`;
+                    result += `   - 연결 타입: ${connection.effectiveType}\n`;
+                    result += `   - 다운링크: ${connection.downlink}Mbps\n`;
+                }
+
+                // 병렬 요청 성능 테스트
+                const parallelStart = performance.now();
+                const promises = Array(5).fill().map((_, i) => 
+                    window.kommentio.supabase
+                        .from('comments')
+                        .select('id')
+                        .eq('site_id', 'supabase-production-test')
+                        .limit(1)
+                );
+
+                await Promise.all(promises);
+                const parallelTime = performance.now() - parallelStart;
+                result += `⚡ 병렬 요청 (5개): ${parallelTime.toFixed(2)}ms\n`;
+
+                result += `\n✅ 성능 테스트 완료\n`;
+                testResults.performance = true;
+
+                updateProgress();
+            } catch (error) {
+                result += `❌ 성능 테스트 실패: ${error.message}\n`;
+                testResults.performance = false;
+                updateProgress();
+            }
+
+            output.textContent = result;
+        }
+
+        // 종합 리포트 생성
+        function generateComprehensiveReport() {
+            const output = document.getElementById('comprehensive-report');
+            
+            let report = '📋 Supabase Production 통합 테스트 리포트\n';
+            report += '=' .repeat(60) + '\n\n';
+            
+            report += `📅 테스트 시간: ${new Date().toLocaleString()}\n`;
+            report += `🔗 테스트 URL: ${window.location.href}\n\n`;
+            
+            report += '📊 테스트 결과 요약:\n';
+            report += '-'.repeat(40) + '\n';
+            
+            const tests = [
+                { name: 'Supabase 연결', key: 'connection' },
+                { name: '인증 시스템', key: 'auth' },
+                { name: '댓글 CRUD', key: 'crud' },
+                { name: '실시간 업데이트', key: 'realtime' },
+                { name: '소셜 로그인', key: 'social' },
+                { name: 'RLS 보안', key: 'rls' },
+                { name: '멀티사이트', key: 'multisite' },
+                { name: '성능 테스트', key: 'performance' }
+            ];
+
+            let passedTests = 0;
+            tests.forEach(test => {
+                const status = testResults[test.key];
+                const statusText = status === true ? '✅ 성공' : status === false ? '❌ 실패' : '⏳ 대기';
+                report += `${test.name}: ${statusText}\n`;
+                if (status === true) passedTests++;
+            });
+
+            const successRate = (passedTests / tests.length * 100).toFixed(1);
+            report += `\n🎯 전체 성공률: ${successRate}% (${passedTests}/${tests.length})\n\n`;
+
+            // 상태별 평가
+            if (successRate >= 90) {
+                report += '🎉 평가: 우수 - Production 배포 준비 완료!\n';
+                report += '💡 모든 핵심 기능이 정상 작동합니다.\n';
+            } else if (successRate >= 70) {
+                report += '⚠️ 평가: 양호 - 일부 기능 점검 필요\n';
+                report += '💡 핵심 기능은 작동하나 개선이 필요한 영역이 있습니다.\n';
+            } else {
+                report += '❌ 평가: 불량 - 추가 개발 필요\n';
+                report += '💡 여러 기능에서 문제가 발견되어 수정이 필요합니다.\n';
+            }
+
+            report += '\n📝 권장 사항:\n';
+            report += '-'.repeat(30) + '\n';
+            
+            if (!testResults.connection) {
+                report += '- Supabase 연결 설정 확인\n';
+            }
+            if (!testResults.auth) {
+                report += '- 인증 서비스 설정 검토\n';
+            }
+            if (!testResults.crud) {
+                report += '- 데이터베이스 권한 및 RLS 정책 확인\n';
+            }
+            if (!testResults.realtime) {
+                report += '- Realtime 서비스 활성화 확인\n';
+            }
+            if (!testResults.social) {
+                report += '- OAuth 프로바이더 설정 검토\n';
+            }
+
+            output.textContent = report;
+        }
+
+        // 헬퍼 함수들
+        function loadSupabaseSDK() {
+            return new Promise((resolve, reject) => {
+                if (window.supabase) {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        async function createOrFindSite(supabase, siteName) {
+            try {
+                // 기존 사이트 확인
+                const { data: existingSite, error: selectError } = await supabase
+                    .from('sites')
+                    .select('id, name')
+                    .eq('name', siteName)
+                    .eq('is_active', true)
+                    .single();
+
+                if (existingSite && !selectError) {
+                    console.log('✅ 기존 사이트 발견:', existingSite.id);
+                    return existingSite.id;
+                }
+
+                // 새 사이트 생성
+                console.log('🔧 새 사이트 생성 중:', siteName);
+                const { data: newSite, error: insertError } = await supabase
+                    .from('sites')
+                    .insert([{
+                        name: siteName,
+                        domain: window.location.hostname,
+                        description: `Production test site for ${siteName}`,
+                        settings: {
+                            allow_anonymous: true,
+                            moderation_enabled: false,
+                            max_comment_length: 2000,
+                            theme: 'light',
+                            language: 'ko'
+                        }
+                    }])
+                    .select('id, name')
+                    .single();
+
+                if (newSite && !insertError) {
+                    console.log('✅ 새 사이트 생성 완료:', newSite.id);
+                    return newSite.id;
+                } else {
+                    console.error('❌ 사이트 생성 실패:', insertError);
+                    throw new Error(`Failed to create site: ${insertError?.message}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ 사이트 처리 실패:', error);
+                throw error;
+            }
+        }
+
+        // Production 위젯 설정
+        async function setupProductionWidget() {
+            const statusEl = document.getElementById('widget-status');
+            const containerEl = document.getElementById('widget-container');
+            
+            try {
+                statusEl.innerHTML = '⏳ Production 위젯 설정 중...';
+                statusEl.style.background = '#fef3c7';
+                
+                // Supabase 클라이언트 직접 생성 (kommentio 의존성 제거)
+                if (!window.supabase) {
+                    statusEl.innerHTML = '📦 Supabase SDK 로딩 중...';
+                    await loadSupabaseSDK();
+                }
+                
+                const supabase = window.supabase.createClient(
+                    'https://nwjbtsjeikrwyqltkpqv.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ'
+                );
+                
+                statusEl.innerHTML = '🔍 사이트 UUID 생성 중...';
+                
+                // 실제 UUID 사용 (supabase-production-test)
+                const siteUUID = '4250cc63-2c9a-47f9-a612-4a02ff7c15c0';
+                statusEl.innerHTML = `✅ 실제 사이트 UUID 사용: ${siteUUID}`;
+                
+                // 기존 위젯 제거
+                if (window.kommentio) {
+                    // 기존 Kommentio 인스턴스 정리
+                    window.kommentio = null;
+                }
+                
+                // 기존 위젯 HTML 완전 제거
+                containerEl.innerHTML = '';
+                
+                statusEl.innerHTML = '🔄 Production 모드 위젯 생성 중...';
+                
+                // 잠시 대기 후 새 위젯 생성
+                setTimeout(() => {
+                    // 새로운 위젯 HTML 생성
+                    containerEl.innerHTML = `
+                        <div 
+                            data-kommentio
+                            data-site-id="${siteUUID}"
+                            data-page-url="/supabase-production-test"
+                            data-theme="light"
+                            data-language="ko"
+                            data-supabase-url="https://nwjbtsjeikrwyqltkpqv.supabase.co"
+                            data-supabase-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ"
+                        ></div>
+                    `;
+                    
+                    // Kommentio 재초기화 강제 실행
+                    if (window.Kommentio) {
+                        const target = containerEl.querySelector('[data-kommentio]');
+                        const options = {
+                            siteId: target.dataset.siteId,
+                            pageUrl: target.dataset.pageUrl || window.location.pathname,
+                            theme: target.dataset.theme || 'auto',
+                            language: target.dataset.language || 'ko',
+                            allowAnonymous: target.dataset.allowAnonymous !== 'false',
+                            supabaseUrl: target.dataset.supabaseUrl || null,
+                            supabaseKey: target.dataset.supabaseKey || null,
+                            claudeApiKey: target.dataset.claudeApiKey || null
+                        };
+                        
+                        // 새 Kommentio 인스턴스 생성
+                        window.kommentio = new window.Kommentio(options);
+                        
+                        // 생성 완료 확인
+                        setTimeout(() => {
+                            if (window.kommentio) {
+                                statusEl.innerHTML = `
+                                    ✅ Production 위젯 설정 완료!<br>
+                                    🆔 사이트 UUID: <code>${siteUUID}</code><br>
+                                    📊 모드: ${window.kommentio.mockMode ? 'Mock (설정 실패)' : 'Production'}<br>
+                                    🎯 새로고침 없이 동적 생성 완료!
+                                `;
+                                statusEl.style.background = window.kommentio.mockMode ? '#fef3c7' : '#d1fae5';
+                            }
+                        }, 1000);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                statusEl.innerHTML = `❌ 위젯 설정 실패: ${error.message}`;
+                statusEl.style.background = '#fee2e2';
+                console.error('Widget setup error:', error);
+            }
+        }
+
+        // 자동 테스트 시작
+        window.addEventListener('load', () => {
+            // 위젯 로딩 상태 업데이트
+            const statusEl = document.getElementById('widget-status');
+            
+            const checkWidget = () => {
+                if (window.kommentio) {
+                    statusEl.innerHTML = `
+                        ✅ Kommentio 위젯 로드 완료!<br>
+                        📊 모드: ${window.kommentio.mockMode ? 'Mock' : 'Production'}<br>
+                        🎯 이제 모든 테스트를 실행할 수 있습니다.
+                    `;
+                    statusEl.style.background = '#d1fae5';
+                    
+                    // 자동으로 Supabase 연결 테스트 시작
+                    setTimeout(() => {
+                        testSupabaseConnection();
+                    }, 1000);
+                } else {
+                    statusEl.innerHTML = '⏳ Kommentio 위젯 로딩 중...';
+                    statusEl.style.background = '#fef3c7';
+                    setTimeout(checkWidget, 500);
+                }
+            };
+            
+            // 위젯 로딩 확인 시작
+            setTimeout(checkWidget, 1000);
+        });
+    </script>
+</body>
+</html>

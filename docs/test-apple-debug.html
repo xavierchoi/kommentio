@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Login 디버그 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f7;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .mode-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .test-btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+        .test-btn-secondary {
+            background: #6c757d;
+        }
+        .test-btn-secondary:hover {
+            background: #545b62;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            white-space: pre-wrap;
+        }
+        .current-mode {
+            font-weight: bold;
+            color: #007aff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍎 Apple Login 디버그 테스트</h1>
+        
+        <div class="mode-info">
+            <h3>현재 모드: <span class="current-mode" id="current-mode">확인 중...</span></h3>
+            <p id="mode-description">모드 정보를 확인하는 중입니다...</p>
+        </div>
+        
+        <div>
+            <button class="test-btn" onclick="testAppleLogin()">🍎 Apple 로그인 테스트</button>
+            <button class="test-btn test-btn-secondary" onclick="toggleMode()">🔄 모드 전환 (Mock ↔ Production)</button>
+            <button class="test-btn test-btn-secondary" onclick="checkCurrentMode()">📊 현재 모드 확인</button>
+            <button class="test-btn test-btn-secondary" onclick="clearLog()">🗑️ 로그 지우기</button>
+        </div>
+        
+        <div class="log" id="log">테스트 로그가 여기에 표시됩니다...\n</div>
+        
+        <!-- Kommentio 위젯 -->
+        <div 
+            id="kommentio-widget"
+            data-kommentio
+            data-site-id="apple-debug-test"
+            data-page-url="/apple-debug"
+            data-theme="light"
+            data-supabase-url=""
+            data-supabase-key=""
+        ></div>
+    </div>
+
+    <script src="kommentio.js"></script>
+    
+    <script>
+        let currentMode = 'mock'; // 기본값
+        
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logEl.textContent += `[${time}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(`[${time}] ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').textContent = '로그 지워짐.\n';
+        }
+        
+        function updateModeDisplay() {
+            const modeEl = document.getElementById('current-mode');
+            const descEl = document.getElementById('mode-description');
+            
+            if (currentMode === 'mock') {
+                modeEl.textContent = 'Mock 모드';
+                modeEl.style.color = '#ff9500';
+                descEl.textContent = 'Mock 모드: Supabase 없이 가상 사용자로 테스트합니다.';
+            } else {
+                modeEl.textContent = 'Production 모드';
+                modeEl.style.color = '#007aff';
+                descEl.textContent = 'Production 모드: 실제 Supabase와 Apple OAuth를 사용합니다.';
+            }
+        }
+        
+        function toggleMode() {
+            log('🔄 모드 전환 시작...');
+            
+            try {
+                const widget = document.getElementById('kommentio-widget');
+                
+                if (currentMode === 'mock') {
+                    // Mock → Production
+                    currentMode = 'production';
+                    widget.setAttribute('data-supabase-url', 'https://nwjbtsjeikrwyqltkpqv.supabase.co');
+                    widget.setAttribute('data-supabase-key', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ');
+                    log('✅ Production 모드로 전환됨');
+                    log('🔧 Supabase URL: nwjbtsjeikrwyqltkpqv.supabase.co');
+                    
+                    // URL 파라미터로 모드 설정하여 페이지 새로고침
+                    log('🔄 Production 모드로 페이지 새로고침...');
+                    setTimeout(() => {
+                        window.location.href = window.location.pathname + '?mode=production';
+                    }, 1000);
+                    
+                } else {
+                    // Production → Mock
+                    currentMode = 'mock';
+                    widget.setAttribute('data-supabase-url', '');
+                    widget.setAttribute('data-supabase-key', '');
+                    log('✅ Mock 모드로 전환됨');
+                    log('🔧 Supabase 설정 제거됨');
+                    
+                    // URL 파라미터 제거하여 페이지 새로고침
+                    log('🔄 Mock 모드로 페이지 새로고침...');
+                    setTimeout(() => {
+                        window.location.href = window.location.pathname;
+                    }, 1000);
+                }
+                
+                updateModeDisplay();
+                
+            } catch (error) {
+                log(`❌ 모드 전환 에러: ${error.message}`);
+                console.error('모드 전환 에러:', error);
+            }
+        }
+        
+        function checkCurrentMode() {
+            log('📊 현재 모드 확인 중...');
+            
+            try {
+                if (typeof kommentio === 'undefined') {
+                    log('⚠️ Kommentio 위젯이 아직 로드되지 않음');
+                    return;
+                }
+                
+                const widget = document.getElementById('kommentio-widget');
+                const supabaseUrl = widget.getAttribute('data-supabase-url');
+                
+                log(`🔧 Kommentio Mock 모드: ${kommentio.mockMode}`);
+                log(`🔧 Widget Supabase URL: ${supabaseUrl || '(없음)'}`);
+                log(`🔧 현재 설정 모드: ${currentMode}`);
+                
+                if (kommentio.currentUser) {
+                    log(`👤 현재 로그인 사용자: ${kommentio.currentUser.email}`);
+                } else {
+                    log('👤 현재 로그인 사용자: 없음');
+                }
+                
+            } catch (error) {
+                log(`❌ 모드 확인 에러: ${error.message}`);
+            }
+        }
+        
+        async function testAppleLogin() {
+            log('🍎 Apple 로그인 테스트 시작...');
+            
+            try {
+                if (typeof kommentio === 'undefined') {
+                    log('❌ Kommentio 위젯이 로드되지 않음');
+                    return;
+                }
+                
+                log(`📊 테스트 모드: ${currentMode}`);
+                log(`📊 Kommentio Mock 모드: ${kommentio.mockMode}`);
+                
+                // Apple 로그인 실행
+                log('⏳ Apple 로그인 실행 중...');
+                await kommentio.login('apple');
+                
+                log('🎉 Apple 로그인 완료!');
+                
+                // 사용자 정보 확인
+                if (kommentio.currentUser) {
+                    log(`✅ 사용자 ID: ${kommentio.currentUser.id}`);
+                    log(`✅ 이메일: ${kommentio.currentUser.email}`);
+                    log(`✅ 이름: ${kommentio.currentUser.user_metadata?.name}`);
+                    log(`✅ 프로바이더: ${kommentio.currentUser.user_metadata?.provider}`);
+                    
+                    if (kommentio.mockMode) {
+                        log('🎭 Mock 모드로 가상 사용자 생성됨');
+                    } else {
+                        log('🔐 실제 Apple OAuth 인증 완료');
+                    }
+                } else {
+                    log('⚠️ 사용자 정보를 찾을 수 없음');
+                }
+                
+            } catch (error) {
+                log(`❌ Apple 로그인 에러: ${error.message}`);
+                console.error('Apple 로그인 에러:', error);
+            }
+        }
+        
+        // 페이지 로드시 초기화
+        window.addEventListener('load', function() {
+            log('📄 Apple Login 디버그 테스트 페이지 로드됨');
+            
+            // URL 파라미터로 모드 설정 확인
+            const urlParams = new URLSearchParams(window.location.search);
+            const modeParam = urlParams.get('mode');
+            if (modeParam === 'production') {
+                currentMode = 'production';
+                const widget = document.getElementById('kommentio-widget');
+                widget.setAttribute('data-supabase-url', 'https://nwjbtsjeikrwyqltkpqv.supabase.co');
+                widget.setAttribute('data-supabase-key', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ');
+            }
+            
+            updateModeDisplay();
+            
+            setTimeout(() => {
+                if (typeof kommentio !== 'undefined') {
+                    log('✅ Kommentio 위젯 로드 완료');
+                    checkCurrentMode();
+                } else {
+                    log('❌ Kommentio 위젯 로드 실패');
+                }
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Production 테스트 수정</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f7;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #007aff;
+        }
+        .test-btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍎 Apple Production 테스트 수정</h1>
+        
+        <div class="step">
+            <h3>1단계: Supabase 사이트 생성</h3>
+            <p>실제 UUID를 가진 사이트를 데이터베이스에 생성합니다.</p>
+            <button class="test-btn" onclick="createSite()">사이트 생성</button>
+        </div>
+        
+        <div class="step">
+            <h3>2단계: Apple Production 테스트</h3>
+            <p>생성된 사이트 UUID로 실제 Apple OAuth 테스트를 진행합니다.</p>
+            <button class="test-btn" onclick="testAppleProduction()" id="testBtn" disabled>Apple 테스트 시작</button>
+        </div>
+        
+        <div class="log" id="log">사이트 생성부터 시작하세요...\n</div>
+        
+        <div id="widget-container" style="display: none;">
+            <h3>🍎 Apple Login 위젯 (Production 모드)</h3>
+            <!-- 동적으로 생성될 위젯 -->
+        </div>
+    </div>
+
+    <script>
+        let siteUUID = null;
+        
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logEl.textContent += `[${time}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        async function createSite() {
+            log('🔧 Supabase 사이트 생성 시작...');
+            
+            try {
+                // Supabase 클라이언트 초기화
+                if (!window.supabase) {
+                    log('📦 Supabase SDK 로딩 중...');
+                    await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2');
+                }
+                
+                const supabase = window.supabase.createClient(
+                    'https://nwjbtsjeikrwyqltkpqv.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ'
+                );
+                
+                log('✅ Supabase 클라이언트 생성 완료');
+                
+                // 기존 사이트 확인
+                const { data: existingSite, error: selectError } = await supabase
+                    .from('sites')
+                    .select('id, name')
+                    .eq('name', 'apple-production-test')
+                    .eq('is_active', true)
+                    .single();
+                
+                if (existingSite && !selectError) {
+                    siteUUID = existingSite.id;
+                    log(`✅ 기존 사이트 발견: ${existingSite.name}`);
+                    log(`🆔 사이트 UUID: ${siteUUID}`);
+                } else {
+                    // 새 사이트 생성
+                    log('🔧 새 사이트 생성 중...');
+                    const { data: newSite, error: insertError } = await supabase
+                        .from('sites')
+                        .insert([{
+                            name: 'apple-production-test',
+                            domain: window.location.hostname,
+                            description: 'Apple OAuth Production Test Site',
+                            settings: {
+                                allow_anonymous: true,
+                                moderation_enabled: false,
+                                max_comment_length: 2000,
+                                theme: 'light',
+                                language: 'ko'
+                            }
+                        }])
+                        .select('id, name')
+                        .single();
+                    
+                    if (newSite && !insertError) {
+                        siteUUID = newSite.id;
+                        log(`✅ 새 사이트 생성 완료: ${newSite.name}`);
+                        log(`🆔 사이트 UUID: ${siteUUID}`);
+                    } else {
+                        log(`❌ 사이트 생성 실패: ${insertError?.message}`);
+                        return;
+                    }
+                }
+                
+                // Apple 테스트 버튼 활성화
+                document.getElementById('testBtn').disabled = false;
+                log('🎉 사이트 준비 완료! Apple 테스트를 시작할 수 있습니다.');
+                
+            } catch (error) {
+                log(`❌ 사이트 생성 에러: ${error.message}`);
+                console.error('Site creation error:', error);
+            }
+        }
+        
+        async function testAppleProduction() {
+            if (!siteUUID) {
+                log('❌ 사이트 UUID가 없습니다. 먼저 사이트를 생성하세요.');
+                return;
+            }
+            
+            log('🍎 Apple Production 테스트 시작...');
+            log(`🆔 사용할 사이트 UUID: ${siteUUID}`);
+            
+            try {
+                // 동적으로 위젯 생성
+                const widgetContainer = document.getElementById('widget-container');
+                widgetContainer.innerHTML = `
+                    <div 
+                        data-kommentio
+                        data-site-id="${siteUUID}"
+                        data-page-url="/apple-production-test"
+                        data-theme="light"
+                        data-supabase-url="https://nwjbtsjeikrwyqltkpqv.supabase.co"
+                        data-supabase-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53amJ0c2plaWtyd3lxbHRrcHF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDUsImV4cCI6MjA2NTExNjQwNX0.UXNFgCrKfBHrcbenw94v9rD-sbGEE6ENDaF7h01EFPQ"
+                    ></div>
+                `;
+                
+                widgetContainer.style.display = 'block';
+                log('✅ 위젯 컨테이너 생성 완료');
+                
+                // Kommentio 스크립트 로드
+                await loadScript('kommentio.js');
+                log('✅ Kommentio 스크립트 로드 완료');
+                
+                // 위젯 초기화 대기
+                setTimeout(() => {
+                    if (window.kommentio) {
+                        log(`📊 Kommentio Mock 모드: ${window.kommentio.mockMode}`);
+                        if (!window.kommentio.mockMode) {
+                            log('🎉 Production 모드 활성화 성공!');
+                            log('🍎 이제 Apple 로그인 버튼을 클릭하여 실제 OAuth 테스트를 진행하세요.');
+                        } else {
+                            log('⚠️ 여전히 Mock 모드입니다. 연결 문제를 확인하세요.');
+                        }
+                    } else {
+                        log('❌ Kommentio 위젯 로드 실패');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                log(`❌ Apple 테스트 에러: ${error.message}`);
+                console.error('Apple test error:', error);
+            }
+        }
+        
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                if (document.querySelector(`script[src="${src}"]`)) {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+        
+        // 페이지 로드 시 안내
+        window.addEventListener('load', function() {
+            log('📄 Apple Production 테스트 수정 페이지 로드됨');
+            log('1️⃣ 먼저 "사이트 생성" 버튼을 클릭하세요');
+            log('2️⃣ 그 다음 "Apple 테스트 시작" 버튼을 클릭하세요');
+        });
+    </script>
+</body>
+</html>
