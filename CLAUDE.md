@@ -94,8 +94,9 @@ If user's prompt starts with "EP:", read `knowledge_base/PROMPT_ENHANCER.md` and
 ## Knowledge Base Reading Triggers
 
 ### Project Status & Updates  
-**Trigger**: When user asks about current status, recent changes, or version history
+**Trigger**: When user asks about current status, recent changes, or version history, or when Claude needs to understand project status
 **Read**: `knowledge_base/LAST_PROJECT_STATUS.md` and `knowledge_base/UPDATE_LOG.md`
+**Important**: Always reference these files instead of the status information in this CLAUDE.md file for current project status
 
 ### OAuth & Authentication Setup
 **Trigger**: When user asks about social login or OAuth setup
@@ -106,6 +107,9 @@ If user's prompt starts with "EP:", read `knowledge_base/PROMPT_ENHANCER.md` and
 **Read**: `knowledge_base/README.md`
 
 ## Current Implementation Status
+
+**⚠️ DEPRECATED**: This section is kept for historical reference only. 
+**For current project status, always read**: `knowledge_base/LAST_PROJECT_STATUS.md` and `knowledge_base/UPDATE_LOG.md`
 
 ### Core Features ✅ COMPLETE
 - Comment CRUD with hierarchical replies (3 levels)
@@ -270,4 +274,7 @@ npm run build:widget
 
 ---
 
-**Current Status**: v0.2.8 - Production-ready system with all PRD requirements completed. Zero hardcoding policy implemented with complete Mock mode fallback system.
+**⚠️ DEPRECATED STATUS**: This status is kept for historical reference only.
+**For current project status, always read**: `knowledge_base/LAST_PROJECT_STATUS.md` and `knowledge_base/UPDATE_LOG.md`
+
+**Historical Status**: v0.2.8 - Production-ready system with all PRD requirements completed. Zero hardcoding policy implemented with complete Mock mode fallback system.

@@ -767,14 +767,19 @@ class Kommentio {
         line-height: 1.5;
         font-size: 0.875rem;
         min-height: 90px;
-        display: flex;
-        align-items: center;
+        padding: 0.75rem;
+        word-wrap: break-word;
+        white-space: normal;
       }
 
       .kommentio-preview-content:empty::before {
         content: "미리보기를 보려면 댓글을 입력하세요...";
         color: var(--kommentio-secondary);
         font-style: italic;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 90px;
       }
 
       /* 폼 하단 영역 */
@@ -842,17 +847,20 @@ class Kommentio {
       }
 
       /* 🎨 v0.3.1 마크다운 지원 CSS */
-      .kommentio-content .kommentio-bold {
+      .kommentio-content .kommentio-bold,
+      .kommentio-preview-content .kommentio-bold {
         font-weight: 600;
         color: var(--kommentio-text);
       }
 
-      .kommentio-content .kommentio-italic {
+      .kommentio-content .kommentio-italic,
+      .kommentio-preview-content .kommentio-italic {
         font-style: italic;
         color: var(--kommentio-secondary);
       }
 
-      .kommentio-content .kommentio-inline-code {
+      .kommentio-content .kommentio-inline-code,
+      .kommentio-preview-content .kommentio-inline-code {
         background: var(--kommentio-border);
         color: var(--kommentio-primary);
         padding: 0.125rem 0.25rem;
@@ -862,7 +870,32 @@ class Kommentio {
         font-weight: 500;
       }
 
-      .kommentio-content .kommentio-link {
+      .kommentio-content .kommentio-code-block,
+      .kommentio-preview-content .kommentio-code-block {
+        background: var(--kommentio-border);
+        border: 1px solid var(--kommentio-border);
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        overflow-x: auto;
+        max-width: 100%;
+        position: relative;
+      }
+
+      .kommentio-content .kommentio-code-block code,
+      .kommentio-preview-content .kommentio-code-block code {
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        font-size: 0.8125rem;
+        line-height: 1.4;
+        color: var(--kommentio-primary);
+        white-space: pre;
+        display: block;
+        word-wrap: normal;
+        word-break: normal;
+      }
+
+      .kommentio-content .kommentio-link,
+      .kommentio-preview-content .kommentio-link {
         color: var(--kommentio-primary);
         text-decoration: underline;
         text-decoration-thickness: 1px;
@@ -870,13 +903,15 @@ class Kommentio {
         transition: all 0.2s ease;
       }
 
-      .kommentio-content .kommentio-link:hover {
+      .kommentio-content .kommentio-link:hover,
+      .kommentio-preview-content .kommentio-link:hover {
         color: var(--kommentio-primary);
         text-decoration-thickness: 2px;
         opacity: 0.8;
       }
 
-      .kommentio-content .kommentio-quote {
+      .kommentio-content .kommentio-quote,
+      .kommentio-preview-content .kommentio-quote {
         margin: 0.5rem 0;
         padding: 0.5rem 0.75rem;
         border-left: 3px solid var(--kommentio-primary);
@@ -888,12 +923,25 @@ class Kommentio {
       }
 
       /* 다크 모드에서 마크다운 요소 최적화 */
-      .kommentio-widget[data-theme="dark"] .kommentio-inline-code {
+      .kommentio-widget[data-theme="dark"] .kommentio-content .kommentio-inline-code,
+      .kommentio-widget[data-theme="dark"] .kommentio-preview-content .kommentio-inline-code {
         background: var(--kommentio-border);
         color: var(--kommentio-primary);
       }
 
-      .kommentio-widget[data-theme="dark"] .kommentio-quote {
+      .kommentio-widget[data-theme="dark"] .kommentio-content .kommentio-code-block,
+      .kommentio-widget[data-theme="dark"] .kommentio-preview-content .kommentio-code-block {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .kommentio-widget[data-theme="dark"] .kommentio-content .kommentio-code-block code,
+      .kommentio-widget[data-theme="dark"] .kommentio-preview-content .kommentio-code-block code {
+        color: var(--kommentio-primary);
+      }
+
+      .kommentio-widget[data-theme="dark"] .kommentio-content .kommentio-quote,
+      .kommentio-widget[data-theme="dark"] .kommentio-preview-content .kommentio-quote {
         background: rgba(255, 255, 255, 0.02);
         border-left-color: var(--kommentio-primary);
       }
@@ -1146,6 +1194,7 @@ class Kommentio {
         .kommentio-preview-content {
           min-height: 76px;
           font-size: 0.8125rem;
+          padding: 0.5rem;
         }
 
         .kommentio-form-footer {
@@ -1244,6 +1293,18 @@ class Kommentio {
         
         .kommentio-comment-nested .kommentio-comment-nested {
           margin-left: 0.25rem;
+        }
+
+        /* 모바일에서 코드 블록 최적화 */
+        .kommentio-content .kommentio-code-block {
+          padding: 0.5rem;
+          margin: 0.25rem 0;
+          border-radius: 4px;
+        }
+
+        .kommentio-content .kommentio-code-block code {
+          font-size: 0.75rem;
+          line-height: 1.3;
         }
       }
       
@@ -1461,10 +1522,10 @@ class Kommentio {
         <!-- 탭 네비게이션 -->
         <div class="kommentio-form-tabs">
           <button type="button" class="kommentio-tab kommentio-tab-active" data-tab="write" onclick="kommentio.switchTab(event, 'write')">
-            ✏️ 작성
+            작성
           </button>
           <button type="button" class="kommentio-tab" data-tab="preview" onclick="kommentio.switchTab(event, 'preview')">
-            👁️ 미리보기
+            미리보기
           </button>
         </div>
 
@@ -1472,7 +1533,7 @@ class Kommentio {
         <div class="kommentio-tab-content kommentio-tab-write kommentio-tab-content-active">
           <textarea 
             class="kommentio-textarea" 
-            placeholder="댓글을 입력하세요..."
+            placeholder="**굵게**, *기울임*, \`코드\`, > 인용구, [링크](URL), \`\`\` 코드블록 \`\`\` 지원"
             oninput="kommentio.updatePreview(this.value)"
             onkeydown="kommentio.handleKeydown(event)"
             required
@@ -1492,9 +1553,7 @@ class Kommentio {
         <div class="kommentio-form-footer">
           <div class="kommentio-markdown-help">
             <small class="kommentio-text-secondary">
-              <strong>**볼드**</strong> • <em>*이탤릭*</em> • <code>\`코드\`</code> • <span style="opacity: 0.7;">&gt; 인용구</span> • <span style="color: var(--kommentio-primary);">[링크](URL)</span>
-              <br>
-              <span style="opacity: 0.8;">💡 Ctrl+Enter: 빠른 등록 • Ctrl+Tab: 탭 전환 • ESC: 작성으로 돌아가기</span>
+              <span style="opacity: 0.8;">Ctrl/Cmd+Enter: 빠른 등록</span>
             </small>
           </div>
           <button type="submit" class="kommentio-btn kommentio-btn-primary">댓글 작성</button>
@@ -1568,52 +1627,130 @@ class Kommentio {
         id: 'mock-1',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: 'Kommentio 정말 좋네요! Disqus보다 훨씬 빠르고 깔끔한 것 같아요. 👍',
+        content: '어서오세요! Kommentio는 7개의 소셜 로그인과 AI 스팸 필터링을 지원하는 댓글 위젯 시스템입니다!',
         parent_id: null,
         depth: 0,
-        author_name: '김개발',
-        author_email: 'dev@example.com',
-        likes_count: 5,
-        created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
+        likes_count: 12,
+        created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
         children: []
       },
       {
         id: 'mock-2',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: '오픈소스라서 더욱 신뢰가 갑니다. 광고도 없고 완전 무료라니 최고예요!',
+        content: '또한 **마크다운** 문법 *일부*를 지원하고 있습니다.',
         parent_id: null,
         depth: 0,
-        author_name: '박코더',
-        author_email: 'coder@example.com',
-        likes_count: 3,
-        created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
+        likes_count: 8,
+        created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        children: []
+      },
+      {
+        id: 'mock-2-1',
+        site_id: this.siteUUID || this.options.siteId,
+        page_url: window.location.pathname,
+        content: '원하는 텍스트를 **볼드** 혹은 *이탤릭* 처리해보세요. 인용문도 생성할 수 있습니다.',
+        parent_id: 'mock-2',
+        depth: 1,
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
+        likes_count: 5,
+        created_at: new Date(Date.now() - 110 * 60 * 1000).toISOString(),
+        children: []
+      },
+      {
+        id: 'mock-2-2',
+        site_id: this.siteUUID || this.options.siteId,
+        page_url: window.location.pathname,
+        content: '기술 블로거들을 위해 구현된 `코드 인라인`과 ```코드 스니펫 블록```도 체험해보세요!',
+        parent_id: 'mock-2',
+        depth: 1,
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
+        likes_count: 7,
+        created_at: new Date(Date.now() - 105 * 60 * 1000).toISOString(),
         children: []
       },
       {
         id: 'mock-3',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: '맞아요! 로딩 속도가 정말 빨라요. React 없이 Vanilla JS로 만든 덕분인 것 같아요.',
-        parent_id: 'mock-1',
+        content: '레오나르도 다 빈치의 말처럼:\n> 단순함은 궁극적인 정교함입니다.',
+        parent_id: null,
+        depth: 0,
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
+        likes_count: 15,
+        created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+        children: []
+      },
+      {
+        id: 'mock-3-1',
+        site_id: this.siteUUID || this.options.siteId,
+        page_url: window.location.pathname,
+        content: '이것이 Kommentio의 개발 모토입니다.',
+        parent_id: 'mock-3',
         depth: 1,
-        author_name: '최성능',
-        author_email: 'performance@example.com',
-        likes_count: 2,
-        created_at: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
+        likes_count: 6,
+        created_at: new Date(Date.now() - 55 * 60 * 1000).toISOString(),
         children: []
       },
       {
         id: 'mock-4',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: '정말 인상적인 프로젝트네요! PRD 명세대로 잘 구현되고 있는 것 같아요. 🚀',
+        content: '더 자세한 내용은 제 [Github 페이지](https://github.com/xavierchoi/kommentio)에서 확인하세요!',
         parent_id: null,
         depth: 0,
-        author_name: '프로젝트매니저',
-        author_email: 'pm@example.com',
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
+        likes_count: 18,
+        created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+        children: []
+      },
+      {
+        id: 'mock-4-1',
+        site_id: this.siteUUID || this.options.siteId,
+        page_url: window.location.pathname,
+        content: '아 참, **Readme 파일**을 읽는 것 잊지 마세요.',
+        parent_id: 'mock-4',
+        depth: 1,
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
         likes_count: 4,
-        created_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+        children: []
+      },
+      {
+        id: 'mock-4-1-1',
+        site_id: this.siteUUID || this.options.siteId,
+        page_url: window.location.pathname,
+        content: '마지막으로, **Kommentio**는 완전한 **오픈소스 프로젝트**입니다.',
+        parent_id: 'mock-4-1',
+        depth: 2,
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
+        likes_count: 9,
+        created_at: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+        children: []
+      },
+      {
+        id: 'mock-4-1-1-1',
+        site_id: this.siteUUID || this.options.siteId,
+        page_url: window.location.pathname,
+        content: '*진짜 마지막으로*, **무료**인데다가 **광고도 없다**는 걸 알아주세요! 지원하는 답글 계층은 *여기까지입니다*.',
+        parent_id: 'mock-4-1-1',
+        depth: 3,
+        author_name: '자비에',
+        author_email: 'xavier@kommentio.tech',
+        likes_count: 25,
+        created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
         children: []
       }
     ];
@@ -1713,7 +1850,7 @@ class Kommentio {
         
         <div class="kommentio-actions">
           <span class="kommentio-action" onclick="kommentio.likeComment('${comment.id}')">
-            👍 ${comment.likes || 0}
+            👍&nbsp;${comment.likes || 0}
           </span>
           ${canReply ? `<span class="kommentio-action" onclick="kommentio.replyTo('${comment.id}')">답글</span>` : ''}
         </div>
@@ -1739,8 +1876,8 @@ class Kommentio {
   }
 
   /**
-   * 경량화된 마크다운 파서 (v0.3.1)
-   * 지원 문법: **bold**, *italic*, `code`, > quote, [link](url)
+   * 경량화된 마크다운 파서 (v0.3.2)
+   * 지원 문법: **bold**, *italic*, `code`, ```codeblock```, > quote, [link](url)
    */
   parseMarkdown(content) {
     // 1. HTML 이스케이프 (XSS 방지)
@@ -1753,7 +1890,14 @@ class Kommentio {
 
     // 2. 마크다운 파싱 (순서 중요!)
     
-    // 코드 블록 (인라인) - 먼저 처리하여 내부 마크다운 무시
+    // 코드 블록 (멀티라인) - 가장 먼저 처리하여 내부 마크다운 완전 무시
+    html = html.replace(/```([^`]*(?:`(?!``)[^`]*)*)```/gs, (match, code) => {
+      // 코드 블록 내용 정리 (앞뒤 공백 제거)
+      const cleanCode = code.trim();
+      return `<pre class="kommentio-code-block"><code>${cleanCode}</code></pre>`;
+    });
+    
+    // 코드 블록 (인라인) - 멀티라인 코드 블록 처리 후
     html = html.replace(/`([^`]+)`/g, '<code class="kommentio-inline-code">$1</code>');
     
     // 볼드 텍스트
@@ -2093,9 +2237,9 @@ class Kommentio {
       if (error) throw error;
       
       // DOM에서 해당 댓글의 좋아요 수 업데이트
-      const likeButton = this.container.querySelector(`[data-comment-id="${commentId}"] .kommentio-btn-like`);
+      const likeButton = this.container.querySelector(`[onclick*="likeComment('${commentId}')"]`);
       if (likeButton) {
-        likeButton.textContent = `👍 ${data.likes_count || 0}`;
+        likeButton.innerHTML = `👍&nbsp;${data.likes_count || 0}`;
       }
       
     } catch (error) {
@@ -2731,12 +2875,12 @@ class Kommentio {
       <form onsubmit="kommentio.handleReplySubmit(event, '${commentId}')">
         <textarea 
           class="kommentio-textarea" 
-          placeholder="답글을 입력하세요..."
+          placeholder="**굵게**, *기울임*, \`코드\`, > 인용구, [링크](URL), \`\`\` 코드블록 \`\`\` 지원"
           style="min-height: 80px; margin-bottom: 0.75rem;"
           required
         ></textarea>
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <small class="kommentio-helper-text" style="color: var(--kommentio-secondary);">Markdown 문법을 지원합니다. • Ctrl+Enter로 빠른 등록</small>
+          <small class="kommentio-helper-text" style="color: var(--kommentio-secondary);">Ctrl/Cmd+Enter: 빠른 등록</small>
           <div style="display: flex; gap: 0.5rem;">
             <button 
               type="button" 

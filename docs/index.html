@@ -279,6 +279,9 @@
             border-radius: 60px;
             transition: all 0.4s var(--ease-premium);
             will-change: transform;
+            max-width: calc(100vw - 40px);
+            width: auto;
+            box-sizing: border-box;
         }
         
         /* 스크롤 다운 시 숨김 상태 */
@@ -297,11 +300,19 @@
                 var(--shadow-glass),
                 0 0 20px rgba(102, 126, 234, 0.1);
         }
+        
+        /* 스크롤 종료 시 강조 효과 - 중앙 정렬 유지 */
+        .nav-premium.nav-emphasis {
+            transform: translateX(-50%) translateY(-5px) !important;
+        }
 
         .nav-content {
             display: flex;
             align-items: center;
             gap: 2rem;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .logo-premium {
@@ -793,10 +804,12 @@
             
             .nav-premium {
                 top: 10px;
-                left: 10px;
-                right: 10px;
-                /* ✅ 중앙 정렬 유지 - transform 제거하지 않음 */
-                transform: translateX(0); /* left/right로 이미 중앙 정렬됨 */
+                left: 50%;
+                right: auto;
+                /* ✅ 완전한 중앙 정렬 유지 - translateX(-50%) 사용 */
+                transform: translateX(-50%);
+                max-width: calc(100vw - 20px);
+                width: auto;
                 border-radius: 20px;
                 -webkit-backdrop-filter: blur(10px);
                         backdrop-filter: blur(10px);
@@ -804,16 +817,21 @@
             
             /* 모바일에서 스크롤 숨김 상태 - 중앙 정렬 유지 */
             .nav-premium.nav-hidden {
-                transform: translateX(0) translateY(-100px);
+                transform: translateX(-50%) translateY(-100px);
                 opacity: 0;
                 pointer-events: none;
             }
             
             /* 모바일에서 스크롤 표시 상태 - 중앙 정렬 유지 */
             .nav-premium.nav-visible {
-                transform: translateX(0) translateY(0);
+                transform: translateX(-50%) translateY(0);
                 opacity: 1;
                 pointer-events: auto;
+            }
+            
+            /* 모바일에서 스크롤 종료 시 강조 효과 - 중앙 정렬 유지 */
+            .nav-premium.nav-emphasis {
+                transform: translateX(-50%) translateY(-5px) !important;
             }
             
             .feature-card-optimized {
@@ -830,7 +848,7 @@
 
             .nav-content {
                 gap: 1rem;
-                justify-content: space-between;
+                justify-content: center;
             }
 
             .nav-links {
@@ -907,6 +925,32 @@
             box-shadow: 
                 var(--shadow-neon),
                 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        /* 🔍 극소형 화면 (320px 미만) - 추가 안정성 */
+        @media (max-width: 320px) {
+            .nav-premium {
+                top: 8px;
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                max-width: calc(100vw - 16px);
+                padding: 10px 16px;
+                border-radius: 16px;
+            }
+            
+            .nav-premium.nav-hidden {
+                transform: translateX(-50%) translateY(-80px);
+            }
+            
+            .nav-premium.nav-visible {
+                transform: translateX(-50%) translateY(0);
+            }
+            
+            /* 극소형 화면에서 스크롤 종료 시 강조 효과 - 중앙 정렬 유지 */
+            .nav-premium.nav-emphasis {
+                transform: translateX(-50%) translateY(-5px) !important;
+            }
         }
 
         /* 🎭 Print Styles */
@@ -1232,7 +1276,6 @@
             if (window.kommentio) {
                 window.kommentio.mockMode = true;
                 window.kommentio.supabase = null;
-                console.log('🎮 Mock mode forcefully activated');
                 window.kommentio.initMockData();
                 window.kommentio.loadComments();
             }
@@ -1268,7 +1311,6 @@
             }
             
             particlesContainer.appendChild(fragment);
-            console.log(`⚡ Ultra-Light Particles: ${particleCount} particles created (device: ${isLowEndDevice ? 'mobile/low-end' : 'desktop'})`);
         }
 
         // Animate counter numbers - 최적화된 버전
@@ -1291,7 +1333,6 @@
             if (!allComplete) {
                 requestAnimationFrame(animateCounters);
             } else {
-                console.log('📊 Counter animation completed');
             }
         }
 
@@ -1301,7 +1342,6 @@
             const theme = isDark ? 'dark' : 'light';
             
             // 디버깅 로그
-            console.log(`🎨 Theme switching to: ${theme} (isDark: ${isDark})`);
             
             // 1. 문서 테마 업데이트
             document.documentElement.setAttribute('data-theme', theme);
@@ -1325,15 +1365,12 @@
                     // 다크 모드: 다크 로고 표시
                     logoLight.style.display = 'none';
                     logoDark.style.display = 'block';
-                    console.log('🌙 Dark logo activated');
                 } else {
                     // 라이트 모드: 라이트 로고 표시
                     logoLight.style.display = 'block';
                     logoDark.style.display = 'none';
-                    console.log('☀️ Light logo activated');
                 }
             } else {
-                console.error('⚠️ Logo elements not found!');
             }
             
             // 4. 아이콘 전환 (CSS 클래스 기반)
@@ -1345,19 +1382,15 @@
                     // 다크 모드: Moon 활성화, Sun 비활성화
                     moonIcon.classList.add('active');
                     sunIcon.classList.remove('active');
-                    console.log('🌙 Moon icon activated');
                 } else {
                     // 라이트 모드: Sun 활성화, Moon 비활성화
                     sunIcon.classList.add('active');
                     moonIcon.classList.remove('active');
-                    console.log('☀️ Sun icon activated');
                 }
             } else {
-                console.error('⚠️ Theme icons not found!');
             }
             
             // 5. 성공 로그
-            console.log(`✅ Theme switched successfully to ${theme}`);
         }
 
         // Smooth reveal animations
@@ -1407,12 +1440,10 @@
         
         // 테마 시스템 초기화 및 검증
         function initThemeSystem() {
-            console.log('🔧 Initializing theme system...');
             
             // 시스템 설정에 따른 초기 테마 설정
             const initialTheme = isDark ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', initialTheme);
-            console.log(`📱 Initial theme set to: ${initialTheme} (system preference)`);
             
             // 아이콘 요소 확인
             const moonIcon = document.querySelector('.moon-icon');
@@ -1420,12 +1451,10 @@
             const themeButton = document.querySelector('.theme-toggle-premium');
             
             if (!moonIcon || !sunIcon) {
-                console.error('❌ Theme icons not found! Check HTML structure.');
                 return;
             }
             
             if (!themeButton) {
-                console.error('❌ Theme button not found!');
                 return;
             }
             
@@ -1445,11 +1474,9 @@
                 if (isDark) {
                     logoLight.style.display = 'none';
                     logoDark.style.display = 'block';
-                    console.log('🌙 Dark logo set as default (system preference)');
                 } else {
                     logoLight.style.display = 'block';
                     logoDark.style.display = 'none';
-                    console.log('☀️ Light logo set as default (system preference)');
                 }
             }
             
@@ -1461,24 +1488,16 @@
                 }
             });
             
-            console.log('✅ Theme system initialized successfully');
-            console.log(`📱 Current theme: ${isDark ? 'dark' : 'light'}`);
             
             // 시스템 테마 변경 감지
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             mediaQuery.addListener(handleSystemThemeChange);
             
-            // 5초 후 시스템 상태 체크
-            setTimeout(validateThemeSystem, 5000);
-            
-            // 성능 모니터링 시작
-            initPerformanceMonitoring();
         }
         
         // 시스템 테마 변경 핸들러
         function handleSystemThemeChange(e) {
             const systemPrefersDark = e.matches;
-            console.log(`🖥️ System theme changed to: ${systemPrefersDark ? 'dark' : 'light'}`);
             
             // 현재 설정과 다르면 자동으로 변경
             if (isDark !== systemPrefersDark) {
@@ -1524,139 +1543,11 @@
                     }
                 }
                 
-                console.log(`✅ Auto-switched to ${theme} mode following system preference`);
             }
         }
         
-        // Ultra-Efficient 성능 모니터링 시스템
-        function initPerformanceMonitoring() {
-            let frameCount = 0;
-            let lastTime = performance.now();
-            let hasOptimized = false;
-            let monitoringActive = true;
-            
-            function measureFPS() {
-                if (!monitoringActive) return;
-                
-                frameCount++;
-                const currentTime = performance.now();
-                
-                // 10초마다 FPS 측정 (5초 → 10초로 더 넓은 간격)
-                if (currentTime - lastTime >= 10000) {
-                    const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
-                    
-                    // 성능 상태 체크
-                    if (fps < 20 && !hasOptimized) {
-                        // 극한 최적화 (20fps 이하)
-                        optimizeForLowEndDevice();
-                        hasOptimized = true;
-                        console.log(`⚡ Extreme optimization applied (${fps} FPS)`);
-                    } else if (fps >= 45 && hasOptimized) {
-                        // 성능이 회복되면 모니터링 빈도 감소
-                        monitoringActive = false;
-                        setTimeout(() => { monitoringActive = true; }, 30000); // 30초 후 재시작
-                        console.log(`✅ Performance recovered (${fps} FPS), monitoring reduced`);
-                    }
-                    
-                    frameCount = 0;
-                    lastTime = currentTime;
-                }
-                
-                // 조건부 모니터링 지속
-                if (monitoringActive || !hasOptimized) {
-                    requestAnimationFrame(measureFPS);
-                } else {
-                    // 성능이 안정되면 30초 후 재체크
-                    setTimeout(() => {
-                        monitoringActive = true;
-                        requestAnimationFrame(measureFPS);
-                    }, 30000);
-                }
-            }
-            
-            requestAnimationFrame(measureFPS);
-        }
         
-        // 극한 성능 최적화 시스템
-        function optimizeForLowEndDevice() {
-            // 1. 파티클 완전 제거
-            const particles = document.querySelectorAll('.particle');
-            particles.forEach(particle => {
-                particle.style.display = 'none';
-            });
-            
-            // 2. 배경 그라디언트 완전 비활성화
-            const bgGradient = document.querySelector('.bg-gradient');
-            if (bgGradient) {
-                bgGradient.style.animation = 'none';
-                bgGradient.style.opacity = '0';
-                bgGradient.style.transform = 'scale(0)';
-            }
-            
-            // 3. 3D 카드 효과 완전 제거
-            const cards = document.querySelectorAll('.feature-card-optimized');
-            cards.forEach(card => {
-                card.style.transition = 'none';
-                card.style.willChange = 'auto';
-                card.style.transform = 'none';
-                card.classList.remove('feature-card-3d');
-            });
-            
-            // 4. 마우스 추적 이미 비활성화됨 (3D 추적 기능 제거됨)
-            
-            // 5. 모든 불필요한 애니메이션 비활성화
-            const animatedElements = document.querySelectorAll('[style*="animation"]');
-            animatedElements.forEach(el => {
-                if (!el.classList.contains('counter-number')) { // 카운터는 유지
-                    el.style.animation = 'none';
-                }
-            });
-            
-            // 6. GPU 가속 비활성화 (배터리 절약)
-            document.body.style.willChange = 'auto';
-            
-            console.log('⚡ EXTREME optimization applied - All animations disabled');
-        }
         
-        // 테마 시스템 검증 및 복구
-        function validateThemeSystem() {
-            const moonIcon = document.querySelector('.moon-icon');
-            const sunIcon = document.querySelector('.sun-icon');
-            
-            // 아이콘 상태 검증
-            const moonActive = moonIcon?.classList.contains('active');
-            const sunActive = sunIcon?.classList.contains('active');
-            
-            console.log(`🔍 Theme validation: Moon=${moonActive}, Sun=${sunActive}, isDark=${isDark}`);
-            
-            // 상태 불일치 감지 및 복구
-            if (isDark && !moonActive) {
-                console.warn('⚠️ Dark mode inconsistency detected, fixing...');
-                moonIcon?.classList.add('active');
-                sunIcon?.classList.remove('active');
-            } else if (!isDark && !sunActive) {
-                console.warn('⚠️ Light mode inconsistency detected, fixing...');
-                sunIcon?.classList.add('active');
-                moonIcon?.classList.remove('active');
-            }
-            
-            // 두 아이콘이 모두 활성화된 경우 (오류 상황)
-            if (moonActive && sunActive) {
-                console.error('🚨 Both icons active! Emergency fix...');
-                if (isDark) {
-                    sunIcon?.classList.remove('active');
-                } else {
-                    moonIcon?.classList.remove('active');
-                }
-            }
-            
-            // 아무 아이콘도 활성화되지 않은 경우 (치명적 오류)
-            if (!moonActive && !sunActive) {
-                console.error('🚨 No icons active! Emergency recovery...');
-                const emergencyIcon = isDark ? moonIcon : sunIcon;
-                emergencyIcon?.classList.add('active');
-            }
-        }
 
         // Premium smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1682,7 +1573,6 @@
             const nav = document.querySelector('.nav-premium');
             if (!nav) return;
             
-            console.log('🧭 Smart navigation initialized');
             
             // 초기 상태 설정
             nav.classList.add('nav-visible');
@@ -1733,7 +1623,6 @@
                     }
                 }
                 
-                console.log(`📜 Scroll ${scrollDirection}: ${currentScrollY}px (Nav: ${nav.classList.contains('nav-visible') ? 'visible' : 'hidden'})`);
             }
             
             lastScrollY = currentScrollY;
@@ -1745,19 +1634,11 @@
             
             // 스크롤이 완전히 멈췄을 때 네비게이션을 살짝 강조
             if (nav.classList.contains('nav-visible')) {
-                // 모바일과 데스크톱 구분하여 올바른 transform 적용
-                const isMobile = window.innerWidth <= 768;
-                if (isMobile) {
-                    nav.style.transform = 'translateX(0) translateY(-5px)';
-                    setTimeout(() => {
-                        nav.style.transform = 'translateX(0) translateY(0)';
-                    }, 200);
-                } else {
-                    nav.style.transform = 'translateX(-50%) translateY(-5px)';
-                    setTimeout(() => {
-                        nav.style.transform = 'translateX(-50%) translateY(0)';
-                    }, 200);
-                }
+                // CSS 클래스 기반 애니메이션으로 교체 - inline style 제거
+                nav.classList.add('nav-emphasis');
+                setTimeout(() => {
+                    nav.classList.remove('nav-emphasis');
+                }, 200);
             }
         }
 
@@ -1768,7 +1649,6 @@
             if (window.lucide) {
                 window.lucide.createIcons();
                 lucideReady = true;
-                console.log('🔧 Lucide icons initialized');
             }
         }
         
@@ -1782,7 +1662,6 @@
                         clearInterval(checkLucide);
                         window.lucide.createIcons();
                         lucideReady = true;
-                        console.log('🔧 Lucide icons initialized (delayed)');
                     }
                 }, 100);
             }
@@ -1793,14 +1672,12 @@
             // 시스템 설정에 따른 초기 테마 설정
             const initialTheme = isDark ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', initialTheme);
-            console.log(`🖥️ System preference detected: ${initialTheme} mode`);
             
             initPremiumExperience();
         });
 
         // 🚫 3D 마우스 추적 완전 비활성화 - CLS와 성능 최적화 우선
         // 저사양 환경에서 성능 문제와 레이아웃 시프트를 방지하기 위해 비활성화
-        console.log('🎯 3D animations disabled for optimal performance and CLS reduction');
         
         // 3D 효과 제거 - CSS only 호버 효과로 대체
 
@@ -1847,7 +1724,6 @@
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
         window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', updateFavicon);
 
-        console.log('🎨 Dynamic favicon switching enabled for dark/light mode');
     </script>
 </body>
 </html>
