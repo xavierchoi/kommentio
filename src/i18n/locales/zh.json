@@ -1,0 +1,66 @@
+{
+  "comment": {
+    "writeComment": "写评论...",
+    "submitComment": "发表评论",
+    "submitting": "发表中...",
+    "reply": "回复",
+    "replying": "回复中...",
+    "replyTo": "回复 {{user}}",
+    "like": "点赞",
+    "likes": "{{count}} 个赞",
+    "anonymous": "匿名",
+    "timeAgo": {
+      "justNow": "刚刚",
+      "minutesAgo": "{{count}} 分钟前",
+      "hoursAgo": "{{count}} 小时前",
+      "daysAgo": "{{count}} 天前",
+      "weeksAgo": "{{count}} 周前",
+      "monthsAgo": "{{count}} 个月前",
+      "yearsAgo": "{{count}} 年前"
+    }
+  },
+  "auth": {
+    "loginWith": "使用 {{provider}} 登录",
+    "signIn": "登录",
+    "signOut": "退出",
+    "anonymous": "匿名评论",
+    "loginRequired": "请登录后发表评论",
+    "providers": {
+      "google": "Google",
+      "apple": "Apple",
+      "github": "GitHub",
+      "twitter": "X.com",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "kakao": "Kakao"
+    }
+  },
+  "messages": {
+    "success": {
+      "commentCreated": "评论发表成功！ ✅",
+      "commentDeleted": "评论已删除。",
+      "commentLiked": "已点赞评论。",
+      "commentUnliked": "已取消点赞。"
+    },
+    "error": {
+      "commentFailed": "评论发表失败。",
+      "loginFailed": "登录失败。",
+      "loadFailed": "评论加载失败。",
+      "networkError": "网络错误。"
+    },
+    "spam": {
+      "detected": "评论被标记为垃圾内容，等待管理员审核。 ⚠️",
+      "reviewing": "评论正在管理员审核中。"
+    }
+  },
+  "placeholder": {
+    "markdown": "**粗体**, *斜体*, `代码`, ```代码块```, > 引用, [链接](url) • Ctrl+Enter 发表"
+  },
+  "tabs": {
+    "write": "✏️ 编写",
+    "preview": "👁️ 预览"
+  },
+  "keyboard": {
+    "shortcuts": "Ctrl+Enter: 发表, Ctrl+Tab: 切换标签, ESC: 编写模式"
+  }
+}

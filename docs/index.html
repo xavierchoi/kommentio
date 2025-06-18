@@ -32,7 +32,7 @@
     <!-- Framer Motion 제거 - React 의존성 때문에 에러 발생 -->
     
     <!-- Lucide Icons - Async loading -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" async onload="initLucideIcons()"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" async></script>
     
     <style>
         /* 🔍 ANCHOR_SEARCH: Premium Landing Page Styles */
@@ -1071,6 +1071,26 @@
                     대시보드
                 </a>
             </div>
+            <!-- 언어 선택기 -->
+            <div class="language-selector" style="position: relative; display: inline-block; margin-right: 1rem;">
+                <button id="languageToggle" class="language-toggle" onclick="toggleLanguageDropdown()" title="언어 변경" style="background: var(--bg-glass); border: 1px solid var(--bg-glass-strong); border-radius: 8px; padding: 0.5rem 0.75rem; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; white-space: nowrap; min-width: fit-content;">
+                    <span id="currentLang" style="white-space: nowrap;">한국어</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                    </svg>
+                </button>
+                <div id="languageDropdown" class="language-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: var(--bg-surface); border: 1px solid var(--bg-glass-strong); border-radius: 8px; padding: 0.5rem; min-width: 120px; box-shadow: var(--shadow-glass); backdrop-filter: blur(10px); z-index: 1000;">
+                    <a href="#" onclick="setLanguage('ko')" style="display: block; padding: 0.5rem 0.75rem; color: var(--text-primary); text-decoration: none; border-radius: 4px; transition: background 0.2s; font-size: 0.875rem;">한국어</a>
+                    <a href="#" onclick="setLanguage('en')" style="display: block; padding: 0.5rem 0.75rem; color: var(--text-primary); text-decoration: none; border-radius: 4px; transition: background 0.2s; font-size: 0.875rem;">English</a>
+                    <a href="#" onclick="setLanguage('ja')" style="display: block; padding: 0.5rem 0.75rem; color: var(--text-primary); text-decoration: none; border-radius: 4px; transition: background 0.2s; font-size: 0.875rem;">日本語</a>
+                    <a href="#" onclick="setLanguage('zh')" style="display: block; padding: 0.5rem 0.75rem; color: var(--text-primary); text-decoration: none; border-radius: 4px; transition: background 0.2s; font-size: 0.875rem;">中文</a>
+                    <a href="#" onclick="setLanguage('es')" style="display: block; padding: 0.5rem 0.75rem; color: var(--text-primary); text-decoration: none; border-radius: 4px; transition: background 0.2s; font-size: 0.875rem;">Español</a>
+                    <a href="#" onclick="setLanguage('fr')" style="display: block; padding: 0.5rem 0.75rem; color: var(--text-primary); text-decoration: none; border-radius: 4px; transition: background 0.2s; font-size: 0.875rem;">Français</a>
+                    <a href="#" onclick="setLanguage('de')" style="display: block; padding: 0.5rem 0.75rem; color: var(--text-primary); text-decoration: none; border-radius: 4px; transition: background 0.2s; font-size: 0.875rem;">Deutsch</a>
+                    <a href="#" onclick="setLanguage('pt')" style="display: block; padding: 0.5rem 0.75rem; color: var(--text-primary); text-decoration: none; border-radius: 4px; transition: background 0.2s; font-size: 0.875rem;">Português</a>
+                </div>
+            </div>
+            
             <button class="theme-toggle-premium" onclick="toggleTheme()" title="테마 변경">
                 <span id="themeIcon" class="theme-icon">
                     <!-- Moon SVG (다크모드 기본) -->
@@ -1104,17 +1124,17 @@
                 </p>
 
                 <div class="hero-cta">
-                    <a href="https://github.com/xavierchoi/kommentio" class="btn-premium btn-primary" target="_blank">
+                    <a href="https://github.com/xavierchoi/kommentio" class="btn-premium btn-primary" target="_blank" data-i18n="hero.githubBtn">
                         <i data-lucide="github"></i>
-                        GitHub에서 보기
+                        <span class="btn-text">GitHub에서 보기</span>
                     </a>
-                    <a href="#demo" class="btn-premium btn-secondary">
+                    <a href="#demo" class="btn-premium btn-secondary" data-i18n="hero.demoBtn">
                         <i data-lucide="play"></i>
-                        라이브 데모 체험
+                        <span class="btn-text">라이브 데모 체험</span>
                     </a>
-                    <a href="./admin-dashboard/" class="btn-premium btn-secondary" target="_blank">
+                    <a href="./admin-dashboard/" class="btn-premium btn-secondary" target="_blank" data-i18n="hero.dashboardBtn">
                         <i data-lucide="layout-dashboard"></i>
-                        관리 대시보드
+                        <span class="btn-text">관리 대시보드</span>
                     </a>
                 </div>
 
@@ -1266,20 +1286,728 @@
         </div>
     </footer>
 
-    <!-- Kommentio Widget Script -->
-    <script src="/kommentio.js?v=hierarchy-fix" async></script>
-    
-    <!-- Force Mock Mode -->
+    <!-- Kommentio Widget Script - 디버깅 추가 -->
     <script>
-        // Mock 모드 강제 활성화
-        setTimeout(() => {
-            if (window.kommentio) {
-                window.kommentio.mockMode = true;
-                window.kommentio.supabase = null;
-                window.kommentio.initMockData();
-                window.kommentio.loadComments();
+        console.log('[Landing i18n] Loading widget script...');
+        
+        // 스크립트 동적 로딩으로 변경하여 로딩 상태 확인
+        const widgetScript = document.createElement('script');
+        widgetScript.src = './widget/kommentio.iife.js';
+        
+        widgetScript.onload = function() {
+            console.log('[Landing i18n] Widget script loaded successfully');
+            console.log('[Landing i18n] Available globals after load:', {
+                Kommentio: !!window.Kommentio,
+                KommentioI18n: !!window.KommentioI18n,
+                kommentio: !!window.kommentio
+            });
+        };
+        
+        widgetScript.onerror = function(error) {
+            console.error('[Landing i18n] Failed to load widget script:', error);
+        };
+        
+        document.head.appendChild(widgetScript);
+    </script>
+
+    <!-- Landing Page i18n System -->
+    <script>
+        // 🌐 Landing Page i18n System - 4개 언어 지원
+        const LANDING_TRANSLATIONS = {
+            ko: {
+                nav: {
+                    home: "홈",
+                    docs: "문서",
+                    dashboard: "대시보드",
+                    themeToggle: "테마 변경",
+                    languageToggle: "언어 변경"
+                },
+                hero: {
+                    badge: "v0.2.42 Performance Optimized Release",
+                    title: "Kommentio",
+                    subtitle: "차세대 프리미엄 댓글 시스템<br>어디에나 어울리는 디자인 + AI 스팸 필터링 + 실시간 관리 대시보드",
+                    githubBtn: "GitHub에서 보기",
+                    demoBtn: "라이브 데모 체험",
+                    dashboardBtn: "관리 대시보드"
+                },
+                stats: {
+                    widget: "KB 경량 위젯",
+                    social: "소셜 로그인",
+                    free: "% 무료",
+                    noAds: "% 광고 없음"
+                },
+                features: {
+                    sectionTitle: "Why Choose Kommentio?",
+                    sectionSubtitle: "Disqus의 모든 기능을 제공하면서도 더 빠르고, 더 아름답고, 더 강력합니다.",
+                    speed: {
+                        title: "초고속 로딩",
+                        description: "16KB 경량 위젯으로 Disqus 대비 96% 작은 크기. 페이지 로딩 속도에 전혀 영향을 주지 않습니다."
+                    },
+                    ai: {
+                        title: "AI 스팸 방지",
+                        description: "Claude Haiku API 기반 지능형 스팸 필터링. 스팸 댓글을 자동으로 차단하고 품질 높은 토론을 보장합니다."
+                    },
+                    social: {
+                        title: "7개 소셜 로그인",
+                        description: "Google, Apple, Github, X, Facebook, LinkedIn, 카카오톡까지 완벽 지원합니다."
+                    },
+                    realtime: {
+                        title: "실시간 업데이트",
+                        description: "Supabase Realtime으로 새 댓글이 달리면 즉시 화면에 반영됩니다. 실시간 소통의 재미를 느껴보세요."
+                    },
+                    dashboard: {
+                        title: "프리미엄 대시보드",
+                        description: "댓글 관리, 사용자 관리, 스팸 필터링, 분석까지 모든 것을 한 곳에서 관리할 수 있습니다."
+                    },
+                    free: {
+                        title: "완전 무료",
+                        description: "오픈소스 MIT 라이선스. 광고도, 숨겨진 결제 유도도 없습니다. 영원히 무료로 사용할 수 있습니다."
+                    }
+                },
+                demo: {
+                    sectionTitle: "Interactive Demo",
+                    sectionSubtitle: "아래에서 Kommentio의 모든 기능을 직접 체험해보세요."
+                },
+                meta: {
+                    title: "Kommentio - Ultra-Premium Comment System | 차세대 Disqus 대체제",
+                    description: "프리미엄 디자인의 무료 댓글 시스템. Apple급 UX/UI + AI 스팸 필터링 + 실시간 관리 대시보드. 16KB 경량 위젯으로 웹사이트 성능은 그대로!"
+                },
+                languages: {
+                    ko: "한국어",
+                    en: "English", 
+                    ja: "日本語",
+                    zh: "中文",
+                    es: "Español",
+                    fr: "Français", 
+                    de: "Deutsch",
+                    pt: "Português"
+                }
+            },
+            en: {
+                nav: {
+                    home: "Home",
+                    docs: "Docs",
+                    dashboard: "Dashboard", 
+                    themeToggle: "Toggle theme",
+                    languageToggle: "Change language"
+                },
+                hero: {
+                    badge: "v0.2.42 Performance Optimized Release",
+                    title: "Kommentio",
+                    subtitle: "Next-Generation Premium Comment System<br>Universal Design + AI Spam Filtering + Real-time Admin Dashboard",
+                    githubBtn: "View on GitHub",
+                    demoBtn: "Try Live Demo",
+                    dashboardBtn: "Admin Dashboard"
+                },
+                stats: {
+                    widget: "KB Lightweight Widget",
+                    social: "Social Logins",
+                    free: "% Free",
+                    noAds: "% Ad-Free"
+                },
+                features: {
+                    sectionTitle: "Why Choose Kommentio?",
+                    sectionSubtitle: "Provides all Disqus features while being faster, more beautiful, and more powerful.",
+                    speed: {
+                        title: "Ultra-Fast Loading",
+                        description: "16KB lightweight widget, 96% smaller than Disqus. No impact on page loading speed whatsoever."
+                    },
+                    ai: {
+                        title: "AI Spam Prevention",
+                        description: "Intelligent spam filtering based on Claude Haiku API. Automatically blocks spam comments and ensures high-quality discussions."
+                    },
+                    social: {
+                        title: "7 Social Logins",
+                        description: "Perfect support for Google, Apple, Github, X, Facebook, LinkedIn, and KakaoTalk."
+                    },
+                    realtime: {
+                        title: "Real-time Updates",
+                        description: "New comments are immediately reflected on screen with Supabase Realtime. Experience the joy of real-time communication."
+                    },
+                    dashboard: {
+                        title: "Premium Dashboard",
+                        description: "Manage everything in one place: comment management, user management, spam filtering, and analytics."
+                    },
+                    free: {
+                        title: "Completely Free",
+                        description: "Open source MIT license. No ads, no hidden payment prompts. Free to use forever."
+                    }
+                },
+                demo: {
+                    sectionTitle: "Interactive Demo",
+                    sectionSubtitle: "Experience all Kommentio features directly below."
+                },
+                meta: {
+                    title: "Kommentio - Ultra-Premium Comment System | Next-Gen Disqus Alternative",
+                    description: "Premium-designed free comment system. Apple-grade UX/UI + AI spam filtering + real-time admin dashboard. 16KB lightweight widget maintains website performance!"
+                },
+                languages: {
+                    ko: "한국어",
+                    en: "English",
+                    ja: "日本語", 
+                    zh: "中文"
+                }
+            },
+            ja: {
+                nav: {
+                    home: "ホーム",
+                    docs: "ドキュメント",
+                    dashboard: "ダッシュボード",
+                    themeToggle: "テーマ切替",
+                    languageToggle: "言語変更"
+                },
+                hero: {
+                    badge: "v0.2.42 Performance Optimized Release",
+                    title: "Kommentio",
+                    subtitle: "次世代プレミアムコメントシステム<br>汎用デザイン + AIスパムフィルタリング + リアルタイム管理ダッシュボード",
+                    githubBtn: "GitHubで見る",
+                    demoBtn: "ライブデモを試す",
+                    dashboardBtn: "管理ダッシュボード"
+                },
+                stats: {
+                    widget: "KB 軽量ウィジェット",
+                    social: "ソーシャルログイン",
+                    free: "% 無料",
+                    noAds: "% 広告なし"
+                },
+                features: {
+                    sectionTitle: "Why Choose Kommentio?",
+                    sectionSubtitle: "Disqusの全機能を提供しながら、より高速で、より美しく、より強力です。",
+                    speed: {
+                        title: "超高速読み込み",
+                        description: "16KB軽量ウィジェットでDisqusより96%小さいサイズ。ページ読み込み速度に全く影響しません。"
+                    },
+                    ai: {
+                        title: "AIスパム防止",
+                        description: "Claude Haiku API基盤のインテリジェントスパムフィルタリング。スパムコメントを自動でブロックし、高品質な議論を保証します。"
+                    },
+                    social: {
+                        title: "7つのソーシャルログイン",
+                        description: "Google、Apple、Github、X、Facebook、LinkedIn、カカオトークまで完璧サポート。"
+                    },
+                    realtime: {
+                        title: "リアルタイム更新",
+                        description: "Supabase Realtimeで新しいコメントが投稿されると即座に画面に反映されます。リアルタイムコミュニケーションの楽しさを体験してください。"
+                    },
+                    dashboard: {
+                        title: "プレミアムダッシュボード",
+                        description: "コメント管理、ユーザー管理、スパムフィルタリング、分析まで全てを一箇所で管理できます。"
+                    },
+                    free: {
+                        title: "完全無料",
+                        description: "オープンソースMITライセンス。広告も、隠れた課金誘導もありません。永遠に無料で使用できます。"
+                    }
+                },
+                demo: {
+                    sectionTitle: "Interactive Demo",
+                    sectionSubtitle: "下でKommentioの全機能を直接体験してみてください。"
+                },
+                meta: {
+                    title: "Kommentio - Ultra-Premium Comment System | 次世代Disqus代替",
+                    description: "プレミアムデザインの無料コメントシステム。Apple級UX/UI + AIスパムフィルタリング + リアルタイム管理ダッシュボード。16KB軽量ウィジェットでWebサイトパフォーマンス維持！"
+                },
+                languages: {
+                    ko: "한국어",
+                    en: "English",
+                    ja: "日本語",
+                    zh: "中文",
+                    es: "Español",
+                    fr: "Français", 
+                    de: "Deutsch",
+                    pt: "Português"
+                }
+            },
+            zh: {
+                nav: {
+                    home: "首页",
+                    docs: "文档",
+                    dashboard: "仪表板",
+                    themeToggle: "切换主题",
+                    languageToggle: "更改语言"
+                },
+                hero: {
+                    badge: "v0.2.42 Performance Optimized Release",
+                    title: "Kommentio",
+                    subtitle: "下一代高级评论系统<br>通用设计 + AI垃圾过滤 + 实时管理仪表板",
+                    githubBtn: "在GitHub上查看",
+                    demoBtn: "试用实时演示",
+                    dashboardBtn: "管理仪表板"
+                },
+                stats: {
+                    widget: "KB 轻量级小部件",
+                    social: "社交登录",
+                    free: "% 免费",
+                    noAds: "% 无广告"
+                },
+                features: {
+                    sectionTitle: "Why Choose Kommentio?",
+                    sectionSubtitle: "提供Disqus的所有功能，同时更快、更美观、更强大。",
+                    speed: {
+                        title: "超快加载",
+                        description: "16KB轻量级小部件，比Disqus小96%。对页面加载速度没有任何影响。"
+                    },
+                    ai: {
+                        title: "AI垃圾防护",
+                        description: "基于Claude Haiku API的智能垃圾过滤。自动阻止垃圾评论，确保高质量讨论。"
+                    },
+                    social: {
+                        title: "7种社交登录",
+                        description: "完美支持Google、Apple、Github、X、Facebook、LinkedIn和KakaoTalk。"
+                    },
+                    realtime: {
+                        title: "实时更新",
+                        description: "通过Supabase Realtime，新评论立即在屏幕上反映。体验实时沟通的乐趣。"
+                    },
+                    dashboard: {
+                        title: "高级仪表板",
+                        description: "在一个地方管理一切：评论管理、用户管理、垃圾过滤和分析。"
+                    },
+                    free: {
+                        title: "完全免费",
+                        description: "开源MIT许可证。没有广告，没有隐藏的付费引导。永远免费使用。"
+                    }
+                },
+                demo: {
+                    sectionTitle: "Interactive Demo",
+                    sectionSubtitle: "在下面直接体验Kommentio的所有功能。"
+                },
+                meta: {
+                    title: "Kommentio - Ultra-Premium Comment System | 下一代Disqus替代品",
+                    description: "高级设计的免费评论系统。Apple级UX/UI + AI垃圾过滤 + 实时管理仪表板。16KB轻量级小部件保持网站性能！"
+                },
+                languages: {
+                    ko: "한국어",
+                    en: "English",
+                    ja: "日本語",
+                    zh: "中文",
+                    es: "Español",
+                    fr: "Français", 
+                    de: "Deutsch",
+                    pt: "Português"
+                }
+            },
+            // 완전한 번역 데이터 (4개 언어에 features 카드 추가)
+            es: {
+                nav: { docs: "Docs", dashboard: "Panel", themeToggle: "Cambiar Tema", languageToggle: "Cambiar Idioma" },
+                hero: { 
+                    subtitle: "Sistema de Comentarios Premium de Próxima Generación<br>Diseño Universal + Filtrado de Spam IA + Panel de Administración en Tiempo Real",
+                    githubBtn: "Ver en GitHub",
+                    demoBtn: "Probar Demo en Vivo",
+                    dashboardBtn: "Panel de Administración"
+                },
+                stats: { widget: "KB Widget Ligero", social: "Inicios de Sesión", free: "% Gratis", noAds: "% Sin Anuncios" },
+                features: { 
+                    sectionTitle: "¿Por Qué Elegir Kommentio?", 
+                    sectionSubtitle: "Proporciona todas las funciones de Disqus siendo más rápido, hermoso y potente.",
+                    speed: {
+                        title: "Carga Ultra Rápida",
+                        description: "Widget ligero de 16KB, 96% más pequeño que Disqus. Sin impacto en la velocidad de carga de la página."
+                    },
+                    ai: {
+                        title: "Protección IA Anti-Spam",
+                        description: "Filtrado inteligente de spam basado en Claude Haiku API. Bloquea automáticamente comentarios spam y garantiza discusiones de alta calidad."
+                    },
+                    social: {
+                        title: "7 Inicios de Sesión Sociales",
+                        description: "Soporte perfecto para Google, Apple, Github, X, Facebook, LinkedIn y KakaoTalk."
+                    },
+                    realtime: {
+                        title: "Actualizaciones en Tiempo Real",
+                        description: "Con Supabase Realtime, los nuevos comentarios se reflejan inmediatamente en pantalla. Experimenta la diversión de la comunicación en tiempo real."
+                    },
+                    dashboard: {
+                        title: "Panel Premium",
+                        description: "Gestiona todo en un lugar: gestión de comentarios, gestión de usuarios, filtrado de spam y análisis."
+                    },
+                    free: {
+                        title: "Completamente Gratis",
+                        description: "Licencia MIT de código abierto. Sin anuncios, sin inducción oculta de pago. Gratis para usar para siempre."
+                    }
+                },
+                demo: { sectionTitle: "Demo Interactivo", sectionSubtitle: "Experimenta todas las funciones de Kommentio directamente abajo." },
+                meta: {
+                    title: "Kommentio - Sistema de Comentarios Ultra-Premium | Alternativa a Disqus de Próxima Generación",
+                    description: "Sistema de comentarios gratuito con diseño premium. UX/UI nivel Apple + Filtrado de spam IA + Panel de administración en tiempo real. ¡Widget ligero de 16KB mantiene el rendimiento del sitio web!"
+                },
+                languages: { ko: "한국어", en: "English", ja: "日本語", zh: "中文", es: "Español", fr: "Français", de: "Deutsch", pt: "Português" }
+            },
+            fr: {
+                nav: { docs: "Docs", dashboard: "Tableau de bord", themeToggle: "Changer de Thème", languageToggle: "Changer de Langue" },
+                hero: { 
+                    subtitle: "Système de Commentaires Premium de Nouvelle Génération<br>Design Universel + Filtrage Spam IA + Tableau de Bord Admin en Temps Réel",
+                    githubBtn: "Voir sur GitHub",
+                    demoBtn: "Essayer la Démo en Direct",
+                    dashboardBtn: "Tableau de Bord Admin"
+                },
+                stats: { widget: "KB Widget Léger", social: "Connexions Sociales", free: "% Gratuit", noAds: "% Sans Pub" },
+                features: { 
+                    sectionTitle: "Pourquoi Choisir Kommentio?", 
+                    sectionSubtitle: "Fournit toutes les fonctionnalités de Disqus tout en étant plus rapide, beau et puissant.",
+                    speed: {
+                        title: "Chargement Ultra Rapide",
+                        description: "Widget léger de 16KB, 96% plus petit que Disqus. Aucun impact sur la vitesse de chargement des pages."
+                    },
+                    ai: {
+                        title: "Protection IA Anti-Spam",
+                        description: "Filtrage intelligent du spam basé sur l'API Claude Haiku. Bloque automatiquement les commentaires spam et garantit des discussions de haute qualité."
+                    },
+                    social: {
+                        title: "7 Connexions Sociales",
+                        description: "Support parfait pour Google, Apple, Github, X, Facebook, LinkedIn et KakaoTalk."
+                    },
+                    realtime: {
+                        title: "Mises à Jour en Temps Réel",
+                        description: "Avec Supabase Realtime, les nouveaux commentaires sont immédiatement reflétés à l'écran. Découvrez le plaisir de la communication en temps réel."
+                    },
+                    dashboard: {
+                        title: "Tableau de Bord Premium",
+                        description: "Gérez tout en un seul endroit: gestion des commentaires, gestion des utilisateurs, filtrage du spam et analyses."
+                    },
+                    free: {
+                        title: "Entièrement Gratuit",
+                        description: "Licence MIT open source. Pas de pub, pas d'incitation cachée au paiement. Gratuit à utiliser pour toujours."
+                    }
+                },
+                demo: { sectionTitle: "Démo Interactif", sectionSubtitle: "Découvrez toutes les fonctionnalités de Kommentio ci-dessous." },
+                meta: {
+                    title: "Kommentio - Système de Commentaires Ultra-Premium | Alternative Disqus de Nouvelle Génération",
+                    description: "Système de commentaires gratuit avec design premium. UX/UI niveau Apple + Filtrage spam IA + Tableau de bord admin en temps réel. Widget léger 16KB maintient les performances du site !"
+                },
+                languages: { ko: "한국어", en: "English", ja: "日本語", zh: "中文", es: "Español", fr: "Français", de: "Deutsch", pt: "Português" }
+            },
+            de: {
+                nav: { docs: "Docs", dashboard: "Dashboard", themeToggle: "Thema Wechseln", languageToggle: "Sprache Ändern" },
+                hero: { 
+                    subtitle: "Nächste Generation Premium Kommentar-System<br>Universelles Design + KI Spam-Filterung + Echtzeit-Admin-Dashboard",
+                    githubBtn: "Auf GitHub Ansehen",
+                    demoBtn: "Live-Demo Ausprobieren",
+                    dashboardBtn: "Admin-Dashboard"
+                },
+                stats: { widget: "KB Leichtes Widget", social: "Soziale Logins", free: "% Kostenlos", noAds: "% Werbefrei" },
+                features: { 
+                    sectionTitle: "Warum Kommentio Wählen?", 
+                    sectionSubtitle: "Bietet alle Disqus-Funktionen und ist dabei schneller, schöner und leistungsfähiger.",
+                    speed: {
+                        title: "Ultra Schnelles Laden",
+                        description: "16KB leichtes Widget, 96% kleiner als Disqus. Kein Einfluss auf die Seitenladegeschwindigkeit."
+                    },
+                    ai: {
+                        title: "KI Anti-Spam Schutz",
+                        description: "Intelligente Spam-Filterung basierend auf Claude Haiku API. Blockiert automatisch Spam-Kommentare und gewährleistet hochwertige Diskussionen."
+                    },
+                    social: {
+                        title: "7 Soziale Logins",
+                        description: "Perfekte Unterstützung für Google, Apple, Github, X, Facebook, LinkedIn und KakaoTalk."
+                    },
+                    realtime: {
+                        title: "Echtzeit-Updates",
+                        description: "Mit Supabase Realtime werden neue Kommentare sofort auf dem Bildschirm angezeigt. Erleben Sie den Spaß der Echtzeit-Kommunikation."
+                    },
+                    dashboard: {
+                        title: "Premium Dashboard",
+                        description: "Verwalten Sie alles an einem Ort: Kommentar-Verwaltung, Benutzer-Verwaltung, Spam-Filterung und Analyse."
+                    },
+                    free: {
+                        title: "Völlig Kostenlos",
+                        description: "Open-Source MIT-Lizenz. Keine Werbung, keine versteckten Zahlungsaufforderungen. Für immer kostenlos zu verwenden."
+                    }
+                },
+                demo: { sectionTitle: "Interaktive Demo", sectionSubtitle: "Erleben Sie alle Kommentio-Funktionen direkt unten." },
+                meta: {
+                    title: "Kommentio - Ultra-Premium Kommentar-System | Nächste Generation Disqus-Alternative",
+                    description: "Kostenloses Kommentar-System mit Premium-Design. Apple-Level UX/UI + KI Spam-Filterung + Echtzeit-Admin-Dashboard. 16KB leichtes Widget erhält Website-Performance!"
+                },
+                languages: { ko: "한국어", en: "English", ja: "日본語", zh: "中文", es: "Español", fr: "Français", de: "Deutsch", pt: "Português" }
+            },
+            pt: {
+                nav: { docs: "Docs", dashboard: "Painel", themeToggle: "Alternar Tema", languageToggle: "Alterar Idioma" },
+                hero: { 
+                    subtitle: "Sistema de Comentários Premium de Próxima Geração<br>Design Universal + Filtragem de Spam IA + Painel de Admin em Tempo Real",
+                    githubBtn: "Ver no GitHub",
+                    demoBtn: "Experimentar Demo ao Vivo",
+                    dashboardBtn: "Painel de Admin"
+                },
+                stats: { widget: "KB Widget Leve", social: "Logins Sociais", free: "% Grátis", noAds: "% Sem Anúncios" },
+                features: { 
+                    sectionTitle: "Por Que Escolher Kommentio?", 
+                    sectionSubtitle: "Fornece todos os recursos do Disqus sendo mais rápido, bonito e poderoso.",
+                    speed: {
+                        title: "Carregamento Ultra Rápido",
+                        description: "Widget leve de 16KB, 96% menor que Disqus. Sem impacto na velocidade de carregamento da página."
+                    },
+                    ai: {
+                        title: "Proteção IA Anti-Spam",
+                        description: "Filtragem inteligente de spam baseada na API Claude Haiku. Bloqueia automaticamente comentários spam e garante discussões de alta qualidade."
+                    },
+                    social: {
+                        title: "7 Logins Sociais",
+                        description: "Suporte perfeito para Google, Apple, Github, X, Facebook, LinkedIn e KakaoTalk."
+                    },
+                    realtime: {
+                        title: "Atualizações em Tempo Real",
+                        description: "Com Supabase Realtime, novos comentários são refletidos imediatamente na tela. Experimente a diversão da comunicação em tempo real."
+                    },
+                    dashboard: {
+                        title: "Painel Premium",
+                        description: "Gerencie tudo em um lugar: gerenciamento de comentários, gerenciamento de usuários, filtragem de spam e análises."
+                    },
+                    free: {
+                        title: "Completamente Grátis",
+                        description: "Licença MIT de código aberto. Sem anúncios, sem indução oculta de pagamento. Grátis para usar para sempre."
+                    }
+                },
+                demo: { sectionTitle: "Demo Interativo", sectionSubtitle: "Experimente todos os recursos do Kommentio diretamente abaixo." },
+                meta: {
+                    title: "Kommentio - Sistema de Comentários Ultra-Premium | Alternativa Disqus de Próxima Geração",
+                    description: "Sistema de comentários grátis com design premium. UX/UI nível Apple + Filtragem de spam IA + Painel de admin em tempo real. Widget leve de 16KB mantém performance do site!"
+                },
+                languages: { ko: "한국어", en: "English", ja: "日本語", zh: "中文", es: "Español", fr: "Français", de: "Deutsch", pt: "Português" }
             }
-        }, 1000);
+        };
+
+        // 현재 언어 (브라우저 언어 자동 감지)
+        let currentLanguage = 'ko';
+        
+        // 브라우저 언어 자동 감지
+        function detectBrowserLanguage() {
+            const browserLang = (navigator.language || navigator.userLanguage).split('-')[0];
+            const supportedLangs = ['ko', 'en', 'ja', 'zh', 'es', 'fr', 'de', 'pt'];
+            return supportedLangs.includes(browserLang) ? browserLang : 'ko';
+        }
+
+        // 번역 함수
+        function t(key, lang = currentLanguage) {
+            const keys = key.split('.');
+            let value = LANDING_TRANSLATIONS[lang];
+            
+            for (let k of keys) {
+                if (value && value[k] !== undefined) {
+                    value = value[k];
+                } else {
+                    console.warn(`Translation missing: ${key} (${lang})`);
+                    return key;
+                }
+            }
+            
+            return value;
+        }
+
+        // 언어 설정
+        function setLanguage(lang) {
+            if (!LANDING_TRANSLATIONS[lang]) {
+                console.error(`[Landing i18n] Language ${lang} not found in translations`);
+                return;
+            }
+            
+            console.log(`[Landing i18n] Setting language to: ${lang}`);
+            
+            currentLanguage = lang;
+            localStorage.setItem('kommentio-landing-lang', lang);
+            
+            // UI 업데이트
+            updateUI();
+            updateCurrentLangDisplay();
+            toggleLanguageDropdown(); // 드롭다운 닫기
+            
+            // 위젯 언어 동기화 - KommentioI18n 글로벌 객체 사용
+            function trySetWidgetLanguage(language, retryCount = 0) {
+                if (window.KommentioI18n) {
+                    const success = window.KommentioI18n.setLanguage(language);
+                    if (success) {
+                        console.log(`[Landing i18n] Widget language successfully changed to: ${language}`);
+                    } else {
+                        console.warn(`[Landing i18n] Failed to change widget language to: ${language}`);
+                    }
+                } else if (retryCount < 10) {
+                    // 최대 5초 동안 500ms마다 재시도
+                    setTimeout(() => {
+                        trySetWidgetLanguage(language, retryCount + 1);
+                    }, 500);
+                } else {
+                    console.warn('[Landing i18n] KommentioI18n not available after 5 seconds');
+                }
+            }
+            
+            trySetWidgetLanguage(lang);
+            
+            console.log(`[Landing i18n] Language changed to: ${lang}`);
+        }
+
+        // UI 업데이트
+        function updateUI() {
+            // 페이지 메타 정보
+            document.title = t('meta.title');
+            document.querySelector('meta[name="description"]').setAttribute('content', t('meta.description'));
+            document.querySelector('meta[property="og:title"]').setAttribute('content', t('meta.title'));
+            document.querySelector('meta[property="og:description"]').setAttribute('content', t('meta.description'));
+            document.querySelector('meta[name="twitter:title"]').setAttribute('content', t('meta.title'));
+            document.querySelector('meta[name="twitter:description"]').setAttribute('content', t('meta.description'));
+            
+            // 히어로 섹션
+            const heroSubtitle = document.querySelector('.hero-subtitle');
+            if (heroSubtitle) heroSubtitle.innerHTML = t('hero.subtitle');
+            
+            // 히어로 버튼 텍스트 업데이트 (아이콘은 유지)
+            const heroButtons = document.querySelectorAll('.hero-cta .btn-premium');
+            heroButtons.forEach(button => {
+                const i18nKey = button.getAttribute('data-i18n');
+                const textSpan = button.querySelector('.btn-text');
+                if (i18nKey && textSpan) {
+                    textSpan.textContent = t(i18nKey);
+                }
+            });
+            
+            // 통계 섹션
+            const statLabels = document.querySelectorAll('.stat-label');
+            if (statLabels[0]) statLabels[0].textContent = t('stats.widget');
+            if (statLabels[1]) statLabels[1].textContent = t('stats.social');
+            if (statLabels[2]) statLabels[2].textContent = t('stats.free');
+            if (statLabels[3]) statLabels[3].textContent = t('stats.noAds');
+            
+            // 네비게이션 링크들 업데이트
+            const docsLink = document.querySelector('.nav-links a[href*="README.md"]');
+            if (docsLink) {
+                const docsIcon = docsLink.querySelector('i[data-lucide="book-open"]');
+                if (docsIcon) {
+                    docsLink.innerHTML = `<i data-lucide="book-open"></i>${t('nav.docs')}`;
+                }
+            }
+            
+            const dashboardLink = document.querySelector('.nav-links a[href="./admin-dashboard/"]');
+            if (dashboardLink) {
+                const dashboardIcon = dashboardLink.querySelector('i[data-lucide="layout-dashboard"]');
+                if (dashboardIcon) {
+                    dashboardLink.innerHTML = `<i data-lucide="layout-dashboard"></i>${t('nav.dashboard')}`;
+                }
+            }
+            
+            // Lucide 아이콘 다시 초기화 (안전한 방식)
+            setTimeout(() => {
+                initLucideIcons();
+            }, 100);
+            
+            // Features 섹션
+            const featuresTitle = document.querySelector('.features-premium .section-title');
+            if (featuresTitle) featuresTitle.textContent = t('features.sectionTitle');
+            
+            const featuresSubtitle = document.querySelector('.features-premium .section-subtitle');
+            if (featuresSubtitle) featuresSubtitle.textContent = t('features.sectionSubtitle');
+            
+            const featureTitles = document.querySelectorAll('.feature-title');
+            const featureDescriptions = document.querySelectorAll('.feature-description');
+            
+            if (featureTitles[0]) featureTitles[0].textContent = t('features.speed.title');
+            if (featureDescriptions[0]) featureDescriptions[0].textContent = t('features.speed.description');
+            
+            if (featureTitles[1]) featureTitles[1].textContent = t('features.ai.title');
+            if (featureDescriptions[1]) featureDescriptions[1].textContent = t('features.ai.description');
+            
+            if (featureTitles[2]) featureTitles[2].textContent = t('features.social.title');
+            if (featureDescriptions[2]) featureDescriptions[2].textContent = t('features.social.description');
+            
+            if (featureTitles[3]) featureTitles[3].textContent = t('features.realtime.title');
+            if (featureDescriptions[3]) featureDescriptions[3].textContent = t('features.realtime.description');
+            
+            if (featureTitles[4]) featureTitles[4].textContent = t('features.dashboard.title');
+            if (featureDescriptions[4]) featureDescriptions[4].textContent = t('features.dashboard.description');
+            
+            if (featureTitles[5]) featureTitles[5].textContent = t('features.free.title');
+            if (featureDescriptions[5]) featureDescriptions[5].textContent = t('features.free.description');
+            
+            // Demo 섹션
+            const demoTitle = document.querySelector('.demo-premium .section-title');
+            if (demoTitle) demoTitle.textContent = t('demo.sectionTitle');
+            
+            const demoSubtitle = document.querySelector('.demo-premium .section-subtitle');
+            if (demoSubtitle) demoSubtitle.textContent = t('demo.sectionSubtitle');
+            
+            // 데모 위젯 언어는 위젯 매니저가 처리함 (별도 코드 불필요)
+            
+            // title 속성들 업데이트
+            const themeToggle = document.querySelector('.theme-toggle-premium');
+            if (themeToggle) themeToggle.setAttribute('title', t('nav.themeToggle'));
+            
+            const langToggle = document.querySelector('#languageToggle');
+            if (langToggle) langToggle.setAttribute('title', t('nav.languageToggle'));
+        }
+
+        // 현재 언어 표시 업데이트
+        function updateCurrentLangDisplay() {
+            const currentLangEl = document.getElementById('currentLang');
+            if (currentLangEl) {
+                currentLangEl.textContent = t('languages.' + currentLanguage);
+            }
+        }
+
+        // 언어 드롭다운 토글
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            if (dropdown) {
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        // 위젯 언어 동기화는 KommentioI18n.setLanguage()로 처리
+
+        // 드롭다운 외부 클릭 시 닫기
+        document.addEventListener('click', function(e) {
+            const selector = document.querySelector('.language-selector');
+            const dropdown = document.getElementById('languageDropdown');
+            
+            if (selector && !selector.contains(e.target) && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // 위젯 준비 대기 함수
+        function waitForKommentioI18n(callback, timeout = 10000) {
+            const startTime = Date.now();
+            
+            function check() {
+                if (window.KommentioI18n) {
+                    console.log('[Landing i18n] KommentioI18n ready');
+                    callback();
+                } else if (Date.now() - startTime < timeout) {
+                    setTimeout(check, 100); // 100ms마다 확인
+                } else {
+                    console.warn('[Landing i18n] KommentioI18n not loaded within timeout');
+                }
+            }
+            
+            check();
+        }
+        
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 저장된 언어 또는 브라우저 언어 사용
+            const savedLang = localStorage.getItem('kommentio-landing-lang');
+            currentLanguage = savedLang || detectBrowserLanguage();
+            
+            console.log(`[Landing i18n] Detected language: ${currentLanguage}`);
+            
+            // 위젯 element에 초기 언어 설정 (위젯 로딩 전에 미리 설정)
+            const widgetElement = document.querySelector('[data-kommentio]');
+            if (widgetElement) {
+                widgetElement.setAttribute('data-language', currentLanguage);
+                console.log(`[Landing i18n] Pre-set widget language to: ${currentLanguage}`);
+            }
+            
+            // UI 초기화
+            updateUI();
+            updateCurrentLangDisplay();
+            
+            // 위젯이 로드되면 초기 언어 동기화
+            waitForKommentioI18n(function() {
+                if (window.KommentioI18n) {
+                    const success = window.KommentioI18n.setLanguage(currentLanguage);
+                    if (success) {
+                        console.log(`[Landing i18n] Initial widget language set to: ${currentLanguage}`);
+                    }
+                }
+            });
+            
+            console.log(`[Landing i18n] Initialization completed with language: ${currentLanguage}`);
+        });
     </script>
 
     <script>
@@ -1552,13 +2280,26 @@
         // Premium smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                const href = this.getAttribute('href');
+                
+                // href가 '#'만 있거나 유효하지 않은 경우 스크롤링 처리하지 않음
+                if (href === '#' || href.length <= 1) {
+                    return; // preventDefault 하지 않고 기본 동작 허용
+                }
+                
+                // 유효한 ID가 있는지 확인
+                try {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                } catch (error) {
+                    console.warn(`Invalid selector: ${href}`);
+                    return; // 에러 발생시 기본 동작 허용
                 }
             });
         });
@@ -1642,26 +2383,37 @@
             }
         }
 
-        // Async Lucide Icons handling
+        // Async Lucide Icons handling - 안전한 초기화
         let lucideReady = false;
         
         function initLucideIcons() {
-            if (window.lucide) {
-                window.lucide.createIcons();
-                lucideReady = true;
+            try {
+                if (window.lucide && window.lucide.createIcons) {
+                    window.lucide.createIcons();
+                    lucideReady = true;
+                    console.log('[Lucide] Icons initialized successfully');
+                }
+            } catch (error) {
+                console.warn('[Lucide] Failed to initialize icons:', error);
             }
         }
         
         function initLucideIconsWhenReady() {
             if (lucideReady) {
-                window.lucide.createIcons();
+                initLucideIcons();
             } else {
-                // Wait for Lucide to load
+                // Wait for Lucide to load with timeout
+                let attempts = 0;
+                const maxAttempts = 50; // 5초 최대 대기
+                
                 const checkLucide = setInterval(() => {
-                    if (window.lucide) {
+                    attempts++;
+                    if (window.lucide && window.lucide.createIcons) {
                         clearInterval(checkLucide);
-                        window.lucide.createIcons();
-                        lucideReady = true;
+                        initLucideIcons();
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(checkLucide);
+                        console.warn('[Lucide] Timeout waiting for Lucide to load');
                     }
                 }, 100);
             }

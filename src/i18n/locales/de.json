@@ -1,0 +1,66 @@
+{
+  "comment": {
+    "writeComment": "Kommentar schreiben...",
+    "submitComment": "Kommentar Veröffentlichen",
+    "submitting": "Wird veröffentlicht...",
+    "reply": "Antworten",
+    "replying": "Antwortet...",
+    "replyTo": "Antwort an {{user}}",
+    "like": "Gefällt mir",
+    "likes": "{{count}} Gefällt mir",
+    "anonymous": "Anonym",
+    "timeAgo": {
+      "justNow": "gerade eben",
+      "minutesAgo": "vor {{count}} Minuten",
+      "hoursAgo": "vor {{count}} Stunden",
+      "daysAgo": "vor {{count}} Tagen",
+      "weeksAgo": "vor {{count}} Wochen",
+      "monthsAgo": "vor {{count}} Monaten",
+      "yearsAgo": "vor {{count}} Jahren"
+    }
+  },
+  "auth": {
+    "loginWith": "Mit {{provider}} anmelden",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "anonymous": "Anonym kommentieren",
+    "loginRequired": "Bitte melden Sie sich an, um zu kommentieren",
+    "providers": {
+      "google": "Google",
+      "apple": "Apple",
+      "github": "GitHub",
+      "twitter": "X.com",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "kakao": "Kakao"
+    }
+  },
+  "messages": {
+    "success": {
+      "commentCreated": "Kommentar erfolgreich veröffentlicht! ✅",
+      "commentDeleted": "Kommentar gelöscht.",
+      "commentLiked": "Kommentar gefällt Ihnen.",
+      "commentUnliked": "Gefällt mir entfernt."
+    },
+    "error": {
+      "commentFailed": "Kommentar konnte nicht veröffentlicht werden.",
+      "loginFailed": "Anmeldung fehlgeschlagen.",
+      "loadFailed": "Kommentare konnten nicht geladen werden.",
+      "networkError": "Netzwerkfehler aufgetreten."
+    },
+    "spam": {
+      "detected": "Kommentar als Spam markiert. Wartet auf Administrator-Genehmigung. ⚠️",
+      "reviewing": "Kommentar wird vom Administrator überprüft."
+    }
+  },
+  "placeholder": {
+    "markdown": "**fett**, *kursiv*, `code`, ```codeblock```, > zitat, [link](url) • Strg+Enter zum Veröffentlichen"
+  },
+  "tabs": {
+    "write": "✏️ Schreiben",
+    "preview": "👁️ Vorschau"
+  },
+  "keyboard": {
+    "shortcuts": "Strg+Enter: Veröffentlichen, Strg+Tab: Tabs wechseln, ESC: Schreibmodus"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "comment": {
+    "writeComment": "Escribe un comentario...",
+    "submitComment": "Publicar Comentario",
+    "submitting": "Publicando...",
+    "reply": "Responder",
+    "replying": "Respondiendo...",
+    "replyTo": "Responder a {{user}}",
+    "like": "Me gusta",
+    "likes": "{{count}} me gusta",
+    "anonymous": "Anónimo",
+    "timeAgo": {
+      "justNow": "hace un momento",
+      "minutesAgo": "hace {{count}} minutos",
+      "hoursAgo": "hace {{count}} horas",
+      "daysAgo": "hace {{count}} días",
+      "weeksAgo": "hace {{count}} semanas",
+      "monthsAgo": "hace {{count}} meses",
+      "yearsAgo": "hace {{count}} años"
+    }
+  },
+  "auth": {
+    "loginWith": "Iniciar sesión con {{provider}}",
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "anonymous": "Comentar anónimamente",
+    "loginRequired": "Por favor inicia sesión para comentar",
+    "providers": {
+      "google": "Google",
+      "apple": "Apple",
+      "github": "GitHub",
+      "twitter": "X.com",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "kakao": "Kakao"
+    }
+  },
+  "messages": {
+    "success": {
+      "commentCreated": "¡Comentario publicado con éxito! ✅",
+      "commentDeleted": "Comentario eliminado.",
+      "commentLiked": "Te gusta este comentario.",
+      "commentUnliked": "Ya no te gusta este comentario."
+    },
+    "error": {
+      "commentFailed": "Error al publicar el comentario.",
+      "loginFailed": "Error al iniciar sesión.",
+      "loadFailed": "Error al cargar los comentarios.",
+      "networkError": "Error de red."
+    },
+    "spam": {
+      "detected": "Comentario marcado como spam. Pendiente de aprobación del administrador. ⚠️",
+      "reviewing": "Comentario bajo revisión del administrador."
+    }
+  },
+  "placeholder": {
+    "markdown": "**negrita**, *cursiva*, `código`, ```bloque de código```, > cita, [enlace](url) • Ctrl+Enter para publicar"
+  },
+  "tabs": {
+    "write": "✏️ Escribir",
+    "preview": "👁️ Vista previa"
+  },
+  "keyboard": {
+    "shortcuts": "Ctrl+Enter: Publicar, Ctrl+Tab: Cambiar pestañas, ESC: Modo escritura"
+  }
+}

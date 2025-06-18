@@ -1,0 +1,66 @@
+{
+  "comment": {
+    "writeComment": "댓글을 작성하세요...",
+    "submitComment": "댓글 작성",
+    "submitting": "작성 중...",
+    "reply": "답글",
+    "replying": "답글 작성 중...",
+    "replyTo": "{{user}}님에게 답글",
+    "like": "좋아요",
+    "likes": "좋아요 {{count}}개",
+    "anonymous": "익명",
+    "timeAgo": {
+      "justNow": "방금 전",
+      "minutesAgo": "{{count}}분 전",
+      "hoursAgo": "{{count}}시간 전",
+      "daysAgo": "{{count}}일 전",
+      "weeksAgo": "{{count}}주 전",
+      "monthsAgo": "{{count}}개월 전",
+      "yearsAgo": "{{count}}년 전"
+    }
+  },
+  "auth": {
+    "loginWith": "{{provider}}(으)로 로그인",
+    "signIn": "로그인",
+    "signOut": "로그아웃",
+    "anonymous": "익명으로 댓글 작성",
+    "loginRequired": "댓글을 작성하려면 로그인하세요",
+    "providers": {
+      "google": "Google",
+      "apple": "Apple",
+      "github": "GitHub", 
+      "twitter": "X.com",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "kakao": "Kakao"
+    }
+  },
+  "messages": {
+    "success": {
+      "commentCreated": "댓글이 성공적으로 작성되었습니다! ✅",
+      "commentDeleted": "댓글이 삭제되었습니다.",
+      "commentLiked": "댓글에 좋아요를 눌렀습니다.",
+      "commentUnliked": "좋아요를 취소했습니다."
+    },
+    "error": {
+      "commentFailed": "댓글 작성에 실패했습니다.",
+      "loginFailed": "로그인에 실패했습니다.",
+      "loadFailed": "댓글을 불러오는데 실패했습니다.",
+      "networkError": "네트워크 오류가 발생했습니다."
+    },
+    "spam": {
+      "detected": "스팸으로 감지된 댓글입니다. 관리자 승인 후 게시됩니다. ⚠️",
+      "reviewing": "관리자 검토 중인 댓글입니다."
+    }
+  },
+  "placeholder": {
+    "markdown": "**볼드**, *이탤릭*, `코드`, ```코드블록```, > 인용구, [링크](url) • Ctrl+Enter로 빠른 등록"
+  },
+  "tabs": {
+    "write": "✏️ 작성",
+    "preview": "👁️ 미리보기"
+  },
+  "keyboard": {
+    "shortcuts": "Ctrl+Enter: 댓글 등록, Ctrl+Tab: 탭 전환, ESC: 작성 모드"
+  }
+}

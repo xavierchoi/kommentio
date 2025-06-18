@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kommentio i18n Demo - 8 Languages Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .demo-header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2rem;
+        }
+
+        .demo-header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .language-switcher {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .language-switcher h3 {
+            margin: 0 0 1rem 0;
+            color: #333;
+        }
+
+        .language-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .current-language {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .kommentio-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .demo-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-info h4 {
+            margin: 0 0 0.5rem 0;
+            color: #1976d2;
+        }
+
+        .api-example {
+            background: #f5f5f5;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🌐 Kommentio v0.3.3 - i18n Demo</h1>
+        <p>8개 언어 지원 댓글 시스템 • 8 Languages Support Comment System • 8言語サポート</p>
+    </div>
+
+    <div class="language-switcher">
+        <h3>🔄 언어 전환 테스트 / Language Switch Test</h3>
+        <div class="language-buttons">
+            <button class="lang-btn active" onclick="switchLanguage('en')">🇺🇸 English</button>
+            <button class="lang-btn" onclick="switchLanguage('ko')">🇰🇷 한국어</button>
+            <button class="lang-btn" onclick="switchLanguage('ja')">🇯🇵 日本語</button>
+            <button class="lang-btn" onclick="switchLanguage('zh')">🇨🇳 中文</button>
+            <button class="lang-btn" onclick="switchLanguage('es')">🇪🇸 Español</button>
+            <button class="lang-btn" onclick="switchLanguage('fr')">🇫🇷 Français</button>
+            <button class="lang-btn" onclick="switchLanguage('de')">🇩🇪 Deutsch</button>
+            <button class="lang-btn" onclick="switchLanguage('pt')">🇵🇹 Português</button>
+        </div>
+        <div class="current-language">
+            <strong>Current Language:</strong> <span id="current-lang">English</span>
+            <br><strong>Browser Language:</strong> <span id="browser-lang">-</span>
+        </div>
+    </div>
+
+    <div class="demo-info">
+        <h4>🧪 테스트 기능 / Test Features</h4>
+        <ul>
+            <li><strong>브라우저 언어 자동 감지</strong> - Browser language auto-detection</li>
+            <li><strong>실시간 언어 전환</strong> - Real-time language switching</li>
+            <li><strong>마크다운 지원</strong> - Markdown support in all languages</li>
+            <li><strong>소셜 로그인 현지화</strong> - Social login localization</li>
+            <li><strong>시간 표시 현지화</strong> - Time display localization</li>
+        </ul>
+        
+        <div class="api-example">
+            <strong>API 사용 예제 / API Usage Examples:</strong><br>
+            KommentioI18n.setLanguage('ko')<br>
+            KommentioI18n.getLanguage()<br>
+            KommentioI18n.getSupportedLanguages()<br>
+            KommentioI18n.t('comment.writeComment')
+        </div>
+    </div>
+
+    <div class="kommentio-container">
+        <!-- Kommentio 위젯이 여기에 렌더링됩니다 -->
+        <div data-kommentio data-site-id="i18n-demo" data-language="en"></div>
+    </div>
+
+    <!-- Kommentio 위젯 로드 -->
+    <script src="./dist/widget/kommentio.iife.js"></script>
+
+    <script>
+        // 브라우저 언어 표시
+        document.getElementById('browser-lang').textContent = navigator.language || 'unknown';
+
+        // 언어 전환 함수
+        function switchLanguage(language) {
+            // 버튼 활성화 상태 변경
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Kommentio 언어 변경
+            if (window.KommentioI18n) {
+                const result = KommentioI18n.setLanguage(language);
+                if (result) {
+                    console.log(`Language changed to: ${language}`);
+                    
+                    // 현재 언어 표시 업데이트
+                    const languageNames = {
+                        en: 'English',
+                        ko: '한국어',
+                        ja: '日本語',
+                        zh: '中文',
+                        es: 'Español',
+                        fr: 'Français',
+                        de: 'Deutsch',
+                        pt: 'Português'
+                    };
+                    document.getElementById('current-lang').textContent = 
+                        `${languageNames[language]} (${language})`;
+                } else {
+                    console.error(`Failed to change language to: ${language}`);
+                }
+            } else {
+                console.warn('KommentioI18n not available yet');
+            }
+        }
+
+        // 위젯 로드 후 초기 언어 설정 확인
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                if (window.KommentioI18n) {
+                    const currentLang = KommentioI18n.getLanguage();
+                    console.log('Widget loaded with language:', currentLang);
+                    
+                    // 지원 언어 목록 출력
+                    console.log('Supported languages:', KommentioI18n.getSupportedLanguages());
+                    
+                    // 번역 테스트
+                    console.log('Translation test:', KommentioI18n.t('comment.writeComment'));
+                }
+            }, 1000);
+        });
+
+        // 개발자 콘솔용 유틸리티
+        window.testI18n = function() {
+            console.group('🌐 Kommentio i18n Test');
+            console.log('Current Language:', KommentioI18n.getLanguage());
+            console.log('Supported Languages:', KommentioI18n.getSupportedLanguages());
+            console.log('Language Names:', KommentioI18n.getSupportedLanguages().map(lang => 
+                `${lang}: ${KommentioI18n.getLanguageName(lang)}`));
+            console.log('Sample Translations:');
+            ['comment.writeComment', 'comment.submitComment', 'auth.signIn', 'messages.success.commentCreated']
+                .forEach(key => console.log(`  ${key}: "${KommentioI18n.t(key)}"`));
+            console.groupEnd();
+        };
+
+        console.log('🧪 Type testI18n() in console to run i18n tests');
+    </script>
+</body>
+</html>

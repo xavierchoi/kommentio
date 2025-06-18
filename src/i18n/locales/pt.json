@@ -1,0 +1,66 @@
+{
+  "comment": {
+    "writeComment": "Escreva um comentário...",
+    "submitComment": "Publicar Comentário",
+    "submitting": "Publicando...",
+    "reply": "Responder",
+    "replying": "Respondendo...",
+    "replyTo": "Responder a {{user}}",
+    "like": "Curtir",
+    "likes": "{{count}} curtidas",
+    "anonymous": "Anônimo",
+    "timeAgo": {
+      "justNow": "agora mesmo",
+      "minutesAgo": "{{count}} minutos atrás",
+      "hoursAgo": "{{count}} horas atrás",
+      "daysAgo": "{{count}} dias atrás",
+      "weeksAgo": "{{count}} semanas atrás",
+      "monthsAgo": "{{count}} meses atrás",
+      "yearsAgo": "{{count}} anos atrás"
+    }
+  },
+  "auth": {
+    "loginWith": "Entrar com {{provider}}",
+    "signIn": "Entrar",
+    "signOut": "Sair",
+    "anonymous": "Comentar anonimamente",
+    "loginRequired": "Por favor, entre para comentar",
+    "providers": {
+      "google": "Google",
+      "apple": "Apple",
+      "github": "GitHub",
+      "twitter": "X.com",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "kakao": "Kakao"
+    }
+  },
+  "messages": {
+    "success": {
+      "commentCreated": "Comentário publicado com sucesso! ✅",
+      "commentDeleted": "Comentário excluído.",
+      "commentLiked": "Comentário curtido.",
+      "commentUnliked": "Curtida removida."
+    },
+    "error": {
+      "commentFailed": "Falha ao publicar o comentário.",
+      "loginFailed": "Falha no login.",
+      "loadFailed": "Falha ao carregar comentários.",
+      "networkError": "Erro de rede."
+    },
+    "spam": {
+      "detected": "Comentário marcado como spam. Aguardando aprovação do administrador. ⚠️",
+      "reviewing": "Comentário sob revisão do administrador."
+    }
+  },
+  "placeholder": {
+    "markdown": "**negrito**, *itálico*, `código`, ```bloco de código```, > citação, [link](url) • Ctrl+Enter para publicar"
+  },
+  "tabs": {
+    "write": "✏️ Escrever",
+    "preview": "👁️ Visualizar"
+  },
+  "keyboard": {
+    "shortcuts": "Ctrl+Enter: Publicar, Ctrl+Tab: Trocar abas, ESC: Modo de escrita"
+  }
+}

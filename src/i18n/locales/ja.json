@@ -1,0 +1,66 @@
+{
+  "comment": {
+    "writeComment": "コメントを書く...",
+    "submitComment": "コメント投稿",
+    "submitting": "投稿中...",
+    "reply": "返信",
+    "replying": "返信中...",
+    "replyTo": "{{user}}さんに返信",
+    "like": "いいね",
+    "likes": "いいね{{count}}個",
+    "anonymous": "匿名",
+    "timeAgo": {
+      "justNow": "たった今",
+      "minutesAgo": "{{count}}分前",
+      "hoursAgo": "{{count}}時間前",
+      "daysAgo": "{{count}}日前",
+      "weeksAgo": "{{count}}週間前",
+      "monthsAgo": "{{count}}ヶ月前",
+      "yearsAgo": "{{count}}年前"
+    }
+  },
+  "auth": {
+    "loginWith": "{{provider}}でログイン",
+    "signIn": "ログイン",
+    "signOut": "ログアウト",
+    "anonymous": "匿名でコメント",
+    "loginRequired": "コメントするにはログインしてください",
+    "providers": {
+      "google": "Google",
+      "apple": "Apple",
+      "github": "GitHub",
+      "twitter": "X.com",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "kakao": "Kakao"
+    }
+  },
+  "messages": {
+    "success": {
+      "commentCreated": "コメントが正常に投稿されました！ ✅",
+      "commentDeleted": "コメントが削除されました。",
+      "commentLiked": "コメントにいいねしました。",
+      "commentUnliked": "いいねを取り消しました。"
+    },
+    "error": {
+      "commentFailed": "コメントの投稿に失敗しました。",
+      "loginFailed": "ログインに失敗しました。",
+      "loadFailed": "コメントの読み込みに失敗しました。",
+      "networkError": "ネットワークエラーが発生しました。"
+    },
+    "spam": {
+      "detected": "スパムとして検出されました。管理者の承認後に公開されます。 ⚠️",
+      "reviewing": "管理者による審査中のコメントです。"
+    }
+  },
+  "placeholder": {
+    "markdown": "**太字**, *斜体*, `コード`, ```コードブロック```, > 引用, [リンク](url) • Ctrl+Enterで投稿"
+  },
+  "tabs": {
+    "write": "✏️ 作成",
+    "preview": "👁️ プレビュー"
+  },
+  "keyboard": {
+    "shortcuts": "Ctrl+Enter: 投稿, Ctrl+Tab: タブ切替, ESC: 作成モード"
+  }
+}

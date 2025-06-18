@@ -1,467 +1,17 @@
 /**
- * Kommentio - 오픈소스 댓글 위젯 (v0.3.3 - i18n Support)
- * 사용법: <div id="kommentio" data-site-id="your-site-id" data-language="en"></div>
+ * Kommentio - 오픈소스 댓글 위젯
+ * 사용법: <div id="kommentio" data-site-id="your-site-id"></div>
  * 
  * 🔍 ANCHOR_SEARCH: Main Kommentio Widget Class
  * - 핵심 위젯 클래스 정의
  * - 소셜 로그인 프로바이더 설정
  * - 초기화 및 옵션 관리
- * - 8개 언어 국제화 지원
  */
-
-// 🔍 ANCHOR_SEARCH: i18n System Integration
-/**
- * Kommentio i18n System - 경량화 국제화 엔진
- * 외부 의존성 없는 순수 자바스크립트 구현
- * 번들 크기: ~3KB, 8개 언어 지원
- */
-class KommentioI18n {
-  constructor(options = {}) {
-    this.currentLanguage = options.defaultLanguage || 'en';
-    this.fallbackLanguage = options.fallbackLanguage || 'en';
-    this.translations = new Map();
-    this.loadedLanguages = new Set();
-    
-    // 8개 지원 언어 정의
-    this.supportedLanguages = ['ko', 'en', 'ja', 'zh', 'es', 'fr', 'de', 'pt'];
-    
-    // 언어별 표시명
-    this.languageNames = {
-      ko: '한국어',
-      en: 'English', 
-      ja: '日本語',
-      zh: '中文',
-      es: 'Español',
-      fr: 'Français',
-      de: 'Deutsch',
-      pt: 'Português'
-    };
-    
-    // 브라우저 언어 자동 감지
-    this.detectBrowserLanguage();
-  }
-
-  detectBrowserLanguage() {
-    if (typeof navigator !== 'undefined') {
-      const browserLang = navigator.language || navigator.userLanguage;
-      const langCode = browserLang.split('-')[0]; // 'ko-KR' -> 'ko'
-      
-      if (this.supportedLanguages.includes(langCode)) {
-        this.currentLanguage = langCode;
-      }
-    }
-  }
-
-  loadLanguage(language, translations) {
-    if (!this.supportedLanguages.includes(language)) {
-      console.warn(`[Kommentio i18n] Unsupported language: ${language}`);
-      return false;
-    }
-    
-    this.translations.set(language, translations);
-    this.loadedLanguages.add(language);
-    return true;
-  }
-
-  setLanguage(language) {
-    if (!this.supportedLanguages.includes(language)) {
-      console.warn(`[Kommentio i18n] Unsupported language: ${language}`);
-      return false;
-    }
-    
-    this.currentLanguage = language;
-    return true;
-  }
-
-  getLanguage() {
-    return this.currentLanguage;
-  }
-
-  getSupportedLanguages() {
-    return [...this.supportedLanguages];
-  }
-
-  getLanguageName(language) {
-    return this.languageNames[language] || language;
-  }
-
-  getValue(obj, path) {
-    return path.split('.').reduce((current, key) => {
-      return current && current[key] !== undefined ? current[key] : null;
-    }, obj);
-  }
-
-  interpolate(template, variables = {}) {
-    if (typeof template !== 'string') return template;
-    
-    return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-      return variables.hasOwnProperty(key) ? variables[key] : match;
-    });
-  }
-
-  t(key, variables = {}, language = null) {
-    const targetLanguage = language || this.currentLanguage;
-    let translation = null;
-
-    // 현재 언어에서 번역 찾기
-    if (this.translations.has(targetLanguage)) {
-      translation = this.getValue(this.translations.get(targetLanguage), key);
-    }
-
-    // 번역을 찾지 못했을 경우 fallback 언어 시도
-    if (translation === null && targetLanguage !== this.fallbackLanguage) {
-      if (this.translations.has(this.fallbackLanguage)) {
-        translation = this.getValue(this.translations.get(this.fallbackLanguage), key);
-      }
-    }
-
-    // 여전히 번역을 찾지 못했을 경우 키 반환
-    if (translation === null) {
-      console.warn(`[Kommentio i18n] Missing translation: ${key} (${targetLanguage})`);
-      return key;
-    }
-
-    // 변수 보간
-    return this.interpolate(translation, variables);
-  }
-
-  timeAgo(date) {
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - new Date(date)) / 1000);
-    
-    if (diffInSeconds < 60) {
-      return this.t('comment.timeAgo.justNow');
-    } else if (diffInSeconds < 3600) {
-      const minutes = Math.floor(diffInSeconds / 60);
-      return this.t('comment.timeAgo.minutesAgo', { count: minutes });
-    } else if (diffInSeconds < 86400) {
-      const hours = Math.floor(diffInSeconds / 3600);
-      return this.t('comment.timeAgo.hoursAgo', { count: hours });
-    } else if (diffInSeconds < 604800) {
-      const days = Math.floor(diffInSeconds / 86400);
-      return this.t('comment.timeAgo.daysAgo', { count: days });
-    } else if (diffInSeconds < 2592000) {
-      const weeks = Math.floor(diffInSeconds / 604800);
-      return this.t('comment.timeAgo.weeksAgo', { count: weeks });
-    } else if (diffInSeconds < 31536000) {
-      const months = Math.floor(diffInSeconds / 2592000);
-      return this.t('comment.timeAgo.monthsAgo', { count: months });
-    } else {
-      const years = Math.floor(diffInSeconds / 31536000);
-      return this.t('comment.timeAgo.yearsAgo', { count: years });
-    }
-  }
-
-  isRTL(language = null) {
-    const lang = language || this.currentLanguage;
-    const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
-    return rtlLanguages.includes(lang);
-  }
-}
-
-// 🔍 ANCHOR_SEARCH: Inline Translation Data
-/**
- * Kommentio 통합 번역 데이터 (8개 언어)
- * 번들 크기 최적화를 위한 인라인 구조
- */
-const KOMMENTIO_TRANSLATIONS = {
-  ko: {
-    "comment": {
-      "title": "댓글",
-      "writeComment": "댓글을 작성하세요...",
-      "submitComment": "댓글 작성",
-      "submitting": "작성 중...",
-      "reply": "답글",
-      "replying": "답글 작성 중...",
-      "replyTo": "{{user}}님에게 답글",
-      "like": "좋아요",
-      "likes": "좋아요 {{count}}개",
-      "anonymous": "익명",
-      "timeAgo": {
-        "justNow": "방금 전",
-        "minutesAgo": "{{count}}분 전",
-        "hoursAgo": "{{count}}시간 전",
-        "daysAgo": "{{count}}일 전",
-        "weeksAgo": "{{count}}주 전",
-        "monthsAgo": "{{count}}개월 전",
-        "yearsAgo": "{{count}}년 전"
-      }
-    },
-    "auth": {
-      "loginWith": "{{provider}}(으)로 로그인",
-      "signIn": "로그인",
-      "signOut": "로그아웃",
-      "cancel": "취소",
-      "user": "사용자",
-      "anonymous": "익명으로 댓글 작성",
-      "loginRequired": "댓글을 작성하려면 로그인하세요",
-      "unsupportedProvider": "지원하지 않는 로그인 방식입니다.",
-      "noProvidersConfigured": "로그인 옵션이 설정되지 않았습니다.",
-      "loginSuccessMock": "{{provider}} 로그인 완료! (Mock 모드) 🎉",
-      "providers": {
-        "google": "Google",
-        "apple": "Apple",
-        "github": "GitHub",
-        "twitter": "X.com",
-        "facebook": "Facebook",
-        "linkedin": "LinkedIn",
-        "kakao": "Kakao"
-      }
-    },
-    "messages": {
-      "success": {
-        "commentCreated": "댓글이 성공적으로 작성되었습니다! ✅",
-        "commentDeleted": "댓글이 삭제되었습니다.",
-        "commentLiked": "댓글에 좋아요를 눌렀습니다.",
-        "commentUnliked": "좋아요를 취소했습니다."
-      },
-      "error": {
-        "commentFailed": "댓글 작성에 실패했습니다.",
-        "loginFailed": "로그인에 실패했습니다.",
-        "loadFailed": "댓글을 불러오는데 실패했습니다.",
-        "networkError": "네트워크 오류가 발생했습니다."
-      },
-      "spam": {
-        "detected": "스팸으로 감지된 댓글입니다. 관리자 승인 후 게시됩니다. ⚠️",
-        "reviewing": "관리자 검토 중인 댓글입니다."
-      }
-    },
-    "placeholder": {
-      "markdown": "**볼드**, *이탤릭*, `코드`, ```코드블록```, > 인용구, [링크](url)"
-    },
-    "tabs": {
-      "write": "✏️ 작성",
-      "preview": "👁️ 미리보기"
-    },
-    "keyboard": {
-      "shortcuts": "Ctrl+Enter: 댓글 등록"
-    },
-    "demo": {
-      "author": "자비에",
-      "comments": [
-        "어서오세요! Kommentio는 8개의 소셜 로그인과 AI 스팸 필터링을 지원하는 댓글 위젯 시스템입니다!",
-        "또한 **마크다운** 문법 *일부*를 지원하고 있습니다.",
-        "원하는 텍스트를 **볼드** 혹은 *이탤릭* 처리해보세요. 인용문도 생성할 수 있습니다.",
-        "기술 블로거들을 위해 구현된 `코드 인라인`과 ```코드 스니펫 블록```도 체험해보세요!",
-        "레오나르도 다 빈치의 말처럼:\n> 단순함은 궁극적인 정교함입니다.",
-        "이것이 Kommentio의 개발 모토입니다.",
-        "더 자세한 내용은 제 [Github 페이지](https://github.com/xavierchoi/kommentio)에서 확인하세요!",
-        "아 참, **Readme 파일**을 읽는 것 잊지 마세요.",
-        "마지막으로, **Kommentio**는 완전한 **오픈소스 프로젝트**입니다.",
-        "*진짜 마지막으로*, **무료**인데다가 **광고도 없다**는 걸 알아주세요! 지원하는 답글 계층은 *여기까지입니다*."
-      ],
-      "realtime": [
-        "실시간 업데이트 테스트입니다! 👋",
-        "Mock 모드에서도 실시간 기능이 잘 동작하네요!",
-        "새로운 댓글이 자동으로 추가되었습니다.",
-        "Kommentio 실시간 업데이트 데모 중...",
-        "이 댓글은 30초마다 자동으로 생성됩니다."
-      ],
-      "authors": ["실시간테스터", "자동댓글봇", "Mock사용자", "데모계정"]
-    }
-  },
-  en: {
-    "comment": {
-      "title": "Comments",
-      "writeComment": "Write a comment...",
-      "submitComment": "Post Comment",
-      "submitting": "Posting...",
-      "reply": "Reply",
-      "replying": "Replying...",
-      "replyTo": "Reply to {{user}}",
-      "like": "Like",
-      "likes": "{{count}} likes",
-      "anonymous": "Anonymous",
-      "timeAgo": {
-        "justNow": "just now",
-        "minutesAgo": "{{count}} minutes ago",
-        "hoursAgo": "{{count}} hours ago",
-        "daysAgo": "{{count}} days ago",
-        "weeksAgo": "{{count}} weeks ago",
-        "monthsAgo": "{{count}} months ago",
-        "yearsAgo": "{{count}} years ago"
-      }
-    },
-    "auth": {
-      "loginWith": "Sign in with {{provider}}",
-      "signIn": "Sign In",
-      "signOut": "Sign Out",
-      "cancel": "Cancel",
-      "user": "User",
-      "anonymous": "Comment anonymously",
-      "loginRequired": "Please sign in to leave a comment",
-      "unsupportedProvider": "Unsupported login method.",
-      "noProvidersConfigured": "No login options configured.",
-      "loginSuccessMock": "{{provider}} login completed! (Mock mode) 🎉",
-      "providers": {
-        "google": "Google",
-        "apple": "Apple",
-        "github": "GitHub",
-        "twitter": "X.com",
-        "facebook": "Facebook",
-        "linkedin": "LinkedIn",
-        "kakao": "Kakao"
-      }
-    },
-    "messages": {
-      "success": {
-        "commentCreated": "Comment posted successfully! ✅",
-        "commentDeleted": "Comment deleted.",
-        "commentLiked": "Comment liked.",
-        "commentUnliked": "Like removed."
-      },
-      "error": {
-        "commentFailed": "Failed to post comment.",
-        "loginFailed": "Login failed.",
-        "loadFailed": "Failed to load comments.",
-        "networkError": "Network error occurred."
-      },
-      "spam": {
-        "detected": "Comment flagged as spam. Pending admin approval. ⚠️",
-        "reviewing": "Comment under admin review."
-      }
-    },
-    "placeholder": {
-      "markdown": "**bold**, *italic*, `code`, ```code block```, > quote, [link](url)"
-    },
-    "tabs": {
-      "write": "✏️ Write",
-      "preview": "👁️ Preview"
-    },
-    "keyboard": {
-      "shortcuts": "Ctrl+Enter: Post"
-    },
-    "demo": {
-      "author": "Xavier",
-      "comments": [
-        "Welcome! Kommentio is a comment widget system that supports 8 social logins and AI spam filtering!",
-        "It also supports **some** *markdown* syntax.",
-        "Try making text **bold** or *italic*. You can also create quotes.",
-        "Experience `inline code` and ```code snippet blocks``` designed for tech bloggers!",
-        "As Leonardo da Vinci said:\n> Simplicity is the ultimate sophistication.",
-        "This is Kommentio's development motto.",
-        "For more details, check out my [Github page](https://github.com/xavierchoi/kommentio)!",
-        "Oh, don't forget to read the **README file**.",
-        "Finally, **Kommentio** is a completely **open source project**.",
-        "*Really finally*, please note that it's **free** and has **no ads**! This is as deep as the reply hierarchy goes."
-      ],
-      "realtime": [
-        "Real-time update test! 👋",
-        "Real-time features work well even in Mock mode!",
-        "A new comment has been automatically added.",
-        "Kommentio real-time update demo in progress...",
-        "This comment is automatically generated every 30 seconds."
-      ],
-      "authors": ["RealtimeTester", "AutoCommentBot", "MockUser", "DemoAccount"]
-    }
-  },
-  ja: {
-    "comment": {
-      "title": "コメント",
-      "writeComment": "コメントを書く...",
-      "submitComment": "コメント投稿",
-      "submitting": "投稿中...",
-      "reply": "返信",
-      "replying": "返信中...",
-      "replyTo": "{{user}}さんに返信",
-      "like": "いいね",
-      "likes": "いいね{{count}}個",
-      "anonymous": "匿名",
-      "timeAgo": {
-        "justNow": "たった今",
-        "minutesAgo": "{{count}}分前",
-        "hoursAgo": "{{count}}時間前",
-        "daysAgo": "{{count}}日前",
-        "weeksAgo": "{{count}}週間前",
-        "monthsAgo": "{{count}}ヶ月前",
-        "yearsAgo": "{{count}}年前"
-      }
-    },
-    "auth": {
-      "loginWith": "{{provider}}でログイン",
-      "signIn": "ログイン",
-      "signOut": "ログアウト",
-      "cancel": "キャンセル",
-      "user": "ユーザー",
-      "anonymous": "匿名でコメント",
-      "loginRequired": "コメントするにはログインしてください",
-      "unsupportedProvider": "サポートされていないログイン方法です。",
-      "noProvidersConfigured": "ログインオプションが設定されていません。",
-      "loginSuccessMock": "{{provider}}ログイン完了！（Mockモード）🎉",
-      "providers": {
-        "google": "Google",
-        "apple": "Apple",
-        "github": "GitHub",
-        "twitter": "X.com",
-        "facebook": "Facebook",
-        "linkedin": "LinkedIn",
-        "kakao": "Kakao"
-      }
-    },
-    "messages": {
-      "success": {
-        "commentCreated": "コメントが正常に投稿されました！ ✅",
-        "commentDeleted": "コメントが削除されました。",
-        "commentLiked": "コメントにいいねしました。",
-        "commentUnliked": "いいねを取り消しました。"
-      },
-      "error": {
-        "commentFailed": "コメントの投稿に失敗しました。",
-        "loginFailed": "ログインに失敗しました。",
-        "loadFailed": "コメントの読み込みに失敗しました。",
-        "networkError": "ネットワークエラーが発生しました。"
-      },
-      "spam": {
-        "detected": "スパムとして検出されました。管理者の承認後に公開されます。 ⚠️",
-        "reviewing": "管理者による審査中のコメントです。"
-      }
-    },
-    "placeholder": {
-      "markdown": "**太字**, *斜体*, `コード`, ```コードブロック```, > 引用, [リンク](url)"
-    },
-    "tabs": {
-      "write": "✏️ 作成",
-      "preview": "👁️ プレビュー"
-    },
-    "keyboard": {
-      "shortcuts": "Ctrl+Enter: 投稿"
-    },
-    "demo": {
-      "author": "ザビエル",
-      "comments": [
-        "いらっしゃいませ！Kommentioは8つのソーシャルログインとAIスパムフィルタリングをサポートするコメントウィジェットシステムです！",
-        "また、**マークダウン** 記法の *一部* をサポートしています。",
-        "テキストを **太字** や *斜体* にしてみてください。引用文も作成できます。",
-        "技術ブロガー向けに実装された `インラインコード` と ```コードスニペットブロック``` も体験してみてください！",
-        "レオナルド・ダ・ヴィンチの言葉のように：\n> シンプルさは究極の洗練である。",
-        "これがKommentioの開発モットーです。",
-        "詳細については私の[Githubページ](https://github.com/xavierchoi/kommentio)をご確認ください！",
-        "あ、**READMEファイル**を読むことを忘れないでください。",
-        "最後に、**Kommentio**は完全な**オープンソースプロジェクト**です。",
-        "*本当に最後に*、**無料**で**広告なし**であることを知ってください！返信階層はここまでです。"
-      ],
-      "realtime": [
-        "リアルタイム更新テストです！ 👋",
-        "Mockモードでもリアルタイム機能がうまく動作しますね！",
-        "新しいコメントが自動的に追加されました。",
-        "Kommentioリアルタイム更新デモ中...",
-        "このコメントは30秒ごとに自動生成されます。"
-      ],
-      "authors": ["リアルタイムテスター", "自動コメントボット", "Mockユーザー", "デモアカウント"]
-    }
-  },
-  // 공간 절약을 위해 다른 언어는 최소화된 형태로 포함 (실제 구현 시 전체 번역 포함)
-  zh: { comment: { title: "评论", writeComment: "写评论...", submitComment: "发表评论", submitting: "发表中...", reply: "回复", like: "点赞", anonymous: "匿名" }, auth: { loginWith: "使用{{provider}}登录", signIn: "登录", signOut: "退出", cancel: "取消", user: "用户", unsupportedProvider: "不支持的登录方式。", noProvidersConfigured: "未配置登录选项。", loginSuccessMock: "{{provider}}登录完成！（Mock模式）🎉", providers: { google: "Google", apple: "Apple", github: "GitHub", twitter: "X.com", facebook: "Facebook", linkedin: "LinkedIn", kakao: "Kakao" } }, messages: { success: { commentCreated: "评论发表成功！ ✅" }, spam: { detected: "评论被标记为垃圾内容，等待管理员审核。 ⚠️" } }, placeholder: { markdown: "**粗体**, *斜体*, `代码`, ```代码块```, > 引用, [链接](url)" }, tabs: { write: "✏️ 编写", preview: "👁️ 预览" }, keyboard: { shortcuts: "Ctrl+Enter: 发表" }, demo: { author: "泽维尔", comments: ["欢迎！Kommentio是支持8种社交登录和AI垃圾邮件过滤的评论小部件系统！", "它还支持**一些** *markdown* 语法。", "尝试使文本**粗体**或*斜体*。您还可以创建引用。", "体验为技术博主设计的`内联代码`和```代码片段块```！", "正如达·芬奇所说：\n> 简约是极致的精致。"], realtime: ["实时更新测试！ 👋", "Mock模式下实时功能运行良好！"], authors: ["实时测试员", "自动评论机器人"] } },
-  es: { comment: { title: "Comentarios", writeComment: "Escribe un comentario...", submitComment: "Publicar Comentario", submitting: "Publicando...", reply: "Responder", like: "Me gusta", anonymous: "Anónimo" }, auth: { loginWith: "Iniciar sesión con {{provider}}", signIn: "Iniciar Sesión", signOut: "Cerrar Sesión", cancel: "Cancelar", user: "Usuario", unsupportedProvider: "Método de inicio de sesión no compatible.", noProvidersConfigured: "No hay opciones de inicio de sesión configuradas.", loginSuccessMock: "¡Inicio de sesión con {{provider}} completado! (Modo Mock) 🎉", providers: { google: "Google", apple: "Apple", github: "GitHub", twitter: "X.com", facebook: "Facebook", linkedin: "LinkedIn", kakao: "Kakao" } }, messages: { success: { commentCreated: "¡Comentario publicado con éxito! ✅" }, spam: { detected: "Comentario marcado como spam. ⚠️" } }, placeholder: { markdown: "**negrita**, *cursiva*, `código`, ```bloque de código```, > cita, [enlace](url)" }, tabs: { write: "✏️ Escribir", preview: "👁️ Vista previa" }, keyboard: { shortcuts: "Ctrl+Enter: Publicar" }, demo: { author: "Javier", comments: ["¡Bienvenidos! Kommentio es un sistema de widgets de comentarios que admite 8 inicios de sesión sociales y filtrado de spam con IA!", "También admite **algo** de sintaxis *markdown*.", "Intenta poner texto en **negrita** o *cursiva*. También puedes crear citas.", "¡Experimenta con `código en línea` y ```bloques de fragmentos de código``` diseñados para bloggers técnicos!", "Como dijo Leonardo da Vinci:\n> La simplicidad es la máxima sofisticación."], realtime: ["¡Prueba de actualización en tiempo real! 👋", "¡Las funciones en tiempo real funcionan bien incluso en modo Mock!"], authors: ["ProbadorTiempoReal", "BotComentarioAuto"] } },
-  fr: { comment: { title: "Commentaires", writeComment: "Écrire un commentaire...", submitComment: "Publier le Commentaire", submitting: "Publication...", reply: "Répondre", like: "J'aime", anonymous: "Anonyme" }, auth: { loginWith: "Se connecter avec {{provider}}", signIn: "Se Connecter", signOut: "Se Déconnecter", cancel: "Annuler", user: "Utilisateur", unsupportedProvider: "Méthode de connexion non prise en charge.", noProvidersConfigured: "Aucune option de connexion configurée.", loginSuccessMock: "Connexion {{provider}} terminée ! (Mode Mock) 🎉", providers: { google: "Google", apple: "Apple", github: "GitHub", twitter: "X.com", facebook: "Facebook", linkedin: "LinkedIn", kakao: "Kakao" } }, messages: { success: { commentCreated: "Commentaire publié avec succès ! ✅" }, spam: { detected: "Commentaire signalé comme spam. ⚠️" } }, placeholder: { markdown: "**gras**, *italique*, `code`, ```bloc de code```, > citation, [lien](url)" }, tabs: { write: "✏️ Écrire", preview: "👁️ Aperçu" }, keyboard: { shortcuts: "Ctrl+Entrée: Publier" }, demo: { author: "Xavier", comments: ["Bienvenue ! Kommentio est un système de widget de commentaires qui prend en charge 8 connexions sociales et le filtrage des spams par IA !", "Il prend également en charge **une partie** de la syntaxe *markdown*.", "Essayez de mettre du texte en **gras** ou en *italique*. Vous pouvez aussi créer des citations.", "Découvrez le `code en ligne` et les ```blocs de fragments de code``` conçus pour les blogueurs techniques !", "Comme l'a dit Léonard de Vinci :\n> La simplicité est la sophistication ultime."], realtime: ["Test de mise à jour en temps réel ! 👋", "Les fonctionnalités en temps réel fonctionnent bien même en mode Mock !"], authors: ["TesteurTempsRéel", "BotCommentaireAuto"] } },
-  de: { comment: { title: "Kommentare", writeComment: "Kommentar schreiben...", submitComment: "Kommentar Veröffentlichen", submitting: "Wird veröffentlicht...", reply: "Antworten", like: "Gefällt mir", anonymous: "Anonym" }, auth: { loginWith: "Mit {{provider}} anmelden", signIn: "Anmelden", signOut: "Abmelden", cancel: "Abbrechen", user: "Benutzer", unsupportedProvider: "Nicht unterstützte Anmeldemethode.", noProvidersConfigured: "Keine Anmeldeoptionen konfiguriert.", loginSuccessMock: "{{provider}} Anmeldung abgeschlossen! (Mock-Modus) 🎉", providers: { google: "Google", apple: "Apple", github: "GitHub", twitter: "X.com", facebook: "Facebook", linkedin: "LinkedIn", kakao: "Kakao" } }, messages: { success: { commentCreated: "Kommentar erfolgreich veröffentlicht! ✅" }, spam: { detected: "Kommentar als Spam markiert. ⚠️" } }, placeholder: { markdown: "**fett**, *kursiv*, `code`, ```codeblock```, > zitat, [link](url)" }, tabs: { write: "✏️ Schreiben", preview: "👁️ Vorschau" }, keyboard: { shortcuts: "Strg+Enter: Veröffentlichen" }, demo: { author: "Xavier", comments: ["Willkommen! Kommentio ist ein Kommentar-Widget-System, das 8 soziale Anmeldungen und KI-Spam-Filterung unterstützt!", "Es unterstützt auch **einige** *Markdown*-Syntax.", "Versuchen Sie, Text **fett** oder *kursiv* zu machen. Sie können auch Zitate erstellen.", "Erleben Sie `Inline-Code` und ```Code-Snippet-Blöcke```, die für Tech-Blogger entwickelt wurden!", "Wie Leonardo da Vinci sagte:\n> Einfachheit ist die ultimative Raffinesse."], realtime: ["Echtzeit-Update-Test! 👋", "Echtzeit-Funktionen funktionieren auch im Mock-Modus gut!"], authors: ["EchtzeitTester", "AutoKommentarBot"] } },
-  pt: { comment: { title: "Comentários", writeComment: "Escreva um comentário...", submitComment: "Publicar Comentário", submitting: "Publicando...", reply: "Responder", like: "Curtir", anonymous: "Anônimo" }, auth: { loginWith: "Entrar com {{provider}}", signIn: "Entrar", signOut: "Sair", cancel: "Cancelar", user: "Usuário", unsupportedProvider: "Método de login não suportado.", noProvidersConfigured: "Nenhuma opção de login configurada.", loginSuccessMock: "Login com {{provider}} concluído! (Modo Mock) 🎉", providers: { google: "Google", apple: "Apple", github: "GitHub", twitter: "X.com", facebook: "Facebook", linkedin: "LinkedIn", kakao: "Kakao" } }, messages: { success: { commentCreated: "Comentário publicado com sucesso! ✅" }, spam: { detected: "Comentário marcado como spam. ⚠️" } }, placeholder: { markdown: "**negrito**, *itálico*, `código`, ```bloco de código```, > citação, [link](url)" }, tabs: { write: "✏️ Escrever", preview: "👁️ Visualizar" }, keyboard: { shortcuts: "Ctrl+Enter: Publicar" }, demo: { author: "Xavier", comments: ["Bem-vindos! Kommentio é um sistema de widget de comentários que suporta 8 logins sociais e filtragem de spam com IA!", "Também suporta **alguma** sintaxe *markdown*.", "Tente deixar o texto em **negrito** ou *itálico*. Você também pode criar citações.", "Experimente `código inline` e ```blocos de snippet de código``` projetados para blogueiros técnicos!", "Como Leonardo da Vinci disse:\n> A simplicidade é a máxima sofisticação."], realtime: ["Teste de atualização em tempo real! 👋", "As funcionalidades em tempo real funcionam bem mesmo no modo Mock!"], authors: ["TestadorTempoReal", "BotComentárioAuto"] } }
-};
 
 // 🔍 ANCHOR_SEARCH: Kommentio Class Definition
 class Kommentio {
   constructor(options = {}) {
-    this.version = '0.3.3';
+    this.version = '0.3.1';
     this.options = {
       siteId: null,
       theme: 'light', // 'light' | 'dark' | 'auto'
@@ -547,85 +97,7 @@ class Kommentio {
     this.currentUser = null;
     this.supabase = null;
     
-    // i18n 시스템 초기화
-    this.initializeI18n();
-    
     this.init();
-  }
-
-  // 🔍 ANCHOR_SEARCH: i18n Initialization
-  /**
-   * i18n 시스템 초기화
-   */
-  initializeI18n() {
-    // i18n 인스턴스 생성
-    this.i18n = new KommentioI18n({
-      defaultLanguage: this.options.language,
-      fallbackLanguage: 'en'
-    });
-
-    // 모든 번역 데이터 로드
-    Object.keys(KOMMENTIO_TRANSLATIONS).forEach(language => {
-      this.i18n.loadLanguage(language, KOMMENTIO_TRANSLATIONS[language]);
-    });
-
-    // 현재 언어 설정
-    this.i18n.setLanguage(this.options.language);
-
-    console.log(`[Kommentio i18n] Initialized with language: ${this.options.language}`);
-  }
-
-  // 🔍 ANCHOR_SEARCH: i18n API Methods
-  /**
-   * 번역 텍스트 가져오기
-   */
-  t(key, variables = {}) {
-    return this.i18n.t(key, variables);
-  }
-
-  /**
-   * 언어 설정
-   */
-  setLanguage(language) {
-    if (this.i18n.setLanguage(language)) {
-      this.options.language = language;
-      
-      // Mock 모드에서는 데모 댓글도 다시 생성
-      if (this.mockMode) {
-        this.initMockData();
-        this.comments = this.buildCommentTree(this.mockComments);
-      }
-      
-      // 언어 변경 시 UI 다시 렌더링
-      if (this.container) {
-        this.render();
-      }
-      
-      console.log(`[Kommentio] Language changed to: ${language}`);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * 현재 언어 반환
-   */
-  getLanguage() {
-    return this.i18n.getLanguage();
-  }
-
-  /**
-   * 지원 언어 목록 반환
-   */
-  getSupportedLanguages() {
-    return this.i18n.getSupportedLanguages();
-  }
-
-  /**
-   * 시간 상대 표시
-   */
-  timeAgo(date) {
-    return this.i18n.timeAgo(date);
   }
 
   // 🔍 ANCHOR_SEARCH: Widget Initialization
@@ -1038,12 +510,12 @@ class Kommentio {
 
       /* 🎨 새로운 원형 소셜 로그인 시스템 */
       .kommentio-social-login {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
         gap: 12px;
         margin-bottom: 1rem;
         max-width: 100%;
-        justify-content: flex-end;
+        justify-content: center;
       }
 
       .kommentio-btn {
@@ -1096,9 +568,6 @@ class Kommentio {
         cursor: pointer;
         min-width: 48px;
         min-height: 48px;
-        max-width: 48px;
-        max-height: 48px;
-        flex-shrink: 0;
         overflow: hidden;
       }
 
@@ -1205,7 +674,6 @@ class Kommentio {
       .kommentio-user-info {
         display: flex;
         align-items: center;
-        justify-content: flex-end;
         gap: 0.5rem;
         font-size: 0.875rem;
         color: var(--kommentio-secondary);
@@ -1520,10 +988,9 @@ class Kommentio {
         
         /* 태블릿에서 소셜 로그인 최적화 */
         .kommentio-social-login {
-          display: flex;
-          flex-wrap: wrap;
+          grid-template-columns: repeat(7, 1fr);
           gap: 16px;
-          justify-content: flex-end;
+          justify-content: center;
           max-width: 100%;
         }
         
@@ -1532,9 +999,6 @@ class Kommentio {
           height: 56px;
           min-width: 56px;
           min-height: 56px;
-          max-width: 56px;
-          max-height: 56px;
-          flex-shrink: 0;
         }
         
         /* 태블릿에서 Apple 아이콘 (원형 마스크 적용으로 스케일링 불필요) */
@@ -1643,10 +1107,9 @@ class Kommentio {
         
         /* 모바일에서 소셜 로그인 4열 그리드 */
         .kommentio-social-login {
-          display: flex;
-          flex-wrap: wrap;
+          grid-template-columns: repeat(4, 1fr);
           gap: 12px;
-          justify-content: flex-end;
+          justify-content: center;
           max-width: 100%;
           margin: 0 auto var(--space-4) auto;
         }
@@ -1656,9 +1119,7 @@ class Kommentio {
           height: 48px;
           min-width: 48px;
           min-height: 48px;
-          max-width: 48px;
-          max-height: 48px;
-          flex-shrink: 0;
+          justify-self: center;
         }
         
         /* 모바일에서 Apple 아이콘 (원형 마스크 적용으로 스케일링 불필요) */
@@ -1788,12 +1249,11 @@ class Kommentio {
         }
         
         .kommentio-social-login {
-          display: flex;
-          flex-wrap: wrap;
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
           gap: 8px;
           max-width: 100%;
           margin: 0 auto var(--space-4) auto;
-          justify-content: flex-end;
         }
         
         .kommentio-btn-social {
@@ -1801,11 +1261,26 @@ class Kommentio {
           height: 44px;
           min-width: 44px;
           min-height: 44px;
-          max-width: 44px;
-          max-height: 44px;
-          flex-shrink: 0;
         }
         
+        /* 2줄 레이아웃: 첫 번째 줄 4개, 두 번째 줄 3개 */
+        .kommentio-btn-social:nth-child(5),
+        .kommentio-btn-social:nth-child(6),
+        .kommentio-btn-social:nth-child(7) {
+          grid-column: 1 / span 1;
+        }
+        
+        .kommentio-btn-social:nth-child(5) {
+          grid-column: 2;
+        }
+        
+        .kommentio-btn-social:nth-child(6) {
+          grid-column: 3;
+        }
+        
+        .kommentio-btn-social:nth-child(7) {
+          grid-column: 4;
+        }
         
         .kommentio-title {
           font-size: 0.875rem;
@@ -1842,12 +1317,11 @@ class Kommentio {
         }
         
         .kommentio-social-login {
-          display: flex;
-          flex-wrap: wrap;
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
           gap: 4px;
           max-width: 280px;
           margin: 0 auto 0.75rem auto;
-          justify-content: flex-end;
         }
         
         .kommentio-btn-social {
@@ -1855,11 +1329,20 @@ class Kommentio {
           height: 40px;
           min-width: 40px;
           min-height: 40px;
-          max-width: 40px;
-          max-height: 40px;
-          flex-shrink: 0;
         }
         
+        /* 2줄 레이아웃: 첫 번째 줄 4개, 두 번째 줄 3개 중앙 정렬 */
+        .kommentio-btn-social:nth-child(5) {
+          grid-column: 2;
+        }
+        
+        .kommentio-btn-social:nth-child(6) {
+          grid-column: 3;
+        }
+        
+        .kommentio-btn-social:nth-child(7) {
+          grid-column: 4;
+        }
         
         .kommentio-title {
           font-size: 0.75rem;
@@ -1946,7 +1429,7 @@ class Kommentio {
     this.container.innerHTML = `
       <div class="kommentio-container">
         <header class="kommentio-header">
-          <h3 class="kommentio-title">${this.t('comment.title')}</h3>
+          <h3 class="kommentio-title">댓글</h3>
           <div class="kommentio-auth">
             ${this.renderAuthButtons()}
           </div>
@@ -1972,8 +1455,8 @@ class Kommentio {
     if (this.currentUser) {
       return `
         <div class="kommentio-user-info">
-          <span>${this.t('auth.user')}: ${this.currentUser.user_metadata?.name || this.currentUser.email}</span>
-          <button class="kommentio-btn kommentio-logout-btn" onclick="kommentio.logout()">${this.t('auth.signOut')}</button>
+          <span>안녕하세요, ${this.currentUser.user_metadata?.name || this.currentUser.email}</span>
+          <button class="kommentio-btn kommentio-logout-btn" onclick="kommentio.logout()">로그아웃</button>
         </div>
       `;
     }
@@ -1983,19 +1466,16 @@ class Kommentio {
       .filter(([, config]) => config.enabled);
 
     if (enabledProviders.length === 0) {
-      return `<p class="kommentio-text-secondary">${this.t('auth.noProvidersConfigured') || 'No login options configured.'}</p>`;
+      return '<p class="kommentio-text-secondary">로그인 옵션이 설정되지 않았습니다.</p>';
     }
 
     const socialButtons = enabledProviders.map(([provider, config], index) => {
-      const providerName = this.t(`auth.providers.${provider}`) || config.label;
-      const loginText = this.t('auth.loginWith', { provider: providerName });
-      
       return `
         <button 
           class="kommentio-btn kommentio-btn-social kommentio-btn-${provider}" 
           onclick="kommentio.login('${provider}')"
-          title="${loginText}"
-          aria-label="${loginText}"
+          title="${config.label}로 로그인"
+          aria-label="${config.label}로 로그인"
           tabindex="${index === 0 ? '0' : '-1'}"
           role="button"
         >
@@ -2034,7 +1514,7 @@ class Kommentio {
    */
   renderCommentForm() {
     if (!this.currentUser && !this.options.allowAnonymous) {
-      return `<p class="kommentio-text-secondary">${this.t('auth.loginRequired')}</p>`;
+      return '<p class="kommentio-text-secondary">댓글을 작성하려면 로그인해주세요.</p>';
     }
 
     return `
@@ -2042,10 +1522,10 @@ class Kommentio {
         <!-- 탭 네비게이션 -->
         <div class="kommentio-form-tabs">
           <button type="button" class="kommentio-tab kommentio-tab-active" data-tab="write" onclick="kommentio.switchTab(event, 'write')">
-            ${this.t('tabs.write')}
+            작성
           </button>
           <button type="button" class="kommentio-tab" data-tab="preview" onclick="kommentio.switchTab(event, 'preview')">
-            ${this.t('tabs.preview')}
+            미리보기
           </button>
         </div>
 
@@ -2053,7 +1533,7 @@ class Kommentio {
         <div class="kommentio-tab-content kommentio-tab-write kommentio-tab-content-active">
           <textarea 
             class="kommentio-textarea" 
-            placeholder="${this.t('placeholder.markdown')}"
+            placeholder="**굵게**, *기울임*, \`코드\`, > 인용구, [링크](URL), \`\`\` 코드블록 \`\`\` 지원"
             oninput="kommentio.updatePreview(this.value)"
             onkeydown="kommentio.handleKeydown(event)"
             required
@@ -2064,7 +1544,7 @@ class Kommentio {
         <div class="kommentio-tab-content kommentio-tab-preview">
           <div class="kommentio-preview-container">
             <div class="kommentio-preview-content">
-${this.t('comment.writeComment')}
+              미리보기를 보려면 댓글을 입력하세요...
             </div>
           </div>
         </div>
@@ -2073,10 +1553,10 @@ ${this.t('comment.writeComment')}
         <div class="kommentio-form-footer">
           <div class="kommentio-markdown-help">
             <small class="kommentio-text-secondary">
-              <span style="opacity: 0.8;">${this.t('keyboard.shortcuts') || 'Ctrl+Enter: Post'}</span>
+              <span style="opacity: 0.8;">Ctrl/Cmd+Enter: 빠른 등록</span>
             </small>
           </div>
-          <button type="submit" class="kommentio-btn kommentio-btn-primary">${this.t('comment.submitComment')}</button>
+          <button type="submit" class="kommentio-btn kommentio-btn-primary">댓글 작성</button>
         </div>
       </form>
     `;
@@ -2142,19 +1622,15 @@ ${this.t('comment.writeComment')}
    * Mock 데이터 초기화
    */
   initMockData() {
-    // 번역된 데모 댓글 사용
-    const demoComments = this.t('demo.comments') || [];
-    const demoAuthor = this.t('demo.author') || 'Xavier';
-    
     this.mockComments = [
       {
         id: 'mock-1',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[0] || 'Welcome! Kommentio is a comment widget system that supports 8 social logins and AI spam filtering!',
+        content: '어서오세요! Kommentio는 7개의 소셜 로그인과 AI 스팸 필터링을 지원하는 댓글 위젯 시스템입니다!',
         parent_id: null,
         depth: 0,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 12,
         created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
@@ -2164,10 +1640,10 @@ ${this.t('comment.writeComment')}
         id: 'mock-2',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[1] || 'It also supports **some** *markdown* syntax.',
+        content: '또한 **마크다운** 문법 *일부*를 지원하고 있습니다.',
         parent_id: null,
         depth: 0,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 8,
         created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -2177,10 +1653,10 @@ ${this.t('comment.writeComment')}
         id: 'mock-2-1',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[2] || 'Try making text **bold** or *italic*. You can also create quotes.',
+        content: '원하는 텍스트를 **볼드** 혹은 *이탤릭* 처리해보세요. 인용문도 생성할 수 있습니다.',
         parent_id: 'mock-2',
         depth: 1,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 5,
         created_at: new Date(Date.now() - 110 * 60 * 1000).toISOString(),
@@ -2190,10 +1666,10 @@ ${this.t('comment.writeComment')}
         id: 'mock-2-2',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[3] || 'Experience `inline code` and ```code snippet blocks``` designed for tech bloggers!',
+        content: '기술 블로거들을 위해 구현된 `코드 인라인`과 ```코드 스니펫 블록```도 체험해보세요!',
         parent_id: 'mock-2',
         depth: 1,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 7,
         created_at: new Date(Date.now() - 105 * 60 * 1000).toISOString(),
@@ -2203,10 +1679,10 @@ ${this.t('comment.writeComment')}
         id: 'mock-3',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[4] || 'As Leonardo da Vinci said:\n> Simplicity is the ultimate sophistication.',
+        content: '레오나르도 다 빈치의 말처럼:\n> 단순함은 궁극적인 정교함입니다.',
         parent_id: null,
         depth: 0,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 15,
         created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
@@ -2216,10 +1692,10 @@ ${this.t('comment.writeComment')}
         id: 'mock-3-1',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[5] || 'This is the development motto of Kommentio.',
+        content: '이것이 Kommentio의 개발 모토입니다.',
         parent_id: 'mock-3',
         depth: 1,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 6,
         created_at: new Date(Date.now() - 55 * 60 * 1000).toISOString(),
@@ -2229,10 +1705,10 @@ ${this.t('comment.writeComment')}
         id: 'mock-4',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[6] || 'For more details, check out my [Github page](https://github.com/xavierchoi/kommentio)!',
+        content: '더 자세한 내용은 제 [Github 페이지](https://github.com/xavierchoi/kommentio)에서 확인하세요!',
         parent_id: null,
         depth: 0,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 18,
         created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
@@ -2242,10 +1718,10 @@ ${this.t('comment.writeComment')}
         id: 'mock-4-1',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[7] || 'Oh, and don\'t forget to read the **Readme file**.',
+        content: '아 참, **Readme 파일**을 읽는 것 잊지 마세요.',
         parent_id: 'mock-4',
         depth: 1,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 4,
         created_at: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
@@ -2255,10 +1731,10 @@ ${this.t('comment.writeComment')}
         id: 'mock-4-1-1',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[8] || 'Finally, **Kommentio** is a completely **open source project**.',
+        content: '마지막으로, **Kommentio**는 완전한 **오픈소스 프로젝트**입니다.',
         parent_id: 'mock-4-1',
         depth: 2,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 9,
         created_at: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
@@ -2268,10 +1744,10 @@ ${this.t('comment.writeComment')}
         id: 'mock-4-1-1-1',
         site_id: this.siteUUID || this.options.siteId,
         page_url: window.location.pathname,
-        content: demoComments[9] || '*Really finally*, please note that it\'s **free** and **ad-free**! The supported reply hierarchy ends *here*.',
+        content: '*진짜 마지막으로*, **무료**인데다가 **광고도 없다**는 걸 알아주세요! 지원하는 답글 계층은 *여기까지입니다*.',
         parent_id: 'mock-4-1-1',
         depth: 3,
-        author_name: demoAuthor,
+        author_name: '자비에',
         author_email: 'xavier@kommentio.tech',
         likes_count: 25,
         created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
@@ -2307,7 +1783,7 @@ ${this.t('comment.writeComment')}
       this.renderComments();
     } catch (error) {
       console.error('Failed to load comments:', error);
-      this.renderError(this.t('messages.error.loadFailed'));
+      this.renderError('댓글을 불러오는데 실패했습니다.');
     }
   }
 
@@ -2349,7 +1825,7 @@ ${this.t('comment.writeComment')}
     }
     
     if (this.comments.length === 0) {
-      container.innerHTML = `<p class="kommentio-text-secondary">${this.t('comment.writeComment').replace('...', '!')}</p>`;
+      container.innerHTML = '<p class="kommentio-text-secondary">첫 번째 댓글을 작성해보세요!</p>';
       return;
     }
 
@@ -2376,7 +1852,7 @@ ${this.t('comment.writeComment')}
           <span class="kommentio-action" onclick="kommentio.likeComment('${comment.id}')">
             👍&nbsp;${comment.likes || 0}
           </span>
-          ${canReply ? `<span class="kommentio-action" onclick="kommentio.replyTo('${comment.id}')">${this.t('comment.reply')}</span>` : ''}
+          ${canReply ? `<span class="kommentio-action" onclick="kommentio.replyTo('${comment.id}')">답글</span>` : ''}
         </div>
         
         ${comment.children.map(child => this.renderComment(child, depth + 1)).join('')}
@@ -2796,7 +2272,7 @@ ${this.t('comment.writeComment')}
     const submitBtn = event.target.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.textContent;
     submitBtn.disabled = true;
-    submitBtn.textContent = this.t('comment.submitting');
+    submitBtn.textContent = '작성 중...';
 
     try {
       const result = await this.createComment(content);
@@ -2807,14 +2283,14 @@ ${this.t('comment.writeComment')}
       
       // 스팸 여부에 따른 알림 표시
       if (result && result.isSpam) {
-        this.showNotification(this.t('messages.spam.detected'));
+        this.showNotification('스팸으로 감지된 댓글입니다. 관리자 승인 후 게시됩니다. ⚠️');
       } else {
-        this.showNotification(this.t('messages.success.commentCreated'));
+        this.showNotification('댓글이 성공적으로 작성되었습니다! ✅');
       }
       
     } catch (error) {
       console.error('Failed to create comment:', error);
-      this.showNotification(this.t('messages.error.commentFailed'));
+      this.showNotification('댓글 작성에 실패했습니다. 다시 시도해주세요. ❌');
     } finally {
       // 버튼 상태 복원
       submitBtn.disabled = false;
@@ -3005,7 +2481,7 @@ ${this.t('comment.writeComment')}
     const providerConfig = this.options.socialProviders[provider];
     
     if (!providerConfig || !providerConfig.enabled) {
-      alert(this.t('auth.unsupportedProvider') || 'Unsupported login method.');
+      alert('지원하지 않는 로그인 방식입니다.');
       return;
     }
 
@@ -3015,14 +2491,13 @@ ${this.t('comment.writeComment')}
         id: 'mock-user-' + Date.now(),
         email: `${provider}user@example.com`,
         user_metadata: {
-          name: `${this.t(`auth.providers.${provider}`) || providerConfig.label} ${this.t('auth.user') || 'User'}`,
+          name: `${providerConfig.label} 사용자`,
           avatar_url: `https://ui-avatars.com/api/?name=${providerConfig.icon}&background=3b82f6&color=fff`,
           provider: provider
         }
       };
       
-      const providerName = this.t(`auth.providers.${provider}`) || providerConfig.label;
-      this.showNotification(this.t('auth.loginSuccessMock', { provider: providerName }) || `${providerName} login completed! (Mock mode) 🎉`);
+      this.showNotification(`${providerConfig.label} 로그인 완료! (Mock 모드) 🎉`);
       this.render(); // UI 업데이트
       return;
     }
@@ -3359,7 +2834,7 @@ ${this.t('comment.writeComment')}
   replyTo(commentId) {
     // 로그인되지 않은 경우 로그인 요청
     if (!this.currentUser && !this.options.allowAnonymous) {
-      alert(this.t('auth.loginRequired'));
+      alert('답글을 작성하려면 로그인해주세요.');
       return;
     }
 
@@ -3390,32 +2865,32 @@ ${this.t('comment.writeComment')}
 
     replyForm.innerHTML = `
       <div style="margin-bottom: 0.75rem;">
-        <strong style="color: var(--kommentio-primary);">${this.t('comment.reply')}</strong>
+        <strong style="color: var(--kommentio-primary);">답글 작성</strong>
         <button 
           onclick="this.closest('.kommentio-reply-form').remove()" 
           style="float: right; background: none; border: none; color: var(--kommentio-secondary); cursor: pointer; font-size: 1.2rem;"
-          title="${this.t('auth.cancel')}"
+          title="닫기"
         >×</button>
       </div>
       <form onsubmit="kommentio.handleReplySubmit(event, '${commentId}')">
         <textarea 
           class="kommentio-textarea" 
-          placeholder="${this.t('placeholder.markdown')}"
+          placeholder="**굵게**, *기울임*, \`코드\`, > 인용구, [링크](URL), \`\`\` 코드블록 \`\`\` 지원"
           style="min-height: 80px; margin-bottom: 0.75rem;"
           required
         ></textarea>
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <small class="kommentio-helper-text" style="color: var(--kommentio-secondary);">${this.t('keyboard.shortcuts') || 'Ctrl+Enter: Post'}</small>
+          <small class="kommentio-helper-text" style="color: var(--kommentio-secondary);">Ctrl/Cmd+Enter: 빠른 등록</small>
           <div style="display: flex; gap: 0.5rem;">
             <button 
               type="button" 
               onclick="this.closest('.kommentio-reply-form').remove()"
               style="padding: 0.5rem 1rem; border: 1px solid var(--kommentio-border); background: var(--kommentio-bg); color: var(--kommentio-text); border-radius: 4px; cursor: pointer;"
-            >${this.t('auth.cancel')}</button>
+            >취소</button>
             <button 
               type="submit" 
               style="padding: 0.5rem 1rem; background: var(--kommentio-primary); color: white; border: none; border-radius: 4px; cursor: pointer;"
-            >${this.t('comment.reply')}</button>
+            >답글 작성</button>
           </div>
         </div>
       </form>
@@ -3446,7 +2921,7 @@ ${this.t('comment.writeComment')}
     const submitBtn = event.target.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.textContent;
     submitBtn.disabled = true;
-    submitBtn.textContent = this.t('comment.submitting');
+    submitBtn.textContent = '작성 중...';
 
     try {
       const result = await this.createComment(content, parentId);
@@ -3462,14 +2937,14 @@ ${this.t('comment.writeComment')}
       
       // 스팸 여부에 따른 알림 표시
       if (result && result.isSpam) {
-        this.showNotification(this.t('messages.spam.detected'));
+        this.showNotification('스팸으로 감지된 답글입니다. 관리자 승인 후 게시됩니다. ⚠️');
       } else {
-        this.showNotification(this.t('messages.success.commentCreated'));
+        this.showNotification('답글이 성공적으로 작성되었습니다! ✅');
       }
       
     } catch (error) {
       console.error('Failed to create reply:', error);
-      this.showNotification(this.t('messages.error.commentFailed'));
+      this.showNotification('답글 작성에 실패했습니다. 다시 시도해주세요. ❌');
     } finally {
       // 버튼 상태 복원 (폼이 제거되기 전에)
       if (submitBtn) {
@@ -3539,7 +3014,7 @@ ${this.t('comment.writeComment')}
       if (!previewElement) return;
 
       if (!content || content.trim() === '') {
-        previewElement.innerHTML = `<span class="kommentio-text-secondary">${this.t('placeholder.markdown')}</span>`;
+        previewElement.innerHTML = '<span class="kommentio-text-secondary">미리보기를 보려면 댓글을 입력하세요...</span>';
         this.lastPreviewContent = '';
         return;
       }
@@ -3617,22 +3092,10 @@ if (document.readyState === 'loading') {
 function autoInit() {
   const target = document.querySelector('[data-kommentio]');
   if (target) {
-    // 브라우저 언어 자동 감지
-    let defaultLanguage = 'en';
-    if (typeof navigator !== 'undefined') {
-      const browserLang = navigator.language || navigator.userLanguage;
-      const langCode = browserLang.split('-')[0]; // 'ko-KR' -> 'ko'
-      const supportedLanguages = ['ko', 'en', 'ja', 'zh', 'es', 'fr', 'de', 'pt'];
-      
-      if (supportedLanguages.includes(langCode)) {
-        defaultLanguage = langCode;
-      }
-    }
-
     const options = {
       siteId: target.dataset.siteId,
       theme: target.dataset.theme || 'light',
-      language: target.dataset.language || defaultLanguage,
+      language: target.dataset.language || 'ko',
       supabaseUrl: target.dataset.supabaseUrl || null,
       supabaseKey: target.dataset.supabaseKey || null,
       claudeApiKey: target.dataset.claudeApiKey
@@ -3650,64 +3113,6 @@ function autoInit() {
 
 // 전역 접근을 위한 window 객체에 추가
 window.Kommentio = Kommentio;
-
-// 전역 i18n API
-window.KommentioI18n = {
-  /**
-   * 현재 언어 설정 변경
-   */
-  setLanguage: function(language) {
-    if (window.kommentio) {
-      return window.kommentio.setLanguage(language);
-    }
-    console.warn('[Kommentio] Widget not initialized yet');
-    return false;
-  },
-
-  /**
-   * 현재 언어 반환
-   */
-  getLanguage: function() {
-    if (window.kommentio) {
-      return window.kommentio.getLanguage();
-    }
-    return 'en';
-  },
-
-  /**
-   * 지원 언어 목록 반환
-   */
-  getSupportedLanguages: function() {
-    return ['ko', 'en', 'ja', 'zh', 'es', 'fr', 'de', 'pt'];
-  },
-
-  /**
-   * 언어 표시명 반환
-   */
-  getLanguageName: function(language) {
-    const names = {
-      ko: '한국어',
-      en: 'English', 
-      ja: '日本語',
-      zh: '中文',
-      es: 'Español',
-      fr: 'Français',
-      de: 'Deutsch',
-      pt: 'Português'
-    };
-    return names[language] || language;
-  },
-
-  /**
-   * 번역 텍스트 직접 접근
-   */
-  t: function(key, variables = {}) {
-    if (window.kommentio) {
-      return window.kommentio.t(key, variables);
-    }
-    return key;
-  }
-};
 
 // 초기에는 null로 설정, autoInit에서 실제 인스턴스 할당
 // window.kommentio = null; // 🐛 BUG FIX: 이 라인이 초기화된 인스턴스를 덮어쓰고 있었음
@@ -3733,49 +3138,4 @@ window.waitForKommentio = function(callback, timeout = 15000) {
   }
   
   check();
-};
-
-// KommentioI18n 글로벌 객체 export (test-i18n-demo.html과 랜딩 페이지 호환성을 위해)
-window.KommentioI18n = {
-  setLanguage: function(language) {
-    if (window.kommentio && typeof window.kommentio.setLanguage === 'function') {
-      return window.kommentio.setLanguage(language);
-    }
-    return false;
-  },
-  
-  getLanguage: function() {
-    if (window.kommentio && typeof window.kommentio.getLanguage === 'function') {
-      return window.kommentio.getLanguage();
-    }
-    return 'ko';
-  },
-  
-  getSupportedLanguages: function() {
-    if (window.kommentio && typeof window.kommentio.getSupportedLanguages === 'function') {
-      return window.kommentio.getSupportedLanguages();
-    }
-    return ['ko', 'en', 'ja', 'zh', 'es', 'fr', 'de', 'pt'];
-  },
-  
-  getLanguageName: function(language) {
-    const names = {
-      ko: '한국어',
-      en: 'English', 
-      ja: '日本語',
-      zh: '中文',
-      es: 'Español',
-      fr: 'Français',
-      de: 'Deutsch',
-      pt: 'Português'
-    };
-    return names[language] || language;
-  },
-  
-  t: function(key, variables = {}) {
-    if (window.kommentio && typeof window.kommentio.t === 'function') {
-      return window.kommentio.t(key, variables);
-    }
-    return key;
-  }
 };

@@ -4,7 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Kommentio is an open-source comment widget system - a free, ad-free alternative to Disqus. The project is implemented as a Vanilla JavaScript embeddable widget with comprehensive admin dashboard and AI-powered spam filtering.
+Kommentio is an open-source comment widget system - a free, ad-free alternative to Disqus. The project is implemented as a Vanilla JavaScript embeddable widget with comprehensive admin dashboard, AI-powered spam filtering, and **full internationalization (i18n) support for 8 languages**.
+
+### 🌐 Internationalization Support
+- **Supported Languages**: 8 languages with complete UI localization
+  - Korean (ko) - 한국어
+  - English (en) - English  
+  - Japanese (ja) - 日本語
+  - Chinese (zh) - 中文
+  - Spanish (es) - Español
+  - French (fr) - Français
+  - German (de) - Deutsch
+  - Portuguese (pt) - Português
+- **Features**: Auto browser language detection, dynamic language switching, complete widget + landing page localization
+- **Implementation**: Custom lightweight i18n system (~3KB) with zero external dependencies
 
 ### Official Domain & Deployment
 - **Primary Domain**: https://kommentio.tech

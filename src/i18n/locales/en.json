@@ -1,0 +1,66 @@
+{
+  "comment": {
+    "writeComment": "Write a comment...",
+    "submitComment": "Post Comment",
+    "submitting": "Posting...",
+    "reply": "Reply",
+    "replying": "Replying...",
+    "replyTo": "Reply to {{user}}",
+    "like": "Like",
+    "likes": "{{count}} likes",
+    "anonymous": "Anonymous",
+    "timeAgo": {
+      "justNow": "just now",
+      "minutesAgo": "{{count}} minutes ago",
+      "hoursAgo": "{{count}} hours ago",
+      "daysAgo": "{{count}} days ago",
+      "weeksAgo": "{{count}} weeks ago",
+      "monthsAgo": "{{count}} months ago",
+      "yearsAgo": "{{count}} years ago"
+    }
+  },
+  "auth": {
+    "loginWith": "Sign in with {{provider}}",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "anonymous": "Comment anonymously",
+    "loginRequired": "Please sign in to leave a comment",
+    "providers": {
+      "google": "Google",
+      "apple": "Apple",
+      "github": "GitHub",
+      "twitter": "X.com",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "kakao": "Kakao"
+    }
+  },
+  "messages": {
+    "success": {
+      "commentCreated": "Comment posted successfully! ✅",
+      "commentDeleted": "Comment deleted.",
+      "commentLiked": "Comment liked.",
+      "commentUnliked": "Like removed."
+    },
+    "error": {
+      "commentFailed": "Failed to post comment.",
+      "loginFailed": "Login failed.",
+      "loadFailed": "Failed to load comments.",
+      "networkError": "Network error occurred."
+    },
+    "spam": {
+      "detected": "Comment flagged as spam. Pending admin approval. ⚠️",
+      "reviewing": "Comment under admin review."
+    }
+  },
+  "placeholder": {
+    "markdown": "**bold**, *italic*, `code`, ```code block```, > quote, [link](url) • Ctrl+Enter to post"
+  },
+  "tabs": {
+    "write": "✏️ Write",
+    "preview": "👁️ Preview"
+  },
+  "keyboard": {
+    "shortcuts": "Ctrl+Enter: Post, Ctrl+Tab: Switch tabs, ESC: Write mode"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "comment": {
+    "writeComment": "Écrire un commentaire...",
+    "submitComment": "Publier le Commentaire",
+    "submitting": "Publication...",
+    "reply": "Répondre",
+    "replying": "Réponse en cours...",
+    "replyTo": "Répondre à {{user}}",
+    "like": "J'aime",
+    "likes": "{{count}} j'aime",
+    "anonymous": "Anonyme",
+    "timeAgo": {
+      "justNow": "à l'instant",
+      "minutesAgo": "il y a {{count}} minutes",
+      "hoursAgo": "il y a {{count}} heures",
+      "daysAgo": "il y a {{count}} jours",
+      "weeksAgo": "il y a {{count}} semaines",
+      "monthsAgo": "il y a {{count}} mois",
+      "yearsAgo": "il y a {{count}} ans"
+    }
+  },
+  "auth": {
+    "loginWith": "Se connecter avec {{provider}}",
+    "signIn": "Se Connecter",
+    "signOut": "Se Déconnecter",
+    "anonymous": "Commenter anonymement",
+    "loginRequired": "Veuillez vous connecter pour commenter",
+    "providers": {
+      "google": "Google",
+      "apple": "Apple",
+      "github": "GitHub",
+      "twitter": "X.com",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "kakao": "Kakao"
+    }
+  },
+  "messages": {
+    "success": {
+      "commentCreated": "Commentaire publié avec succès ! ✅",
+      "commentDeleted": "Commentaire supprimé.",
+      "commentLiked": "Commentaire aimé.",
+      "commentUnliked": "J'aime retiré."
+    },
+    "error": {
+      "commentFailed": "Échec de la publication du commentaire.",
+      "loginFailed": "Échec de la connexion.",
+      "loadFailed": "Échec du chargement des commentaires.",
+      "networkError": "Erreur réseau."
+    },
+    "spam": {
+      "detected": "Commentaire signalé comme spam. En attente d'approbation de l'administrateur. ⚠️",
+      "reviewing": "Commentaire en cours de révision par l'administrateur."
+    }
+  },
+  "placeholder": {
+    "markdown": "**gras**, *italique*, `code`, ```bloc de code```, > citation, [lien](url) • Ctrl+Entrée pour publier"
+  },
+  "tabs": {
+    "write": "✏️ Écrire",
+    "preview": "👁️ Aperçu"
+  },
+  "keyboard": {
+    "shortcuts": "Ctrl+Entrée : Publier, Ctrl+Tab : Changer d'onglet, ESC : Mode écriture"
+  }
+}
