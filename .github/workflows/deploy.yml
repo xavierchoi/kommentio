@@ -36,15 +36,11 @@ jobs:
 
       - name: Build project
         run: |
-          npm run build
           npm run build:widget
 
       - name: Prepare GitHub Pages content
         run: |
           # docs directory already exists with all necessary files
-          # Just copy the built landing page over existing index.html
-          cp dist/docs/index.html docs/index.html
-          
           # Copy built widget files to docs
           mkdir -p docs/widget
           cp -r dist/widget/* docs/widget/

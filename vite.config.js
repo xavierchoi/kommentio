@@ -2,12 +2,12 @@ import { defineConfig } from 'vite';
 
 // 개발용 설정 - 안정성 및 성능 최적화
 export default defineConfig({
-  root: './docs', // docs 폴더를 루트로 설정
+  root: 'docs', // docs 폴더를 루트로 설정 (./ 제거)
   build: {
-    outDir: '../dist/docs', // 상대 경로로 다시 변경 (docs 기준)
+    outDir: '../build', // 상대 경로 유지
     emptyOutDir: true, // outDir 비우기 허용
     rollupOptions: {
-      input: 'index.html' // docs 폴더 내의 index.html
+      input: 'index.html' // 단순한 파일명
     }
   },
   server: {
