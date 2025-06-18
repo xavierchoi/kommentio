@@ -382,8 +382,15 @@ class Components {
         
         btn.style.cssText = btnStyles;
         
-        if (button.onclick) {
-          Utils.on(btn, 'click', button.onclick);
+        if (button.onclick && typeof button.onclick === 'function') {
+          const btnHandler = Utils.on(btn, 'click', () => {
+            try {
+              button.onclick();
+            } catch (error) {
+              console.error('Components.createModal: 버튼 핸들러 오류:', error);
+            }
+          });
+          this._trackEventListener(btn, 'click', btnHandler);
         }
         footer.appendChild(btn);
       });

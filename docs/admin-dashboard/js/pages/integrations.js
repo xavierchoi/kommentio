@@ -6,6 +6,20 @@ class IntegrationsPage {
     this.webhooks = [];
     this.thirdPartyIntegrations = [];
     this.currentTab = 'api-keys';
+    
+    // 메모리 누수 방지 시스템
+    this.eventListeners = new Map();
+    this.destroyed = false;
+    this.timers = new Set();
+    
+    // 성능 최적화: 캐싱 시스템
+    this.renderCache = new Map();
+    this.lastRenderTime = 0;
+    this.renderThrottleMs = 100;
+    
+    // 이벤트 디바운싱
+    this.searchTimeout = null;
+    this.updateTimeout = null;
   }
 
   async render() {
@@ -194,13 +208,13 @@ class IntegrationsPage {
         overflow: hidden !important;
       `;
 
-      // 호버 효과
-      statCard.addEventListener('mouseenter', () => {
+      // 호버 효과 (메모리 안전한 이벤트 리스너)
+      this.addEventListenerSafe(statCard, 'mouseenter', () => {
         statCard.style.transform = 'translateY(-4px) !important';
         statCard.style.background = 'rgba(255, 255, 255, 0.25) !important';
       });
 
-      statCard.addEventListener('mouseleave', () => {
+      this.addEventListenerSafe(statCard, 'mouseleave', () => {
         statCard.style.transform = 'translateY(0) !important';
         statCard.style.background = 'rgba(255, 255, 255, 0.15) !important';
       });
@@ -387,20 +401,20 @@ class IntegrationsPage {
         <span>${tab.name}</span>
       `;
 
-      // 호버 효과
+      // 호버 효과 (메모리 안전한 이벤트 리스너)
       if (!isActive) {
-        tabButton.addEventListener('mouseenter', () => {
+        this.addEventListenerSafe(tabButton, 'mouseenter', () => {
           tabButton.style.background = '#f8fafc !important';
           tabButton.style.color = '#1e293b !important';
         });
 
-        tabButton.addEventListener('mouseleave', () => {
+        this.addEventListenerSafe(tabButton, 'mouseleave', () => {
           tabButton.style.background = 'transparent !important';
           tabButton.style.color = '#64748b !important';
         });
       }
       
-      Utils.on(tabButton, 'click', () => this.switchTab(tab.id));
+      this.addEventListenerSafe(tabButton, 'click', () => this.switchTab(tab.id));
       tabList.appendChild(tabButton);
     });
 
@@ -2506,6 +2520,179 @@ class IntegrationsPage {
       console.error('CSV 내보내기 실패:', error);
       Utils.showToast('CSV 내보내기에 실패했습니다.', 'error');
     }
+  }
+
+  // 메모리 누수 방지 및 정리
+  destroy() {
+    if (this.destroyed) return;
+    
+    console.log('IntegrationsPage 리소스 정리 시작...');
+    
+    // 타이머 정리
+    this.timers.forEach(timerId => {
+      clearTimeout(timerId);
+      clearInterval(timerId);
+    });
+    this.timers.clear();
+    
+    // 개별 타이머 정리
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
+    }
+    if (this.updateTimeout) {
+      clearTimeout(this.updateTimeout);
+      this.updateTimeout = null;
+    }
+    
+    // 이벤트 리스너 정리
+    this.eventListeners.forEach((listeners, element) => {
+      listeners.forEach(({ event, handler }) => {
+        try {
+          element.removeEventListener(event, handler);
+        } catch (error) {
+          console.warn('이벤트 리스너 제거 실패:', error);
+        }
+      });
+    });
+    this.eventListeners.clear();
+    
+    // 캐시 정리
+    this.renderCache.clear();
+    
+    // 상태 초기화
+    this.apiKeys = [];
+    this.webhooks = [];
+    this.thirdPartyIntegrations = [];
+    
+    this.destroyed = true;
+    console.log('IntegrationsPage 리소스 정리 완료');
+  }
+
+  // 안전한 이벤트 리스너 추가
+  addEventListenerSafe(element, event, handler) {
+    if (!element || this.destroyed) return;
+    
+    element.addEventListener(event, handler);
+    
+    if (!this.eventListeners.has(element)) {
+      this.eventListeners.set(element, []);
+    }
+    this.eventListeners.get(element).push({ event, handler });
+  }
+
+  // 안전한 타이머 설정
+  setTimeoutSafe(callback, delay) {
+    if (this.destroyed) return null;
+    
+    const timerId = setTimeout(() => {
+      if (!this.destroyed) {
+        callback();
+      }
+      this.timers.delete(timerId);
+    }, delay);
+    
+    this.timers.add(timerId);
+    return timerId;
+  }
+
+  // 디바운싱된 검색
+  debouncedSearch(query, delay = 300) {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    
+    this.searchTimeout = setTimeout(() => {
+      if (!this.destroyed) {
+        this.performSearch(query);
+      }
+    }, delay);
+  }
+
+  // 검색 실행
+  performSearch(query) {
+    const lowerQuery = query.toLowerCase();
+    
+    // API 키 필터링
+    const filteredApiKeys = this.apiKeys.filter(key => 
+      key.name.toLowerCase().includes(lowerQuery) ||
+      key.description.toLowerCase().includes(lowerQuery)
+    );
+    
+    // 웹훅 필터링
+    const filteredWebhooks = this.webhooks.filter(webhook =>
+      webhook.name.toLowerCase().includes(lowerQuery) ||
+      webhook.url.toLowerCase().includes(lowerQuery)
+    );
+    
+    // 써드파티 서비스 필터링
+    const filteredServices = this.thirdPartyIntegrations.filter(service =>
+      service.name.toLowerCase().includes(lowerQuery) ||
+      service.description.toLowerCase().includes(lowerQuery)
+    );
+    
+    // 결과 업데이트 (성능 최적화를 위해 디바운싱)
+    this.updateSearchResults(filteredApiKeys, filteredWebhooks, filteredServices);
+  }
+
+  // 검색 결과 업데이트 (디바운싱)
+  updateSearchResults(apiKeys, webhooks, services) {
+    if (this.updateTimeout) {
+      clearTimeout(this.updateTimeout);
+    }
+    
+    this.updateTimeout = setTimeout(() => {
+      if (!this.destroyed) {
+        this.renderFilteredResults(apiKeys, webhooks, services);
+      }
+    }, 50);
+  }
+
+  // 필터링된 결과 렌더링
+  renderFilteredResults(apiKeys, webhooks, services) {
+    // 현재 탭에 따라 해당 결과만 업데이트
+    switch (this.currentTab) {
+      case 'api-keys':
+        this.renderApiKeysList(apiKeys);
+        break;
+      case 'webhooks':
+        this.renderWebhooksList(webhooks);
+        break;
+      case 'third-party':
+        this.renderThirdPartyList(services);
+        break;
+    }
+  }
+
+  // 성능 최적화된 렌더링 (스로틀링)
+  throttledRender(renderFunction, ...args) {
+    const now = Date.now();
+    if (now - this.lastRenderTime < this.renderThrottleMs) {
+      return;
+    }
+    
+    this.lastRenderTime = now;
+    renderFunction.apply(this, args);
+  }
+
+  // 캐시 기반 DOM 생성
+  createElementCached(tag, className, innerHTML) {
+    const cacheKey = `${tag}-${className}-${innerHTML?.substring(0, 50)}`;
+    
+    if (this.renderCache.has(cacheKey)) {
+      return this.renderCache.get(cacheKey).cloneNode(true);
+    }
+    
+    const element = Utils.createElement(tag, className, innerHTML);
+    
+    // 캐시 크기 제한 (메모리 사용량 제어)
+    if (this.renderCache.size > 100) {
+      const firstKey = this.renderCache.keys().next().value;
+      this.renderCache.delete(firstKey);
+    }
+    
+    this.renderCache.set(cacheKey, element.cloneNode(true));
+    return element;
   }
 }
 

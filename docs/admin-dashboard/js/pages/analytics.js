@@ -16,6 +16,9 @@ class AnalyticsPage {
     this.dateRange = '30d'; // 7d, 30d, 90d, 1y
     this.selectedSite = 'all';
     this.sites = [];
+    this.eventListeners = new Map();
+    this.destroyed = false;
+    this.chartJSLoaded = false;
   }
 
   async render() {
@@ -65,23 +68,41 @@ class AnalyticsPage {
   }
 
   async loadChartJS() {
-    if (window.Chart) {
+    // 이미 로드된 경우
+    if (window.Chart && this.chartJSLoaded) {
       return Promise.resolve();
     }
+    
+    // CDN 대체 및 fallback 시스템
+    const cdnUrls = [
+      'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js',
+      'https://unpkg.com/chart.js@4.4.0/dist/chart.umd.js'
+    ];
 
+    for (const url of cdnUrls) {
+      try {
+        await this.loadChartJSFromURL(url);
+        this.chartJSLoaded = true;
+        console.log(`Chart.js 로드 성공: ${url}`);
+        return;
+      } catch (error) {
+        console.warn(`Chart.js 로드 실패: ${url}`, error);
+        continue;
+      }
+    }
+    
+    // 모든 CDN 실패 시 fallback
+    console.error('모든 Chart.js CDN 로드 실패');
+    this.showChartLoadError();
+  }
+  
+  loadChartJSFromURL(url) {
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js';
-      script.onload = () => {
-        console.log('Chart.js 로드 완료');
-        resolve();
-      };
-      script.onerror = (error) => {
-        console.error('Chart.js 로드 실패:', error);
-        // Chart.js 로드 실패시 대체 처리
-        this.showChartLoadError();
-        resolve(); // 에러여도 계속 진행
-      };
+      script.src = url;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error(`Failed to load from ${url}`));
       document.head.appendChild(script);
     });
   }
@@ -316,23 +337,29 @@ class AnalyticsPage {
     section.appendChild(header);
     section.appendChild(body);
     
-    // 이벤트 리스너
+    // 이벤트 리스너 (추적 가능)
     setTimeout(() => {
       const dateFilter = Utils.$('#dateRangeFilter');
       const siteFilter = Utils.$('#siteFilter');
       
       if (dateFilter) {
-        Utils.on(dateFilter, 'change', (e) => {
-          this.dateRange = e.target.value;
-          this.refreshAnalytics();
-        });
+        const dateChangeHandler = (e) => {
+          if (!this.destroyed) {
+            this.dateRange = e.target.value;
+            this.refreshAnalytics();
+          }
+        };
+        this.addEventListenerWithTracking(dateFilter, 'change', dateChangeHandler);
       }
       
       if (siteFilter) {
-        Utils.on(siteFilter, 'change', (e) => {
-          this.selectedSite = e.target.value;
-          this.refreshAnalytics();
-        });
+        const siteChangeHandler = (e) => {
+          if (!this.destroyed) {
+            this.selectedSite = e.target.value;
+            this.refreshAnalytics();
+          }
+        };
+        this.addEventListenerWithTracking(siteFilter, 'change', siteChangeHandler);
       }
     }, 100);
     
@@ -1065,14 +1092,28 @@ class AnalyticsPage {
   }
 
   async refreshAnalytics() {
-    // 기존 차트들 제거
-    Object.values(this.charts).forEach(chart => {
-      if (chart) chart.destroy();
-    });
-    this.charts = {};
+    if (this.destroyed) return;
+    
+    // 안전한 차트 제거
+    this.destroyAllCharts();
 
     // 페이지 다시 렌더링
     await this.render();
+  }
+  
+  // 메모리 누수 방지를 위한 차트 정리
+  destroyAllCharts() {
+    try {
+      Object.values(this.charts).forEach(chart => {
+        if (chart && typeof chart.destroy === 'function') {
+          chart.destroy();
+        }
+      });
+    } catch (error) {
+      console.warn('차트 제거 오류:', error);
+    } finally {
+      this.charts = {};
+    }
   }
 
   async refreshData() {
@@ -1094,6 +1135,30 @@ class AnalyticsPage {
     );
   }
 
+  // 이벤트 리스너 추적 관리
+  addEventListenerWithTracking(element, eventType, handler, options = {}) {
+    element.addEventListener(eventType, handler, options);
+    const key = `${element.constructor.name}-${eventType}-${Date.now()}`;
+    this.eventListeners.set(key, { element, eventType, handler, options });
+    return key;
+  }
+
+  // 메모리 누수 방지를 위한 정리 메서드
+  destroy() {
+    this.destroyed = true;
+    
+    // 차트 인스턴스 정리
+    this.destroyAllCharts();
+    
+    // 이벤트 리스너 제거
+    for (const [key, listener] of this.eventListeners) {
+      listener.element.removeEventListener(listener.eventType, listener.handler, listener.options);
+    }
+    this.eventListeners.clear();
+    
+    console.log('AnalyticsPage destroyed and cleaned up');
+  }
+
   // 차트 내보내기 기능
   exportChart(chartId) {
     try {
@@ -1113,28 +1178,36 @@ class AnalyticsPage {
 
   // 개별 차트 새로고침
   async refreshChart(chartId) {
+    if (this.destroyed) return;
+    
     try {
       const loadingEl = Utils.$(`#${chartId}-loading`);
       if (loadingEl) {
         loadingEl.style.display = 'flex';
       }
 
-      // 기존 차트 제거
+      // 안전한 차트 제거
       const chartInstance = Object.values(this.charts).find(chart => 
         chart && chart.canvas && chart.canvas.id === chartId
       );
-      if (chartInstance) {
-        chartInstance.destroy();
+      if (chartInstance && typeof chartInstance.destroy === 'function') {
+        try {
+          chartInstance.destroy();
+        } catch (destroyError) {
+          console.warn(`차트 ${chartId} 제거 오류:`, destroyError);
+        }
       }
 
-      // 차트 다시 렌더링
+      // 차트 다시 렌더링 (디바운스)
       setTimeout(async () => {
-        await this.renderSpecificChart(chartId);
-        if (loadingEl) {
-          loadingEl.style.display = 'none';
+        if (!this.destroyed) {
+          await this.renderSpecificChart(chartId);
+          if (loadingEl) {
+            loadingEl.style.display = 'none';
+          }
+          Utils.showNotification('차트가 새로고침되었습니다.', 'success');
         }
-        Utils.showNotification('차트가 새로고침되었습니다.', 'success');
-      }, 500);
+      }, 300);
 
     } catch (error) {
       console.error('차트 새로고침 실패:', error);

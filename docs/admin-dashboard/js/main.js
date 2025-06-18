@@ -3,7 +3,16 @@
 class AdminApp {
   constructor() {
     this.router = null;
+    this.apiService = null;
     this.initialized = false;
+    this.eventListeners = new Map(); // 이벤트 리스너 추적용
+    this.config = {
+      breakpoints: {
+        mobile: 768,
+        tablet: 1024,
+        desktop: 1200
+      }
+    };
   }
 
   async init() {
@@ -24,17 +33,10 @@ class AdminApp {
       await this.initializeAPIService();
 
       // 라우터 초기화
-      this.router = new Router();
-      window.router = this.router;
-
-      // 전역 페이지 인스턴스 설정 (템플릿에서 사용하기 위해)
-      window.dashboardPage = this.router.pages.get('dashboard');
-      window.sitesPage = this.router.pages.get('sites');
-      window.commentsPage = this.router.pages.get('comments');
-      window.spamFilterPage = this.router.pages.get('spam-filter');
-      window.analyticsPage = this.router.pages.get('analytics');
-      window.usersPage = this.router.pages.get('users');
-      window.integrationsPage = this.router.pages.get('integrations');
+      this.router = new Router(this.config);
+      
+      // 전역 접근을 위한 안전한 네임스페이스 설정
+      this.setupGlobalNamespace();
 
       // 전역 에러 핸들러 설정
       this.setupErrorHandlers();
@@ -67,7 +69,7 @@ class AdminApp {
 
   async initializeAPIService() {
     // API 서비스 인스턴스 생성 및 초기화
-    window.apiService = new AdminAPIService();
+    this.apiService = new AdminAPIService();
     
     // 설정 - 실제 환경에서는 환경변수나 설정 파일에서 가져와야 함
     const config = {
@@ -76,13 +78,34 @@ class AdminApp {
       demoMode: true // 현재는 데모 모드로 설정
     };
 
-    await window.apiService.init(config);
+    await this.apiService.init(config);
     
-    console.log('API 서비스 초기화 완료:', window.apiService.getConnectionStatus());
+    console.log('API 서비스 초기화 완료:', this.apiService.getConnectionStatus());
+  }
+
+  setupGlobalNamespace() {
+    // 안전한 전역 네임스페이스 설정
+    if (!window.KommentioAdmin) {
+      window.KommentioAdmin = {};
+    }
+    
+    // 필요한 인스턴스만 전역에 노출
+    window.KommentioAdmin.router = this.router;
+    window.KommentioAdmin.apiService = this.apiService;
+    window.KommentioAdmin.app = this;
+    
+    // 하위 호환성을 위한 임시 참조 (추후 제거 예정)
+    window.router = this.router;
+    window.apiService = this.apiService;
+    
+    // 페이지 인스턴스는 함수로 접근하도록 변경
+    window.KommentioAdmin.getPage = (pageName) => {
+      return this.router?.pages?.get(pageName) || null;
+    };
   }
 
   showConnectionStatus() {
-    const status = window.apiService.getConnectionStatus();
+    const status = this.apiService.getConnectionStatus();
     const statusText = status.demoMode ? '데모 모드' : '실제 API 연결';
     const statusClass = status.demoMode ? 'warning' : 'success';
     
@@ -91,7 +114,7 @@ class AdminApp {
 
   setupErrorHandlers() {
     // 전역 JavaScript 에러 핸들러
-    Utils.on(window, 'error', (event) => {
+    const errorHandler = (event) => {
       console.error('JavaScript 오류:', event.error);
       
       // Chart.js 관련 오류는 별도 처리
@@ -101,10 +124,9 @@ class AdminApp {
       }
       
       Utils.showNotification('예상치 못한 오류가 발생했습니다.', 'error');
-    });
+    };
 
-    // Promise rejection 핸들러
-    Utils.on(window, 'unhandledrejection', (event) => {
+    const rejectionHandler = (event) => {
       console.error('처리되지 않은 Promise 거부:', event.reason);
       
       // 네트워크 관련 오류 구분
@@ -122,7 +144,72 @@ class AdminApp {
       
       // 오류를 방지하여 계속 실행되도록 함
       event.preventDefault();
+    };
+
+    // 이벤트 리스너 추가 및 추적
+    this.addEventListenerWithTracking(window, 'error', errorHandler);
+    this.addEventListenerWithTracking(window, 'unhandledrejection', rejectionHandler);
+  }
+
+  // 이벤트 리스너 추가 및 추적 메서드
+  addEventListenerWithTracking(element, eventType, handler, options = {}) {
+    element.addEventListener(eventType, handler, options);
+    
+    // 메모리 누수 방지를 위한 추적
+    const key = `${element.constructor.name}-${eventType}-${Date.now()}`;
+    this.eventListeners.set(key, {
+      element,
+      eventType,
+      handler,
+      options
     });
+    
+    return key; // 나중에 제거할 때 사용
+  }
+
+  // 특정 이벤트 리스너 제거
+  removeEventListener(key) {
+    const listener = this.eventListeners.get(key);
+    if (listener) {
+      listener.element.removeEventListener(
+        listener.eventType, 
+        listener.handler, 
+        listener.options
+      );
+      this.eventListeners.delete(key);
+      return true;
+    }
+    return false;
+  }
+
+  // 앱 종료 시 모든 이벤트 리스너 정리
+  destroy() {
+    console.log('AdminApp 종료 중...');
+    
+    // 모든 이벤트 리스너 제거
+    for (const [key, listener] of this.eventListeners) {
+      listener.element.removeEventListener(
+        listener.eventType, 
+        listener.handler, 
+        listener.options
+      );
+    }
+    this.eventListeners.clear();
+    
+    // 전역 네임스페이스 정리
+    if (window.KommentioAdmin) {
+      delete window.KommentioAdmin.router;
+      delete window.KommentioAdmin.apiService;
+      delete window.KommentioAdmin.app;
+      delete window.KommentioAdmin.getPage;
+    }
+    
+    // 하위 호환성 참조 제거
+    delete window.router;
+    delete window.apiService;
+    
+    this.initialized = false;
+    console.log('AdminApp 종료 완료');
   }
 
   addNotificationStyles() {
@@ -251,8 +338,8 @@ class AdminApp {
       return;
     }
 
-    // 모바일/태블릿에서만 동작 (1024px 이하)
-    const isMobile = () => window.innerWidth <= 1024;
+    // 모바일/태블릿에서만 동작 (중앙화된 브레이크포인트 사용)
+    const isMobile = () => window.innerWidth <= this.config.breakpoints.tablet;
 
     // 3단계 상태 관리: 'hidden', 'collapsed', 'expanded'
     let currentState = 'collapsed'; // 기본값: 접힌 상태
@@ -354,7 +441,7 @@ class AdminApp {
       const rect = header.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       
-      if (clickX <= 60 && window.innerWidth <= 1024) {
+      if (clickX <= 60 && window.innerWidth <= this.config.breakpoints.tablet) {
         toggleFunction();
       }
     });
@@ -365,7 +452,7 @@ class AdminApp {
       const touch = e.touches[0];
       const touchX = touch.clientX - rect.left;
       
-      if (touchX <= 60 && window.innerWidth <= 1024) {
+      if (touchX <= 60 && window.innerWidth <= this.config.breakpoints.tablet) {
         e.preventDefault(); // 기본 터치 동작 방지
         toggleFunction();
       }
@@ -391,7 +478,7 @@ class AdminApp {
 
     // 스와이프 시작
     const handleTouchStart = (e) => {
-      if (window.innerWidth > 1024) return; // 데스크톱에서는 비활성화
+      if (window.innerWidth > this.config.breakpoints.tablet) return; // 데스크톱에서는 비활성화
       
       const touch = e.touches[0];
       startX = touch.clientX;
@@ -401,7 +488,7 @@ class AdminApp {
 
     // 스와이프 이동
     const handleTouchMove = (e) => {
-      if (window.innerWidth > 1024) return;
+      if (window.innerWidth > this.config.breakpoints.tablet) return;
       if (!isSwipeGesture) return;
       
       e.preventDefault(); // 스크롤 방지
@@ -409,7 +496,7 @@ class AdminApp {
 
     // 스와이프 종료
     const handleTouchEnd = (e) => {
-      if (window.innerWidth > 1024) return;
+      if (window.innerWidth > this.config.breakpoints.tablet) return;
       
       const touch = e.changedTouches[0];
       const deltaX = touch.clientX - startX;
@@ -446,7 +533,7 @@ class AdminApp {
 
     // 스와이프 감지 개선
     const handleTouchMoveImproved = (e) => {
-      if (window.innerWidth > 1024) return;
+      if (window.innerWidth > this.config.breakpoints.tablet) return;
       
       const touch = e.touches[0];
       const deltaX = Math.abs(touch.clientX - startX);
@@ -483,7 +570,7 @@ class AdminApp {
 
     // 터치/클릭 시작 감지
     const handleStart = (e) => {
-      if (window.innerWidth > 1024) return; // 데스크톱에서는 비활성화
+      if (window.innerWidth > this.config.breakpoints.tablet) return; // 데스크톱에서는 비활성화
       
       const currentState = sidebar.classList.contains('expanded');
       if (!currentState) return; // 사이드바가 펼쳐져 있을 때만 작동
@@ -560,7 +647,7 @@ class AdminApp {
 
     // ESC 키로 사이드바 닫기 (접근성)
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && window.innerWidth <= 1024) {
+      if (e.key === 'Escape' && window.innerWidth <= this.config.breakpoints.tablet) {
         const currentState = sidebar.classList.contains('expanded');
         if (currentState) {
           toggleFunction();

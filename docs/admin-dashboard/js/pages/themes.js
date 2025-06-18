@@ -11,6 +11,26 @@ class ThemesPage {
       customThemes: 0,
       cssLines: 0
     };
+    
+    // 메모리 누수 방지 시스템
+    this.eventListeners = new Map();
+    this.destroyed = false;
+    this.timers = new Set();
+    
+    // CSS 에디터 성능 최적화
+    this.cssEditorCache = new Map();
+    this.lastCssUpdate = '';
+    this.cssUpdateTimeout = null;
+    this.cssValidationTimeout = null;
+    
+    // 실시간 미리보기 최적화
+    this.previewUpdateDelay = 150; // ms
+    this.previewThrottleTimeout = null;
+    this.lastPreviewUpdate = 0;
+    
+    // 테마 선택 캐싱
+    this.themeRenderCache = new Map();
+    this.maxCacheSize = 50;
   }
 
   async render() {
@@ -186,12 +206,12 @@ class ThemesPage {
       font-size: 14px !important;
     `;
     exportButton.innerHTML = '<i class="fas fa-download"></i><span>테마 내보내기</span>';
-    exportButton.addEventListener('click', () => this.exportThemeData());
-    exportButton.addEventListener('mouseenter', () => {
+    this.addEventListenerSafe(exportButton, 'click', () => this.exportThemeData());
+    this.addEventListenerSafe(exportButton, 'mouseenter', () => {
       exportButton.style.background = 'rgba(255, 255, 255, 0.3) !important';
       exportButton.style.transform = 'translateY(-2px) !important';
     });
-    exportButton.addEventListener('mouseleave', () => {
+    this.addEventListenerSafe(exportButton, 'mouseleave', () => {
       exportButton.style.background = 'rgba(255, 255, 255, 0.2) !important';
       exportButton.style.transform = 'translateY(0) !important';
     });
@@ -214,13 +234,13 @@ class ThemesPage {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
     `;
     importButton.innerHTML = '<i class="fas fa-upload"></i><span>테마 가져오기</span>';
-    importButton.addEventListener('click', () => this.openThemeImportModal());
-    importButton.addEventListener('mouseenter', () => {
+    this.addEventListenerSafe(importButton, 'click', () => this.openThemeImportModal());
+    this.addEventListenerSafe(importButton, 'mouseenter', () => {
       importButton.style.transform = 'translateY(-3px) !important';
       importButton.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.25) !important';
       importButton.style.background = 'white !important';
     });
-    importButton.addEventListener('mouseleave', () => {
+    this.addEventListenerSafe(importButton, 'mouseleave', () => {
       importButton.style.transform = 'translateY(0) !important';
       importButton.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15) !important';
       importButton.style.background = 'rgba(255, 255, 255, 0.95) !important';
@@ -982,6 +1002,292 @@ class ThemesPage {
       </div>
     `;
     return errorState;
+  }
+
+  // 메모리 누수 방지 및 정리
+  destroy() {
+    if (this.destroyed) return;
+    
+    console.log('ThemesPage 리소스 정리 시작...');
+    
+    // 타이머 정리
+    this.timers.forEach(timerId => {
+      clearTimeout(timerId);
+      clearInterval(timerId);
+    });
+    this.timers.clear();
+    
+    // CSS 에디터 관련 타이머 정리
+    if (this.cssUpdateTimeout) {
+      clearTimeout(this.cssUpdateTimeout);
+      this.cssUpdateTimeout = null;
+    }
+    if (this.cssValidationTimeout) {
+      clearTimeout(this.cssValidationTimeout);
+      this.cssValidationTimeout = null;
+    }
+    if (this.previewThrottleTimeout) {
+      clearTimeout(this.previewThrottleTimeout);
+      this.previewThrottleTimeout = null;
+    }
+    
+    // 이벤트 리스너 정리
+    this.eventListeners.forEach((listeners, element) => {
+      listeners.forEach(({ event, handler }) => {
+        try {
+          element.removeEventListener(event, handler);
+        } catch (error) {
+          console.warn('이벤트 리스너 제거 실패:', error);
+        }
+      });
+    });
+    this.eventListeners.clear();
+    
+    // 캐시 정리
+    this.cssEditorCache.clear();
+    this.themeRenderCache.clear();
+    
+    // 상태 초기화
+    this.themes = [];
+    this.customCss = '';
+    
+    this.destroyed = true;
+    console.log('ThemesPage 리소스 정리 완료');
+  }
+
+  // 안전한 이벤트 리스너 추가
+  addEventListenerSafe(element, event, handler) {
+    if (!element || this.destroyed) return;
+    
+    element.addEventListener(event, handler);
+    
+    if (!this.eventListeners.has(element)) {
+      this.eventListeners.set(element, []);
+    }
+    this.eventListeners.get(element).push({ event, handler });
+  }
+
+  // 안전한 타이머 설정
+  setTimeoutSafe(callback, delay) {
+    if (this.destroyed) return null;
+    
+    const timerId = setTimeout(() => {
+      if (!this.destroyed) {
+        callback();
+      }
+      this.timers.delete(timerId);
+    }, delay);
+    
+    this.timers.add(timerId);
+    return timerId;
+  }
+
+  // CSS 에디터 성능 최적화: 디바운싱된 업데이트
+  debouncedCssUpdate(css, delay = 300) {
+    if (this.cssUpdateTimeout) {
+      clearTimeout(this.cssUpdateTimeout);
+    }
+    
+    this.cssUpdateTimeout = setTimeout(() => {
+      if (!this.destroyed && css !== this.lastCssUpdate) {
+        this.lastCssUpdate = css;
+        this.updateCssPreview(css);
+      }
+    }, delay);
+  }
+
+  // CSS 미리보기 업데이트 (스로틀링)
+  updateCssPreview(css) {
+    const now = Date.now();
+    if (now - this.lastPreviewUpdate < this.previewUpdateDelay) {
+      if (this.previewThrottleTimeout) {
+        clearTimeout(this.previewThrottleTimeout);
+      }
+      
+      this.previewThrottleTimeout = setTimeout(() => {
+        this.applyCssToPreview(css);
+      }, this.previewUpdateDelay);
+      return;
+    }
+    
+    this.lastPreviewUpdate = now;
+    this.applyCssToPreview(css);
+  }
+
+  // CSS를 실시간 미리보기에 적용
+  applyCssToPreview(css) {
+    if (this.destroyed) return;
+    
+    try {
+      const previewElement = Utils.$('#theme-preview');
+      if (!previewElement) return;
+      
+      // 기존 커스텀 스타일 제거
+      const existingStyle = Utils.$('#theme-preview-style');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+      
+      // 새 스타일 적용
+      if (css.trim()) {
+        const styleElement = document.createElement('style');
+        styleElement.id = 'theme-preview-style';
+        styleElement.textContent = css;
+        document.head.appendChild(styleElement);
+      }
+      
+      // 미리보기 영역에 스타일 클래스 적용
+      previewElement.className = 'theme-preview-active';
+      
+    } catch (error) {
+      console.warn('CSS 미리보기 적용 실패:', error);
+    }
+  }
+
+  // CSS 유효성 검사 (디바운싱)
+  debouncedCssValidation(css, delay = 500) {
+    if (this.cssValidationTimeout) {
+      clearTimeout(this.cssValidationTimeout);
+    }
+    
+    this.cssValidationTimeout = setTimeout(() => {
+      if (!this.destroyed) {
+        this.validateCssSyntax(css);
+      }
+    }, delay);
+  }
+
+  // CSS 문법 검사 최적화
+  validateCssSyntax(css) {
+    try {
+      if (!css || css.trim() === '') {
+        this.updateValidationUI(true, '');
+        return;
+      }
+      
+      // 기본적인 CSS 문법 검사
+      const openBraces = (css.match(/\{/g) || []).length;
+      const closeBraces = (css.match(/\}/g) || []).length;
+      
+      if (openBraces !== closeBraces) {
+        this.updateValidationUI(false, '중괄호가 일치하지 않습니다.');
+        return;
+      }
+      
+      // 더 정교한 검사를 위해 임시 스타일 엘리먼트 생성
+      const testStyle = document.createElement('style');
+      testStyle.textContent = css;
+      
+      try {
+        document.head.appendChild(testStyle);
+        // 성공적으로 추가되면 유효한 CSS
+        this.updateValidationUI(true, 'CSS 문법이 올바릅니다.');
+        document.head.removeChild(testStyle);
+      } catch (error) {
+        this.updateValidationUI(false, `CSS 오류: ${error.message}`);
+      }
+      
+    } catch (error) {
+      this.updateValidationUI(false, `검증 오류: ${error.message}`);
+    }
+  }
+
+  // 유효성 검사 UI 업데이트
+  updateValidationUI(isValid, message) {
+    const validationElement = Utils.$('#css-validation-result');
+    if (!validationElement) return;
+    
+    validationElement.style.display = message ? 'block' : 'none';
+    validationElement.className = `validation-message ${isValid ? 'valid' : 'invalid'}`;
+    validationElement.textContent = message;
+  }
+
+  // 테마 캐싱 시스템
+  getCachedThemeRender(themeId) {
+    return this.themeRenderCache.get(themeId);
+  }
+
+  setCachedThemeRender(themeId, renderedElement) {
+    // 캐시 크기 제한
+    if (this.themeRenderCache.size >= this.maxCacheSize) {
+      const firstKey = this.themeRenderCache.keys().next().value;
+      this.themeRenderCache.delete(firstKey);
+    }
+    
+    this.themeRenderCache.set(themeId, renderedElement.cloneNode(true));
+  }
+
+  // CSS 포맷팅 최적화
+  formatCssOptimized(css) {
+    if (!css || css.trim() === '') return '';
+    
+    try {
+      // 캐싱된 포맷팅 결과 확인
+      const cacheKey = css.substring(0, 100); // 처음 100자로 캐시 키 생성
+      if (this.cssEditorCache.has(cacheKey)) {
+        return this.cssEditorCache.get(cacheKey);
+      }
+      
+      // CSS 포맷팅 실행
+      let formatted = css
+        .replace(/\{/g, ' {\n  ')
+        .replace(/\}/g, '\n}\n')
+        .replace(/;/g, ';\n  ')
+        .replace(/,/g, ',\n')
+        .replace(/\n\s*\n/g, '\n') // 중복 줄바꿈 제거
+        .trim();
+      
+      // 결과 캐싱
+      this.cssEditorCache.set(cacheKey, formatted);
+      
+      return formatted;
+    } catch (error) {
+      console.warn('CSS 포맷팅 실패:', error);
+      return css;
+    }
+  }
+
+  // 성능 최적화된 테마 적용
+  selectThemeOptimized(themeId) {
+    if (this.destroyed || themeId === this.currentTheme) return;
+    
+    try {
+      // 캐시된 테마 확인
+      const cachedTheme = this.getCachedThemeRender(themeId);
+      if (cachedTheme) {
+        this.applyThemeFromCache(themeId, cachedTheme);
+        return;
+      }
+      
+      // 새 테마 적용
+      this.selectTheme(themeId);
+      
+    } catch (error) {
+      console.error('테마 적용 실패:', error);
+      Utils.showNotification('테마 적용에 실패했습니다.', 'error');
+    }
+  }
+
+  // 캐시된 테마 적용
+  applyThemeFromCache(themeId, cachedElement) {
+    this.currentTheme = themeId;
+    
+    // 모든 테마 비활성화
+    this.themes.forEach(theme => theme.active = false);
+    
+    // 선택된 테마 활성화
+    const selectedTheme = this.themes.find(theme => theme.id === themeId);
+    if (selectedTheme) {
+      selectedTheme.active = true;
+      Utils.showNotification(`${selectedTheme.name} 테마가 적용되었습니다.`, 'success');
+    }
+    
+    // UI 업데이트 (디바운싱)
+    this.setTimeoutSafe(() => {
+      if (!this.destroyed) {
+        this.render();
+      }
+    }, 100);
   }
 }
 

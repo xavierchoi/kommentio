@@ -14,6 +14,25 @@ class BillingPage {
       apiCalls: 0,
       storage: 0
     };
+    
+    // 메모리 누수 방지 시스템
+    this.eventListeners = new Map();
+    this.destroyed = false;
+    this.timers = new Set();
+    
+    // 상태 관리 최적화
+    this.planChangeTimeout = null;
+    this.usageUpdateInterval = null;
+    this.lastPlanChange = 0;
+    
+    // 결제 정보 캐싱
+    this.billingCache = new Map();
+    this.lastCacheUpdate = 0;
+    this.cacheExpiry = 5 * 60 * 1000; // 5분
+    
+    // 모달 관리
+    this.activeModals = new Set();
+    this.modalEventListeners = new Map();
   }
 
   async render() {
@@ -211,16 +230,23 @@ class BillingPage {
         overflow: hidden !important;
       `;
 
-      // 호버 효과
-      statCard.addEventListener('mouseenter', () => {
-        statCard.style.transform = 'translateY(-4px) !important';
-        statCard.style.background = 'rgba(255, 255, 255, 0.25) !important';
-      });
-
-      statCard.addEventListener('mouseleave', () => {
-        statCard.style.transform = 'translateY(0) !important';
-        statCard.style.background = 'rgba(255, 255, 255, 0.15) !important';
-      });
+      // 안전한 호버 효과
+      const hoverEnter = () => {
+        if (!this.destroyed) {
+          statCard.style.transform = 'translateY(-4px) !important';
+          statCard.style.background = 'rgba(255, 255, 255, 0.25) !important';
+        }
+      };
+      
+      const hoverLeave = () => {
+        if (!this.destroyed) {
+          statCard.style.transform = 'translateY(0) !important';
+          statCard.style.background = 'rgba(255, 255, 255, 0.15) !important';
+        }
+      };
+      
+      this.addEventListenerSafe(statCard, 'mouseenter', hoverEnter);
+      this.addEventListenerSafe(statCard, 'mouseleave', hoverLeave);
 
       const cardContent = Utils.createElement('div');
       cardContent.style.cssText = `
@@ -301,14 +327,18 @@ class BillingPage {
       font-size: 14px !important;
     `;
     downloadReceiptBtn.innerHTML = '<i class="fas fa-download"></i><span>영수증 다운로드</span>';
-    downloadReceiptBtn.addEventListener('click', () => this.downloadReceipt());
-    downloadReceiptBtn.addEventListener('mouseenter', () => {
-      downloadReceiptBtn.style.background = 'rgba(255, 255, 255, 0.3) !important';
-      downloadReceiptBtn.style.transform = 'translateY(-2px) !important';
+    this.addEventListenerSafe(downloadReceiptBtn, 'click', () => this.downloadReceipt());
+    this.addEventListenerSafe(downloadReceiptBtn, 'mouseenter', () => {
+      if (!this.destroyed) {
+        downloadReceiptBtn.style.background = 'rgba(255, 255, 255, 0.3) !important';
+        downloadReceiptBtn.style.transform = 'translateY(-2px) !important';
+      }
     });
-    downloadReceiptBtn.addEventListener('mouseleave', () => {
-      downloadReceiptBtn.style.background = 'rgba(255, 255, 255, 0.2) !important';
-      downloadReceiptBtn.style.transform = 'translateY(0) !important';
+    this.addEventListenerSafe(downloadReceiptBtn, 'mouseleave', () => {
+      if (!this.destroyed) {
+        downloadReceiptBtn.style.background = 'rgba(255, 255, 255, 0.2) !important';
+        downloadReceiptBtn.style.transform = 'translateY(0) !important';
+      }
     });
 
     const managePaymentBtn = Utils.createElement('button');
@@ -329,16 +359,20 @@ class BillingPage {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
     `;
     managePaymentBtn.innerHTML = '<i class="fas fa-credit-card"></i><span>결제 수단 관리</span>';
-    managePaymentBtn.addEventListener('click', () => this.managePaymentMethod());
-    managePaymentBtn.addEventListener('mouseenter', () => {
-      managePaymentBtn.style.transform = 'translateY(-3px) !important';
-      managePaymentBtn.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.25) !important';
-      managePaymentBtn.style.background = 'white !important';
+    this.addEventListenerSafe(managePaymentBtn, 'click', () => this.managePaymentMethod());
+    this.addEventListenerSafe(managePaymentBtn, 'mouseenter', () => {
+      if (!this.destroyed) {
+        managePaymentBtn.style.transform = 'translateY(-3px) !important';
+        managePaymentBtn.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.25) !important';
+        managePaymentBtn.style.background = 'white !important';
+      }
     });
-    managePaymentBtn.addEventListener('mouseleave', () => {
-      managePaymentBtn.style.transform = 'translateY(0) !important';
-      managePaymentBtn.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15) !important';
-      managePaymentBtn.style.background = 'rgba(255, 255, 255, 0.95) !important';
+    this.addEventListenerSafe(managePaymentBtn, 'mouseleave', () => {
+      if (!this.destroyed) {
+        managePaymentBtn.style.transform = 'translateY(0) !important';
+        managePaymentBtn.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15) !important';
+        managePaymentBtn.style.background = 'rgba(255, 255, 255, 0.95) !important';
+      }
     });
 
     actionsSection.appendChild(downloadReceiptBtn);
@@ -832,7 +866,15 @@ class BillingPage {
   }
 
   changePlan(newPlan) {
-    if (newPlan === this.currentPlan) return;
+    if (newPlan === this.currentPlan || this.destroyed) return;
+    
+    // 중복 요청 방지
+    const now = Date.now();
+    if (now - this.lastPlanChange < 1000) {
+      console.log('플랜 변경 요청이 너무 빨리 발생했습니다.');
+      return;
+    }
+    this.lastPlanChange = now;
 
     const planNames = {
       'free': '무료 플랜',
@@ -841,7 +883,7 @@ class BillingPage {
     };
 
     if (newPlan === 'enterprise') {
-      Utils.showToast('엔터프라이즈 플랜은 문의를 통해 진행됩니다.', 'info');
+      Utils.showToast && Utils.showToast('엔터프라이즈 플랜은 문의를 통해 진행됩니다.', 'info');
       return;
     }
 
@@ -850,13 +892,32 @@ class BillingPage {
       `${planNames[newPlan]}으로 업그레이드하시겠습니까?`;
 
     if (confirm(confirmMessage)) {
-      this.currentPlan = newPlan;
-      localStorage.setItem('kommentio-current-plan', newPlan);
+      // 안전한 플랜 변경 처리
+      this.clearTimeout('planChange');
+      this.planChangeTimeout = setTimeout(() => {
+        if (!this.destroyed) {
+          this.currentPlan = newPlan;
+          
+          try {
+            localStorage.setItem('kommentio-current-plan', newPlan);
+          } catch (error) {
+            console.warn('로컬 스토리지 저장 실패:', error);
+          }
+          
+          // 캐시 무효화
+          this.billingCache.clear();
+          this.lastCacheUpdate = 0;
+          
+          Utils.showToast && Utils.showToast(`${planNames[newPlan]}으로 변경되었습니다.`, 'success');
+          
+          // 페이지 다시 렌더링
+          this.render().catch(error => {
+            console.error('페이지 렌더링 실패:', error);
+          });
+        }
+      }, 100);
       
-      Utils.showToast(`${planNames[newPlan]}으로 변경되었습니다.`, 'success');
-      
-      // 페이지 다시 렌더링
-      this.render();
+      this.timers.add(this.planChangeTimeout);
     }
   }
 
@@ -991,16 +1052,24 @@ class BillingPage {
       gap: 8px !important;
     `;
     addCardBtn.innerHTML = '<i class="fas fa-plus"></i><span>새 결제 수단 추가</span>';
-    addCardBtn.addEventListener('mouseenter', () => {
-      addCardBtn.style.background = '#f1f5f9 !important';
-      addCardBtn.style.borderColor = '#94a3b8 !important';
-      addCardBtn.style.color = '#475569 !important';
-    });
-    addCardBtn.addEventListener('mouseleave', () => {
-      addCardBtn.style.background = '#f8fafc !important';
-      addCardBtn.style.borderColor = '#cbd5e1 !important';
-      addCardBtn.style.color = '#64748b !important';
-    });
+    const addCardHoverEnter = () => {
+      if (!this.destroyed) {
+        addCardBtn.style.background = '#f1f5f9 !important';
+        addCardBtn.style.borderColor = '#94a3b8 !important';
+        addCardBtn.style.color = '#475569 !important';
+      }
+    };
+    
+    const addCardHoverLeave = () => {
+      if (!this.destroyed) {
+        addCardBtn.style.background = '#f8fafc !important';
+        addCardBtn.style.borderColor = '#cbd5e1 !important';
+        addCardBtn.style.color = '#64748b !important';
+      }
+    };
+    
+    this.addModalEventListener(addCardBtn, 'mouseenter', addCardHoverEnter);
+    this.addModalEventListener(addCardBtn, 'mouseleave', addCardHoverLeave);
 
     modalContent.appendChild(currentCard);
     modalContent.appendChild(addCardBtn);
@@ -1027,9 +1096,8 @@ class BillingPage {
       transition: all 0.2s ease !important;
     `;
     closeBtn.textContent = '닫기';
-    closeBtn.addEventListener('click', () => {
-      document.body.removeChild(modal);
-    });
+    const closeModal = () => this.closeModalSafe(modal);
+    this.addModalEventListener(closeBtn, 'click', closeModal);
 
     buttons.appendChild(closeBtn);
     modalContent.appendChild(buttons);
@@ -1085,11 +1153,12 @@ class BillingPage {
     modal.appendChild(modalDialog);
 
     // 모달 외부 클릭시 닫기
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        document.body.removeChild(modal);
+    const outsideClick = (e) => {
+      if (e.target === modal && !this.destroyed) {
+        this.closeModalSafe(modal);
       }
-    });
+    };
+    this.addModalEventListener(modal, 'click', outsideClick);
 
     document.body.appendChild(modal);
   }
@@ -1099,7 +1168,128 @@ class BillingPage {
   }
 
   downloadInvoice(invoiceId) {
-    Utils.showToast(`영수증 ${invoiceId}를 다운로드합니다.`, 'info');
+    if (!this.destroyed && Utils.showToast) {
+      Utils.showToast(`영수증 ${invoiceId}를 다운로드합니다.`, 'info');
+    }
+  }
+  
+  // 메모리 관리 헬퍼 메서드들
+  addEventListenerSafe(element, event, handler) {
+    if (!element || this.destroyed) return;
+    
+    const wrappedHandler = (...args) => {
+      if (!this.destroyed) {
+        try {
+          handler(...args);
+        } catch (error) {
+          console.error('이벤트 핸들러 오류:', error);
+        }
+      }
+    };
+    
+    element.addEventListener(event, wrappedHandler);
+    
+    if (!this.eventListeners.has(element)) {
+      this.eventListeners.set(element, []);
+    }
+    this.eventListeners.get(element).push({ event, handler: wrappedHandler });
+  }
+  
+  addModalEventListener(element, event, handler) {
+    if (!element || this.destroyed) return;
+    
+    const wrappedHandler = (...args) => {
+      if (!this.destroyed) {
+        try {
+          handler(...args);
+        } catch (error) {
+          console.error('모달 이벤트 핸들러 오류:', error);
+        }
+      }
+    };
+    
+    element.addEventListener(event, wrappedHandler);
+    
+    if (!this.modalEventListeners.has(element)) {
+      this.modalEventListeners.set(element, []);
+    }
+    this.modalEventListeners.get(element).push({ event, handler: wrappedHandler });
+  }
+  
+  closeModalSafe(modal) {
+    if (!modal || !modal.parentNode || this.destroyed) return;
+    
+    try {
+      // 모달 이벤트 리스너 정리
+      this.modalEventListeners.forEach((listeners, element) => {
+        listeners.forEach(({ event, handler }) => {
+          element.removeEventListener(event, handler);
+        });
+      });
+      this.modalEventListeners.clear();
+      
+      // 활성 모달에서 제거
+      this.activeModals.delete(modal);
+      
+      // DOM에서 제거
+      modal.parentNode.removeChild(modal);
+      
+      // body 스크롤 복원
+      if (this.activeModals.size === 0) {
+        document.body.style.overflow = '';
+      }
+    } catch (error) {
+      console.error('모달 닫기 오류:', error);
+    }
+  }
+  
+  clearTimeout(name) {
+    if (this[name + 'Timeout']) {
+      clearTimeout(this[name + 'Timeout']);
+      this.timers.delete(this[name + 'Timeout']);
+      this[name + 'Timeout'] = null;
+    }
+  }
+  
+  clearInterval(name) {
+    if (this[name + 'Interval']) {
+      clearInterval(this[name + 'Interval']);
+      this.timers.delete(this[name + 'Interval']);
+      this[name + 'Interval'] = null;
+    }
+  }
+  
+  destroy() {
+    if (this.destroyed) return;
+    
+    console.log('BillingPage 메모리 정리 시작...');
+    this.destroyed = true;
+    
+    // 타이머 정리
+    this.timers.forEach(timer => {
+      clearTimeout(timer);
+      clearInterval(timer);
+    });
+    this.timers.clear();
+    
+    // 이벤트 리스너 정리
+    this.eventListeners.forEach((listeners, element) => {
+      listeners.forEach(({ event, handler }) => {
+        element.removeEventListener(event, handler);
+      });
+    });
+    this.eventListeners.clear();
+    
+    // 모달 정리
+    this.activeModals.forEach(modal => {
+      this.closeModalSafe(modal);
+    });
+    this.activeModals.clear();
+    
+    // 캐시 정리
+    this.billingCache.clear();
+    
+    console.log('BillingPage 메모리 정리 완료');
   }
 }
 

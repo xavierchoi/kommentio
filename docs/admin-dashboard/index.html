@@ -4,10 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kommentio 관리 대시보드</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- External Dependencies with Fallback -->
+    <script>
+        // TailwindCSS fallback
+        function loadTailwind() {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.tailwindcss.com';
+            script.onerror = function() {
+                console.warn('TailwindCSS CDN failed to load. Using fallback styles.');
+                document.documentElement.classList.add('no-tailwind');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Chart.js fallback
+        function loadChartJS() {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            script.onerror = function() {
+                console.warn('Chart.js CDN failed to load. Charts will be disabled.');
+                window.Chart = null;
+                window.chartJSAvailable = false;
+            };
+            script.onload = function() {
+                window.chartJSAvailable = true;
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Font Awesome fallback
+        function loadFontAwesome() {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+            link.onerror = function() {
+                console.warn('Font Awesome CDN failed to load. Using fallback icons.');
+                document.documentElement.classList.add('no-fontawesome');
+            };
+            document.head.appendChild(link);
+        }
+        
+        // Load all dependencies
+        loadTailwind();
+        loadChartJS();
+        loadFontAwesome();
+    </script>
+    
     <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div id="app">

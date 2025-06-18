@@ -10,6 +10,9 @@ class CommentsPage {
     this.currentPage = 1;
     this.itemsPerPage = 20;
     this.searchQuery = '';
+    this.eventListeners = new Map();
+    this.destroyed = false;
+    this.searchTimeout = null;
   }
 
   async render() {
@@ -891,6 +894,49 @@ class CommentsPage {
       '다시 시도',
       () => this.render()
     );
+  }
+
+  // 이벤트 리스너 추적 관리
+  addEventListenerWithTracking(element, eventType, handler, options = {}) {
+    element.addEventListener(eventType, handler, options);
+    const key = `${element.constructor.name}-${eventType}-${Date.now()}`;
+    this.eventListeners.set(key, { element, eventType, handler, options });
+    return key;
+  }
+
+  // 메모리에 효율적인 검색 디바운스
+  debouncedSearch(query) {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    
+    this.searchTimeout = setTimeout(() => {
+      if (!this.destroyed) {
+        this.searchQuery = query;
+        this.currentPage = 1;
+        this.filterComments();
+        this.refreshCommentsTable();
+      }
+    }, 300);
+  }
+
+  // 메모리 누수 방지를 위한 정리 메서드
+  destroy() {
+    this.destroyed = true;
+    
+    // 검색 타임아웃 정리
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
+    }
+    
+    // 이벤트 리스너 제거
+    for (const [key, listener] of this.eventListeners) {
+      listener.element.removeEventListener(listener.eventType, listener.handler, listener.options);
+    }
+    this.eventListeners.clear();
+    
+    console.log('CommentsPage destroyed and cleaned up');
   }
 }
 

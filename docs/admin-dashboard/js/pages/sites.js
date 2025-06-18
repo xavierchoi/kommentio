@@ -5,6 +5,9 @@ class SitesPage {
     this.sites = [];
     this.filteredSites = [];
     this.searchQuery = '';
+    this.eventListeners = new Map();
+    this.destroyed = false;
+    this.searchTimeout = null;
   }
 
   async render() {
@@ -221,17 +224,27 @@ class SitesPage {
     section.appendChild(header);
     section.appendChild(body);
     
-    // 이벤트 리스너 설정
+    // 이벤트 리스너 설정 (추적 가능)
     setTimeout(() => {
       const searchInput = Utils.$('#search-sites');
       const statusFilter = Utils.$('#status-filter');
       
       if (searchInput) {
-        Utils.on(searchInput, 'input', (e) => this.handleSearch(e.target.value, statusFilter.value));
+        const searchHandler = (e) => {
+          if (!this.destroyed) {
+            this.debouncedSearch(e.target.value, statusFilter.value);
+          }
+        };
+        this.addEventListenerWithTracking(searchInput, 'input', searchHandler);
       }
       
       if (statusFilter) {
-        Utils.on(statusFilter, 'change', (e) => this.handleSearch(searchInput.value, e.target.value));
+        const filterHandler = (e) => {
+          if (!this.destroyed) {
+            this.handleSearch(searchInput.value, e.target.value);
+          }
+        };
+        this.addEventListenerWithTracking(statusFilter, 'change', filterHandler);
       }
     }, 100);
     
@@ -388,19 +401,47 @@ class SitesPage {
     return card;
   }
 
+  // 성능 최적화된 검색 처리
+  debouncedSearch(query, statusFilter = 'all') {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    
+    this.searchTimeout = setTimeout(() => {
+      if (!this.destroyed) {
+        this.handleSearch(query, statusFilter);
+      }
+    }, 300);
+  }
+
   handleSearch(query, statusFilter = 'all') {
+    if (this.destroyed) return;
+    
     this.searchQuery = query.toLowerCase();
+    
+    // 성능 최적화된 필터링
     this.filteredSites = this.sites.filter(site => {
-      const matchesSearch = site.name.toLowerCase().includes(this.searchQuery) ||
-                           site.domain.toLowerCase().includes(this.searchQuery) ||
-                           site.description.toLowerCase().includes(this.searchQuery);
+      // 캐시된 lowercase 값 사용
+      const siteNameLower = site.nameLower || (site.nameLower = site.name.toLowerCase());
+      const siteDomainLower = site.domainLower || (site.domainLower = site.domain.toLowerCase());
+      const siteDescLower = site.descLower || (site.descLower = site.description.toLowerCase());
+      
+      const matchesSearch = !this.searchQuery || 
+                           siteNameLower.includes(this.searchQuery) ||
+                           siteDomainLower.includes(this.searchQuery) ||
+                           siteDescLower.includes(this.searchQuery);
       
       const matchesStatus = statusFilter === 'all' || site.status === statusFilter;
       
       return matchesSearch && matchesStatus;
     });
     
-    // 사이트 그리드 다시 렌더링
+    // 부분 업데이트로 성능 개선
+    this.updateSitesGrid();
+  }
+  
+  // 효율적인 그리드 업데이트
+  updateSitesGrid() {
     const existingGrid = Utils.$('.grid');
     if (existingGrid) {
       const newGrid = this.createSitesGrid();
@@ -768,6 +809,40 @@ class SitesPage {
       '다시 시도',
       () => this.render()
     );
+  }
+
+  // 이벤트 리스너 추적 관리
+  addEventListenerWithTracking(element, eventType, handler, options = {}) {
+    element.addEventListener(eventType, handler, options);
+    const key = `${element.constructor.name}-${eventType}-${Date.now()}`;
+    this.eventListeners.set(key, { element, eventType, handler, options });
+    return key;
+  }
+
+  // 메모리 누수 방지를 위한 정리 메서드
+  destroy() {
+    this.destroyed = true;
+    
+    // 검색 타임아웃 정리
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
+    }
+    
+    // 이벤트 리스너 제거
+    for (const [key, listener] of this.eventListeners) {
+      listener.element.removeEventListener(listener.eventType, listener.handler, listener.options);
+    }
+    this.eventListeners.clear();
+    
+    // 캐시된 데이터 정리
+    this.sites.forEach(site => {
+      delete site.nameLower;
+      delete site.domainLower;
+      delete site.descLower;
+    });
+    
+    console.log('SitesPage destroyed and cleaned up');
   }
 }
 

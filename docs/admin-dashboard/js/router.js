@@ -1,10 +1,11 @@
 // Kommentio Admin Dashboard - Router
 
 class Router {
-  constructor() {
+  constructor(config = {}) {
     this.routes = new Map();
     this.currentPage = 'dashboard';
     this.pages = new Map();
+    this.config = config;
     
     this.initializePages();
     this.setupEventListeners();
@@ -145,7 +146,7 @@ class Router {
     }
 
     // 모바일/태블릿 환경에서만 사이드바 자동 닫기
-    if (window.innerWidth > 1024) {
+    if (window.innerWidth > (this.config?.breakpoints?.tablet || 1024)) {
       return; // 데스크톱에서는 사이드바 상태 유지
     }
 

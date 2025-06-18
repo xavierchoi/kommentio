@@ -11,6 +11,10 @@ class UsersPage {
     this.sortOrder = 'desc';
     this.currentPage = 1;
     this.itemsPerPage = 20;
+    this.eventListeners = new Map();
+    this.destroyed = false;
+    this.searchTimeout = null;
+    this.mockUsers = null; // 캐시된 Mock 데이터
   }
 
   async render() {
@@ -62,10 +66,13 @@ class UsersPage {
     }
   }
 
-  async loadUsers() {
-    try {
-      // Mock 사용자 데이터 생성
-      this.users = [
+  generateMockUsers() {
+    if (this.mockUsers) {
+      return this.mockUsers; // 캐시된 데이터 반환
+    }
+    
+    // Mock 데이터 생성 (한 번만)
+    this.mockUsers = [
         {
           id: 1,
           name: '김철수',
@@ -157,7 +164,14 @@ class UsersPage {
           total_likes_received: 89
         }
       ];
+      
+    return this.mockUsers;
+  }
 
+  async loadUsers() {
+    try {
+      // Mock 데이터 로드 (캐시 사용)
+      this.users = this.generateMockUsers();
       this.applyFiltersAndSort();
       
     } catch (error) {
@@ -168,43 +182,50 @@ class UsersPage {
   }
 
   applyFiltersAndSort() {
+    if (this.destroyed) return;
+    
     let filtered = [...this.users];
 
-    // 사이트 필터
+    // 사이트 필터 (성능 최적화)
     if (this.currentSite !== 'all') {
       const site = this.sites.find(s => s.id == this.currentSite);
       if (site) {
+        const siteName = site.name;
         filtered = filtered.filter(user => 
-          user.sites_participated.includes(site.name)
+          user.sites_participated.includes(siteName)
         );
       }
     }
 
-    // 검색 필터
+    // 검색 필터 (성능 최적화)
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(user =>
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query)
-      );
+      filtered = filtered.filter(user => {
+        const nameMatch = user.name.toLowerCase().includes(query);
+        const emailMatch = user.email.toLowerCase().includes(query);
+        return nameMatch || emailMatch;
+      });
     }
 
-    // 정렬
-    filtered.sort((a, b) => {
-      let aValue = a[this.sortBy];
-      let bValue = b[this.sortBy];
+    // 정렬 (성능 최적화)
+    if (filtered.length > 1) {
+      const sortBy = this.sortBy;
+      const isDesc = this.sortOrder === 'desc';
+      const isDateSort = sortBy === 'last_comment';
+      
+      filtered.sort((a, b) => {
+        let aValue = a[sortBy];
+        let bValue = b[sortBy];
 
-      if (this.sortBy === 'last_comment') {
-        aValue = new Date(aValue);
-        bValue = new Date(bValue);
-      }
+        if (isDateSort) {
+          aValue = new Date(aValue).getTime();
+          bValue = new Date(bValue).getTime();
+        }
 
-      if (this.sortOrder === 'desc') {
-        return bValue > aValue ? 1 : bValue < aValue ? -1 : 0;
-      } else {
-        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-      }
-    });
+        const comparison = aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+        return isDesc ? -comparison : comparison;
+      });
+    }
 
     this.filteredUsers = filtered;
     this.applyPagination();
@@ -250,13 +271,16 @@ class UsersPage {
       </div>
     `;
     
-    // 새로고침 버튼 이벤트
+    // 새로고침 버튼 이벤트 (추적 가능)
     const refreshBtn = Utils.$('#refresh-users-btn', header);
     if (refreshBtn) {
-      Utils.on(refreshBtn, 'click', () => {
-        this.loadUsers().then(() => this.refreshUsersTable());
-        Utils.showToast('사용자 목록을 새로고침했습니다.', 'success');
-      });
+      const refreshHandler = () => {
+        if (!this.destroyed) {
+          this.loadUsers().then(() => this.refreshUsersTable());
+          Utils.showToast('사용자 목록을 새로고침했습니다.', 'success');
+        }
+      };
+      this.addEventListenerWithTracking(refreshBtn, 'click', refreshHandler);
     }
     
     return header;
@@ -1027,6 +1051,52 @@ class UsersPage {
       '다시 시도',
       () => this.render()
     );
+  }
+
+  // 이벤트 리스너 추적 관리
+  addEventListenerWithTracking(element, eventType, handler, options = {}) {
+    element.addEventListener(eventType, handler, options);
+    const key = `${element.constructor.name}-${eventType}-${Date.now()}`;
+    this.eventListeners.set(key, { element, eventType, handler, options });
+    return key;
+  }
+
+  // 메모리에 효율적인 검색 디바운스
+  debouncedSearch(query) {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    
+    this.searchTimeout = setTimeout(() => {
+      if (!this.destroyed) {
+        this.searchQuery = query;
+        this.currentPage = 1;
+        this.applyFiltersAndSort();
+        this.refreshUsersTable();
+      }
+    }, 300);
+  }
+
+  // 메모리 누수 방지를 위한 정리 메서드
+  destroy() {
+    this.destroyed = true;
+    
+    // 검색 타임아웃 정리
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
+    }
+    
+    // 이벤트 리스너 제거
+    for (const [key, listener] of this.eventListeners) {
+      listener.element.removeEventListener(listener.eventType, listener.handler, listener.options);
+    }
+    this.eventListeners.clear();
+    
+    // Mock 데이터 캐시 지우기 (옵션)
+    this.mockUsers = null;
+    
+    console.log('UsersPage destroyed and cleaned up');
   }
 }
 

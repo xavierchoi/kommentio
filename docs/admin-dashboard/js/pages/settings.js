@@ -4,6 +4,21 @@ class SettingsPage {
   constructor() {
     this.settings = {};
     this.isDirty = false;
+    
+    // 메모리 누수 방지 시스템
+    this.eventListeners = new Map();
+    this.destroyed = false;
+    this.timers = new Set();
+    
+    // 설정 관리 최적화
+    this.settingsCache = new Map();
+    this.lastSaveTime = 0;
+    this.saveTimeout = null;
+    this.validationTimeout = null;
+    
+    // 라우터 연동 안전성
+    this.routerCallbacks = new Set();
+    this.routerConnectionTimeout = null;
   }
 
   async render() {
@@ -800,6 +815,366 @@ class SettingsPage {
       console.error('설정 내보내기 실패:', error);
       Utils.showNotification('설정 내보내기에 실패했습니다.', 'error');
     }
+  }
+
+  // 메모리 누수 방지 및 정리
+  destroy() {
+    if (this.destroyed) return;
+    
+    console.log('SettingsPage 리소스 정리 시작...');
+    
+    // 타이머 정리
+    this.timers.forEach(timerId => {
+      clearTimeout(timerId);
+      clearInterval(timerId);
+    });
+    this.timers.clear();
+    
+    // 설정 관련 타이머 정리
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+      this.saveTimeout = null;
+    }
+    if (this.validationTimeout) {
+      clearTimeout(this.validationTimeout);
+      this.validationTimeout = null;
+    }
+    if (this.routerConnectionTimeout) {
+      clearTimeout(this.routerConnectionTimeout);
+      this.routerConnectionTimeout = null;
+    }
+    
+    // 이벤트 리스너 정리
+    this.eventListeners.forEach((listeners, element) => {
+      listeners.forEach(({ event, handler }) => {
+        try {
+          element.removeEventListener(event, handler);
+        } catch (error) {
+          console.warn('이벤트 리스너 제거 실패:', error);
+        }
+      });
+    });
+    this.eventListeners.clear();
+    
+    // 라우터 콜백 정리
+    this.routerCallbacks.clear();
+    
+    // 캐시 정리
+    this.settingsCache.clear();
+    
+    // 상태 초기화
+    this.settings = {};
+    this.isDirty = false;
+    
+    this.destroyed = true;
+    console.log('SettingsPage 리소스 정리 완료');
+  }
+
+  // 안전한 이벤트 리스너 추가
+  addEventListenerSafe(element, event, handler) {
+    if (!element || this.destroyed) return;
+    
+    element.addEventListener(event, handler);
+    
+    if (!this.eventListeners.has(element)) {
+      this.eventListeners.set(element, []);
+    }
+    this.eventListeners.get(element).push({ event, handler });
+  }
+
+  // 안전한 타이머 설정
+  setTimeoutSafe(callback, delay) {
+    if (this.destroyed) return null;
+    
+    const timerId = setTimeout(() => {
+      if (!this.destroyed) {
+        callback();
+      }
+      this.timers.delete(timerId);
+    }, delay);
+    
+    this.timers.add(timerId);
+    return timerId;
+  }
+
+  // 디바운싱된 설정 저장
+  debouncedSave(delay = 1000) {
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+    }
+    
+    this.saveTimeout = setTimeout(() => {
+      if (!this.destroyed) {
+        this.saveAllSettings();
+      }
+    }, delay);
+  }
+
+  // 설정 검증 (디바운싱)
+  debouncedValidation(settingKey, value, delay = 300) {
+    if (this.validationTimeout) {
+      clearTimeout(this.validationTimeout);
+    }
+    
+    this.validationTimeout = setTimeout(() => {
+      if (!this.destroyed) {
+        this.validateSetting(settingKey, value);
+      }
+    }, delay);
+  }
+
+  // 개별 설정 검증
+  validateSetting(key, value) {
+    try {
+      let isValid = true;
+      let errorMessage = '';
+      
+      switch (key) {
+        case 'adminEmail':
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          isValid = emailRegex.test(value);
+          errorMessage = isValid ? '' : '올바른 이메일 형식이 아닙니다.';
+          break;
+          
+        case 'maxCommentLength':
+          const length = parseInt(value);
+          isValid = length >= 100 && length <= 10000;
+          errorMessage = isValid ? '' : '댓글 길이는 100-10000자 사이여야 합니다.';
+          break;
+          
+        case 'commentInterval':
+          const interval = parseInt(value);
+          isValid = interval >= 5 && interval <= 300;
+          errorMessage = isValid ? '' : '댓글 간격은 5-300초 사이여야 합니다.';
+          break;
+          
+        case 'spamThreshold':
+          const threshold = parseFloat(value);
+          isValid = threshold >= 0 && threshold <= 1;
+          errorMessage = isValid ? '' : '스팸 임계값은 0-1 사이여야 합니다.';
+          break;
+          
+        default:
+          // 기본적으로 유효한 것으로 처리
+          break;
+      }
+      
+      this.updateValidationUI(key, isValid, errorMessage);
+      return isValid;
+      
+    } catch (error) {
+      console.warn(`설정 검증 실패 (${key}):`, error);
+      this.updateValidationUI(key, false, '검증 중 오류가 발생했습니다.');
+      return false;
+    }
+  }
+
+  // 검증 UI 업데이트
+  updateValidationUI(key, isValid, message) {
+    const field = Utils.$(`#${key}`);
+    if (!field) return;
+    
+    // 기존 검증 메시지 제거
+    const existingMessage = field.parentNode.querySelector('.validation-message');
+    if (existingMessage) {
+      existingMessage.remove();
+    }
+    
+    // 필드 스타일 업데이트
+    field.style.borderColor = isValid ? '' : '#ef4444';
+    field.style.backgroundColor = isValid ? '' : '#fef2f2';
+    
+    // 오류 메시지 표시
+    if (!isValid && message) {
+      const messageElement = document.createElement('div');
+      messageElement.className = 'validation-message';
+      messageElement.style.cssText = `
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 4px;
+      `;
+      messageElement.textContent = message;
+      field.parentNode.appendChild(messageElement);
+    }
+  }
+
+  // 라우터 연동 최적화
+  toggleSidebarAutoCloseOptimized(enabled) {
+    try {
+      // 라우터 연결 상태 확인 (타임아웃)
+      this.routerConnectionTimeout = setTimeout(() => {
+        if (!window.router) {
+          console.warn('라우터 연결 타임아웃');
+          Utils.showToast('라우터에 연결할 수 없습니다. 페이지를 새로고침하세요.', 'warning');
+          return;
+        }
+      }, 1000);
+      
+      // 라우터 존재 여부 확인
+      if (window.router && typeof window.router.toggleAutoCloseSidebar === 'function') {
+        // 콜백 등록 (중복 방지)
+        const callback = () => {
+          this.onRouterSettingChanged('sidebarAutoClose', enabled);
+        };
+        
+        if (!this.routerCallbacks.has(callback)) {
+          this.routerCallbacks.add(callback);
+        }
+        
+        // 라우터 설정 업데이트
+        window.router.toggleAutoCloseSidebar(enabled);
+        
+        // 즉시 피드백
+        const message = enabled ? 
+          '모바일 사이드바 자동 닫기가 활성화되었습니다.' : 
+          '모바일 사이드바 자동 닫기가 비활성화되었습니다.';
+        
+        Utils.showToast(message, enabled ? 'success' : 'info');
+        
+        // Dirty 상태 업데이트
+        this.isDirty = true;
+        
+        console.log(`라우터 설정 변경 성공: sidebarAutoClose=${enabled}`);
+        
+        // 타임아웃 클리어
+        if (this.routerConnectionTimeout) {
+          clearTimeout(this.routerConnectionTimeout);
+          this.routerConnectionTimeout = null;
+        }
+        
+      } else {
+        throw new Error('라우터 인스턴스 또는 메소드를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('라우터 설정 변경 실패:', error);
+      Utils.showToast('설정 변경 중 오류가 발생했습니다.', 'error');
+      
+      // 실패 시 체크박스 되돌리기
+      const checkbox = Utils.$('#enableSidebarAutoClose');
+      if (checkbox) {
+        checkbox.checked = !enabled;
+      }
+    }
+  }
+
+  // 라우터 설정 변경 콜백
+  onRouterSettingChanged(setting, value) {
+    console.log(`라우터 설정 변경됨: ${setting}=${value}`);
+    
+    // 설정 캐시 업데이트
+    if (!this.settings.advanced) {
+      this.settings.advanced = {};
+    }
+    this.settings.advanced[setting] = value;
+    
+    // 자동 저장 (디바운싱)
+    this.debouncedSave(2000);
+  }
+
+  // 설정 캐싱 시스템
+  getCachedSetting(key) {
+    return this.settingsCache.get(key);
+  }
+
+  setCachedSetting(key, value) {
+    this.settingsCache.set(key, value);
+    
+    // 캐시 크기 제한
+    if (this.settingsCache.size > 100) {
+      const firstKey = this.settingsCache.keys().next().value;
+      this.settingsCache.delete(firstKey);
+    }
+  }
+
+  // 성능 최적화된 설정 수집
+  collectFormDataOptimized() {
+    try {
+      const formData = {};
+      
+      // 설정 섹션별로 병렬 처리
+      const sections = ['general', 'security', 'notifications', 'advanced'];
+      
+      sections.forEach(section => {
+        formData[section] = this.collectSectionData(section);
+      });
+      
+      // 캐시 업데이트
+      Object.keys(formData).forEach(section => {
+        Object.keys(formData[section]).forEach(key => {
+          this.setCachedSetting(`${section}.${key}`, formData[section][key]);
+        });
+      });
+      
+      this.settings = formData;
+      return formData;
+      
+    } catch (error) {
+      console.error('설정 수집 실패:', error);
+      return this.settings;
+    }
+  }
+
+  // 섹션별 데이터 수집
+  collectSectionData(section) {
+    const data = {};
+    
+    try {
+      switch (section) {
+        case 'general':
+          data.siteName = Utils.$('#siteName')?.value || '';
+          data.adminEmail = Utils.$('#adminEmail')?.value || '';
+          data.siteDescription = Utils.$('#siteDescription')?.value || '';
+          data.defaultLanguage = Utils.$('#defaultLanguage')?.value || 'ko';
+          data.timezone = Utils.$('#timezone')?.value || 'Asia/Seoul';
+          data.showCommentCount = Utils.$('#showCommentCount')?.checked || false;
+          data.showTimestamp = Utils.$('#showTimestamp')?.checked || false;
+          data.allowAnonymous = Utils.$('#allowAnonymous')?.checked || false;
+          break;
+          
+        case 'security':
+          data.spamThreshold = parseFloat(Utils.$('#spamThreshold')?.value || '0.7');
+          data.approvalMode = Utils.$('#approvalMode')?.value || 'auto';
+          data.enableSpamFilter = Utils.$('#enableSpamFilter')?.checked || false;
+          data.requireLogin = Utils.$('#requireLogin')?.checked || false;
+          data.enableCaptcha = Utils.$('#enableCaptcha')?.checked || false;
+          data.enableRateLimit = Utils.$('#enableRateLimit')?.checked || false;
+          data.maxCommentLength = parseInt(Utils.$('#maxCommentLength')?.value || '2000');
+          data.commentInterval = parseInt(Utils.$('#commentInterval')?.value || '30');
+          data.blockedWords = Utils.$('#blockedWords')?.value || '';
+          break;
+          
+        case 'notifications':
+          data.emailNewComment = Utils.$('#emailNewComment')?.checked || false;
+          data.emailSpamDetected = Utils.$('#emailSpamDetected')?.checked || false;
+          data.emailSystemUpdate = Utils.$('#emailSystemUpdate')?.checked || false;
+          data.emailWeeklyReport = Utils.$('#emailWeeklyReport')?.checked || false;
+          data.pushNewComment = Utils.$('#pushNewComment')?.checked || false;
+          data.pushSpamAlert = Utils.$('#pushSpamAlert')?.checked || false;
+          data.emailBatchInterval = Utils.$('#emailBatchInterval')?.value || 'immediate';
+          data.maxNotifications = parseInt(Utils.$('#maxNotifications')?.value || '100');
+          break;
+          
+        case 'advanced':
+          data.backupInterval = Utils.$('#backupInterval')?.value || 'daily';
+          data.backupRetention = parseInt(Utils.$('#backupRetention')?.value || '30');
+          data.autoBackup = Utils.$('#autoBackup')?.checked || false;
+          data.enableDebugMode = Utils.$('#enableDebugMode')?.checked || false;
+          data.enableApiLogging = Utils.$('#enableApiLogging')?.checked || false;
+          data.enablePerformanceMonitoring = Utils.$('#enablePerformanceMonitoring')?.checked || false;
+          data.enableSidebarAutoClose = Utils.$('#enableSidebarAutoClose')?.checked !== false;
+          data.logRetention = parseInt(Utils.$('#logRetention')?.value || '90');
+          break;
+      }
+    } catch (error) {
+      console.warn(`${section} 섹션 데이터 수집 실패:`, error);
+    }
+    
+    return data;
+  }
+
+  // 최적화된 toggleSidebarAutoClose (기존 메소드 오버라이드)
+  toggleSidebarAutoClose(enabled) {
+    this.toggleSidebarAutoCloseOptimized(enabled);
   }
 }
 

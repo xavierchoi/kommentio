@@ -9,6 +9,9 @@ class DashboardPage {
       spamBlocked: 0
     };
     this.recentComments = [];
+    this.eventListeners = new Map();
+    this.animationFrameId = null;
+    this.destroyed = false;
   }
 
   async render() {
@@ -219,6 +222,33 @@ class DashboardPage {
     return header;
   }
 
+  // 이벤트 리스너 추적 관리
+  addEventListenerWithTracking(element, eventType, handler, options = {}) {
+    element.addEventListener(eventType, handler, options);
+    const key = `${element.constructor.name}-${eventType}-${Date.now()}`;
+    this.eventListeners.set(key, { element, eventType, handler, options });
+    return key;
+  }
+
+  // 메모리 누수 방지를 위한 정리 메서드
+  destroy() {
+    this.destroyed = true;
+    
+    // 이벤트 리스너 제거
+    for (const [key, listener] of this.eventListeners) {
+      listener.element.removeEventListener(listener.eventType, listener.handler, listener.options);
+    }
+    this.eventListeners.clear();
+    
+    // 애니메이션 프레임 정리
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+    
+    console.log('DashboardPage destroyed and cleaned up');
+  }
+
   createPremiumStatsGrid() {
     const grid = Utils.createElement('div');
     grid.style.cssText = `
@@ -290,16 +320,22 @@ class DashboardPage {
       transform: translateY(0) !important;
     `;
 
-    // 호버 효과
-    card.addEventListener('mouseenter', () => {
-      card.style.transform = 'translateY(-4px) !important';
-      card.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important';
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'translateY(0) !important';
-      card.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important';
-    });
+    // 호버 효과 - 추적 가능한 이벤트 리스너
+    const mouseEnterHandler = () => {
+      if (!this.destroyed) {
+        card.style.transform = 'translateY(-4px) !important';
+        card.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important';
+      }
+    };
+    const mouseLeaveHandler = () => {
+      if (!this.destroyed) {
+        card.style.transform = 'translateY(0) !important';
+        card.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important';
+      }
+    };
+    
+    this.addEventListenerWithTracking(card, 'mouseenter', mouseEnterHandler);
+    this.addEventListenerWithTracking(card, 'mouseleave', mouseLeaveHandler);
 
     // 그라데이션 헤더
     const header = Utils.createElement('div');
